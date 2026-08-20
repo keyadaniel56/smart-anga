@@ -120,7 +120,7 @@ npm run start        # Serves from backend/node on port 3000
 ### Bug Fixes
 
 #### 1. Fix Weather API Response Parsing
-**Priority: High**
+**Priority: High** | **Assignee: Bellah**
 **File:** `frontend/src/services/api.ts`
 
 The `fetchLiveClimate` function returns the full API envelope `{success, coordinates, weather, flood, fetchedAt}` instead of extracting the actual weather data. The frontend then reads `liveWeather.humidity` but the real data is at `liveWeather.weather.humidity`. This causes all live weather displays to show `undefined`.
@@ -128,7 +128,7 @@ The `fetchLiveClimate` function returns the full API envelope `{success, coordin
 **Task:** Transform the Open-Meteo API response into the `LiveWeatherData` interface shape. Map `response.weather.current` fields to the flat `LiveWeatherData` structure and attach `response.flood` data to `floodForecast`.
 
 #### 2. Persist Incident Creation to Backend
-**Priority: Medium**
+**Priority: Medium** | **Assignee: Tedy**
 **File:** `frontend/src/App.tsx`
 
 `handleCreateIncident` adds incidents to local state only. They disappear on refresh.
@@ -136,7 +136,7 @@ The `fetchLiveClimate` function returns the full API envelope `{success, coordin
 **Task:** Call the `createIncident` API function (already in `api.ts`) from `handleCreateIncident` so new incidents are persisted to the backend. After the POST succeeds, update local state with the server-returned incident (which includes the proper ID and timestamp).
 
 #### 3. Fix SME Profile Toggle Persistence
-**Priority: Low**
+**Priority: Low** | **Assignee: Bellah**
 **File:** `frontend/src/components/SMEPreparednessModule.tsx`
 
 The `toggleMeasure` function updates local React state only. There is no backend endpoint to persist SME facility changes.
@@ -148,7 +148,7 @@ The `toggleMeasure` function updates local React state only. There is no backend
 ### Features
 
 #### 4. Implement Scenario Simulator Output Panel
-**Priority: High**
+**Priority: High** | **Assignee: Bellah**
 **File:** `frontend/src/components/ScenarioSimulator.tsx`
 
 The simulator has 4 input sliders and 3 presets but renders no output. When the user adjusts parameters, nothing happens.
@@ -162,7 +162,7 @@ The simulator has 4 input sliders and 3 presets but renders no output. When the 
 - A "Run Simulation" button that computes impacts client-side based on slider values
 
 #### 5. Add Real-Time Data Polling
-**Priority: High**
+**Priority: High** | **Assignee: Tedy**
 **File:** `frontend/src/App.tsx`
 
 All data is fetched once on mount. The UI labels say "REAL-TIME TELEMETRY" and "Polling 10s" but there is no actual polling mechanism.
@@ -174,7 +174,7 @@ All data is fetched once on mount. The UI labels say "REAL-TIME TELEMETRY" and "
 - Consider adding a visual indicator when new data arrives
 
 #### 6. Add Incident Detail View
-**Priority: High**
+**Priority: High** | **Assignee: Tedy**
 **File:** `frontend/src/components/EarlyWarningModule.tsx`
 
 The Incident Command Board shows incidents but the detail view is minimal. Users cannot see the full action audit trail or edit individual actions.
@@ -185,7 +185,7 @@ The Incident Command Board shows incidents but the detail view is minimal. Users
 - Show the incident lifecycle (active -> in_progress -> mitigated -> resolved) as a visual timeline
 
 #### 7. Connect Overview Dashboard to Live State
-**Priority: Medium**
+**Priority: Medium** | **Assignee: Bellah**
 **File:** `frontend/src/App.tsx`
 
 The Overview tab has hardcoded "Early Warning Feed" items and a static "Historical Trends" bar chart. These should reflect actual app state.
@@ -196,7 +196,7 @@ The Overview tab has hardcoded "Early Warning Feed" items and a static "Historic
 - Make the "Data Integration" panel reflect actual API connection status
 
 #### 8. Improve Sensor Telemetry with Live Updates
-**Priority: Medium**
+**Priority: Medium** | **Assignee: Tedy**
 **File:** `frontend/src/components/LiveSensorFeed.tsx`
 
 The sensor feed shows static mock data. Manual gauge logging works locally but has no backend persistence.
@@ -209,7 +209,7 @@ The sensor feed shows static mock data. Manual gauge logging works locally but h
 ### UI/UX
 
 #### 9. Add Mobile Responsive Improvements
-**Priority: Medium**
+**Priority: Medium** | **Assignee: Bellah**
 **Files:** All components
 
 Several components have layout issues on small screens:
@@ -223,7 +223,7 @@ Several components have layout issues on small screens:
 - Improve tab navigation UX on mobile (horizontal scroll with snap)
 
 #### 10. Add Loading States and Error Boundaries
-**Priority: Medium**
+**Priority: Medium** | **Assignee: Tedy**
 **Files:** `App.tsx`, `api.ts`, all components
 
 Currently, failed API calls log to console but the UI shows no feedback. Users see stale mock data with no indication that live data failed to load.
@@ -237,7 +237,7 @@ Currently, failed API calls log to console but the UI shows no feedback. Users s
 ### Testing
 
 #### 11. Write Component Tests
-**Priority: Low**
+**Priority: Low** | **Assignee: Tedy**
 **Files:** All components
 
 There are zero tests in the project.
