@@ -41,43 +41,43 @@ const (
 )
 
 type Incident struct {
-	ID                   string          `json:"id"`
-	Title                string          `json:"title"`
-	HazardType           HazardType      `json:"hazardType"`
-	Severity             Severity        `json:"severity"`
-	Location             string          `json:"location"`
-	Coordinates          [2]float64      `json:"coordinates"`
-	ReportedAt           time.Time       `json:"reportedAt"`
-	Status               IncidentStatus  `json:"status"`
-	Department           Department      `json:"department"`
-	AssignedTo           string          `json:"assignedTo"`
-	ActionsTaken         []string        `json:"actionsTaken"`
-	AutomatedDispatchSent bool          `json:"automatedDispatchSent"`
+	ID                    string         `json:"id"`
+	Title                 string         `json:"title"`
+	HazardType            HazardType     `json:"hazardType"`
+	Severity              Severity       `json:"severity"`
+	Location              string         `json:"location"`
+	Coordinates           [2]float64     `json:"coordinates"`
+	ReportedAt            time.Time      `json:"reportedAt"`
+	Status                IncidentStatus `json:"status"`
+	Department            Department     `json:"department"`
+	AssignedTo            string         `json:"assignedTo"`
+	ActionsTaken          []string       `json:"actionsTaken"`
+	AutomatedDispatchSent bool           `json:"automatedDispatchSent"`
 }
 
 type CreateIncidentRequest struct {
-	Title        string      `json:"title"`
-	HazardType   HazardType  `json:"hazardType"`
-	Severity     Severity    `json:"severity"`
-	Location     string      `json:"location"`
-	Coordinates  [2]float64  `json:"coordinates"`
-	Department   Department  `json:"department"`
-	AssignedTo   string      `json:"assignedTo"`
-	ActionsTaken []string    `json:"actionsTaken"`
+	Title        string     `json:"title"`
+	HazardType   HazardType `json:"hazardType"`
+	Severity     Severity   `json:"severity"`
+	Location     string     `json:"location"`
+	Coordinates  [2]float64 `json:"coordinates"`
+	Department   Department `json:"department"`
+	AssignedTo   string     `json:"assignedTo"`
+	ActionsTaken []string   `json:"actionsTaken"`
 }
 
 type UpdateIncidentRequest struct {
-	Status     *IncidentStatus `json:"status"`
-	ActionsTaken []string      `json:"actionsTaken"`
-	AssignedTo *string          `json:"assignedTo"`
+	Status       *IncidentStatus `json:"status"`
+	ActionsTaken []string        `json:"actionsTaken"`
+	AssignedTo   *string         `json:"assignedTo"`
 }
 
 type ClimateResponse struct {
-	Success     bool             `json:"success"`
-	Coordinates Coordinates      `json:"coordinates"`
-	Weather     interface{}      `json:"weather"`
-	Flood       interface{}      `json:"flood"`
-	FetchedAt   string           `json:"fetchedAt"`
+	Success     bool        `json:"success"`
+	Coordinates Coordinates `json:"coordinates"`
+	Weather     interface{} `json:"weather"`
+	Flood       interface{} `json:"flood"`
+	FetchedAt   string      `json:"fetchedAt"`
 }
 
 type Coordinates struct {
@@ -86,11 +86,11 @@ type Coordinates struct {
 }
 
 type RiskAssessmentRequest struct {
-	LocationName    string                 `json:"locationName"`
-	Coordinates     [2]float64             `json:"coordinates"`
-	LiveConditions  map[string]interface{} `json:"liveConditions"`
-	SectorFocus     string                 `json:"sectorFocus"`
-	Timeframe       string                 `json:"timeframe"`
+	LocationName   string                 `json:"locationName"`
+	Coordinates    [2]float64             `json:"coordinates"`
+	LiveConditions map[string]interface{} `json:"liveConditions"`
+	SectorFocus    string                 `json:"sectorFocus"`
+	Timeframe      string                 `json:"timeframe"`
 }
 
 type ScenarioSimulateRequest struct {
@@ -103,11 +103,11 @@ type ScenarioSimulateRequest struct {
 }
 
 type ActionPlanRequest struct {
-	BusinessName   string                 `json:"businessName"`
-	Industry       string                 `json:"industry"`
-	EmployeeCount  string                 `json:"employeeCount"`
-	Location       string                 `json:"location"`
-	PrimaryThreats []string               `json:"primaryThreats"`
+	BusinessName    string                 `json:"businessName"`
+	Industry        string                 `json:"industry"`
+	EmployeeCount   string                 `json:"employeeCount"`
+	Location        string                 `json:"location"`
+	PrimaryThreats  []string               `json:"primaryThreats"`
 	CurrentMeasures map[string]interface{} `json:"currentMeasures"`
 }
 
@@ -117,20 +117,39 @@ type ChatMessage struct {
 }
 
 type ChatAssistantRequest struct {
-	Messages []ChatMessage         `json:"messages"`
+	Messages []ChatMessage          `json:"messages"`
 	Context  map[string]interface{} `json:"context"`
 }
 
 type ReportRequest struct {
-	Location     map[string]string   `json:"location"`
-	Hazards      map[string]interface{} `json:"hazards"`
-	Sensors      []interface{}       `json:"sensors"`
-	SMEProfiles  []interface{}       `json:"smeProfiles"`
-	Incidents    []interface{}       `json:"incidents"`
+	Location    map[string]string      `json:"location"`
+	Hazards     map[string]interface{} `json:"hazards"`
+	Sensors     []interface{}          `json:"sensors"`
+	SMEProfiles []interface{}          `json:"smeProfiles"`
+	Incidents   []interface{}          `json:"incidents"`
 }
 
 type APIResponse struct {
 	Success bool        `json:"success"`
 	Data    interface{} `json:"data,omitempty"`
 	Error   string      `json:"error,omitempty"`
+}
+
+type User struct {
+	ID           int       `json:"id"`
+	Username     string    `json:"username"`
+	PasswordHash string    `json:"-"`    // Hides password hash when serialized to JSON
+	Role         string    `json:"role"` // 'admin', 'operator', 'viewer'
+	CreatedAt    time.Time `json:"createdAt"`
+}
+
+type RegisterRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Role     string `json:"role"`
+}
+
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }

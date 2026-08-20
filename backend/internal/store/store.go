@@ -1,39 +1,83 @@
 package store
 
 import (
+	"database/sql"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"math/rand"
-	"sync"
 	"time"
 
 	"github.com/anga/backend/internal/models"
+	"github.com/jmoiron/sqlx"
 )
 
 type Store struct {
-	mu        sync.RWMutex
-	incidents []models.Incident
+	db    *sqlx.DB
+	users []models.User
 }
 
-func New() *Store {
-	s := &Store{}
-	s.seedIncidents()
+func New(db *sqlx.DB) *Store {
+	s := &Store{db: db}
+	s.runMigrations()
+	s.seedDefaultIncidents()
 	return s
 }
 
-func (s *Store) seedIncidents() {
+// runMigrations automatically runs our schema file on startup
+func (s *Store) runMigrations() {
+	schema := `
+	CREATE TABLE IF NOT EXISTS incidents (
+		id VARCHAR(10) PRIMARY KEY,
+		title TEXT NOT NULL,
+		hazard_type VARCHAR(20) NOT NULL,
+		severity VARCHAR(20) NOT NULL,
+		location TEXT NOT NULL,
+		coordinates JSONB NOT NULL,
+		reported_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+		status VARCHAR(20) NOT NULL DEFAULT 'active',
+		department VARCHAR(50) NOT NULL,
+		assigned_to TEXT NOT NULL,
+		actions_taken JSONB DEFAULT '[]',
+		automated_dispatch_sent BOOLEAN DEFAULT true,
+		created_at TIMESTAMPTZ DEFAULT NOW(),
+		updated_at TIMESTAMPTZ DEFAULT NOW()
+	);
+
+	CREATE INDEX IF NOT EXISTS idx_incidents_hazard_type ON incidents(hazard_type);
+	CREATE INDEX IF NOT EXISTS idx_incidents_severity ON incidents(severity);
+	CREATE INDEX IF NOT EXISTS idx_incidents_status ON incidents(status);
+	CREATE INDEX IF NOT EXISTS idx_incidents_reported_at ON incidents(reported_at);
+	`
+	_, err := s.db.Exec(schema)
+	if err != nil {
+		log.Fatalf("Failed to run database migrations: %v", err)
+	}
+	log.Println("Database migrations checked/applied successfully.")
+}
+
+// seedDefaultIncidents populates initial sample data if table is empty
+func (s *Store) seedDefaultIncidents() {
+	var count int
+	err := s.db.Get(&count, "SELECT COUNT(*) FROM incidents")
+	if err != nil || count > 0 {
+		return
+	}
+
 	now := time.Now()
-	s.incidents = []models.Incident{
+	initials := []models.Incident{
 		{
-			ID:         "INC-8491",
-			Title:      "River Basalt Stage 3 Flash Inundation Warning",
-			HazardType: models.HazardFlood,
-			Severity:   models.SeverityCritical,
-			Location:   "Lower Valley District & Industrial Park",
+			ID:          "INC-8491",
+			Title:       "River Basalt Stage 3 Flash Inundation Warning",
+			HazardType:  models.HazardFlood,
+			Severity:    models.SeverityCritical,
+			Location:    "Lower Valley District & Industrial Park",
 			Coordinates: [2]float64{51.5074, -0.1278},
-			ReportedAt: now.Add(-45 * time.Minute),
-			Status:     models.StatusInProgress,
-			Department: models.DeptEmergencyMgmt,
-			AssignedTo: "Commander Vance & Team Alpha",
+			ReportedAt:  now.Add(-45 * time.Minute),
+			Status:      models.StatusInProgress,
+			Department:  models.DeptEmergencyMgmt,
+			AssignedTo:  "Commander Vance & Team Alpha",
 			ActionsTaken: []string{
 				"Deployed automated telemetry stream-gauge warning sirens",
 				"Evacuated low-lying SME warehousing zone 4",
@@ -42,129 +86,239 @@ func (s *Store) seedIncidents() {
 			AutomatedDispatchSent: true,
 		},
 		{
-			ID:         "INC-8492",
-			Title:      "Agricultural Zone Soil Moisture Critical Deficit (12%)",
-			HazardType: models.HazardDrought,
-			Severity:   models.SeverityHigh,
-			Location:   "Eastern Irrigation Basin & Grain Corridors",
+			ID:          "INC-8492",
+			Title:       "Agricultural Zone Soil Moisture Critical Deficit (12%)",
+			HazardType:  models.HazardDrought,
+			Severity:    models.SeverityHigh,
+			Location:    "Eastern Irrigation Basin & Grain Corridors",
 			Coordinates: [2]float64{51.48, -0.05},
-			ReportedAt: now.Add(-120 * time.Minute),
-			Status:     models.StatusActive,
-			Department: models.DeptAgriculture,
-			AssignedTo: "Dr. Aris (Agronomy Division)",
+			ReportedAt:  now.Add(-120 * time.Minute),
+			Status:      models.StatusActive,
+			Department:  models.DeptAgriculture,
+			AssignedTo:  "Dr. Aris (Agronomy Division)",
 			ActionsTaken: []string{
 				"Notified 45 local farming collectives via CAP broadcast",
 				"Scheduled regulated emergency aquifer allocation tier-2",
 			},
 			AutomatedDispatchSent: true,
 		},
-		{
-			ID:         "INC-8493",
-			Title:      "Urban Heat Island Grid Overload Alert (41.5°C Index)",
-			HazardType: models.HazardHeatwave,
-			Severity:   models.SeverityHigh,
-			Location:   "Downtown Commercial Core & Central Transit",
-			Coordinates: [2]float64{51.52, -0.14},
-			ReportedAt: now.Add(-180 * time.Minute),
-			Status:     models.StatusInProgress,
-			Department: models.DeptHealthcare,
-			AssignedTo: "Metro Paramedic Rapid Response",
-			ActionsTaken: []string{
-				"Opened 6 municipal public cooling shelters with emergency hydration",
-				"Dispatched grid load-shedding protocol to municipal substation #3",
-			},
-			AutomatedDispatchSent: true,
-		},
+	}
+
+	for _, inc := range initials {
+		actionsJSON, _ := json.Marshal(inc.ActionsTaken)
+		coordsJSON, _ := json.Marshal(inc.Coordinates)
+		_, _ = s.db.Exec(`
+			INSERT INTO incidents (id, title, hazard_type, severity, location, coordinates, reported_at, status, department, assigned_to, actions_taken, automated_dispatch_sent)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+			ON CONFLICT (id) DO NOTHING`,
+			inc.ID, inc.Title, inc.HazardType, inc.Severity, inc.Location, coordsJSON, inc.ReportedAt, inc.Status, inc.Department, inc.AssignedTo, actionsJSON, inc.AutomatedDispatchSent,
+		)
+	}
+	log.Println("Default incidents seeded into PostgreSQL.")
+}
+
+// Helper struct for scanning database rows
+type dbIncident struct {
+	ID                    string          `db:"id"`
+	Title                 string          `db:"title"`
+	HazardType            string          `db:"hazard_type"`
+	Severity              string          `db:"severity"`
+	Location              string          `db:"location"`
+	Coordinates           json.RawMessage `db:"coordinates"`
+	ReportedAt            time.Time       `db:"reported_at"`
+	Status                string          `db:"status"`
+	Department            string          `db:"department"`
+	AssignedTo            string          `db:"assigned_to"`
+	ActionsTaken          json.RawMessage `db:"actions_taken"`
+	AutomatedDispatchSent bool            `db:"automated_dispatch_sent"`
+	CreatedAt             time.Time       `db:"created_at"`
+	UpdatedAt             time.Time       `db:"updated_at"`
+}
+
+func toModelIncident(d dbIncident) models.Incident {
+	var actions []string
+	_ = json.Unmarshal(d.ActionsTaken, &actions)
+	if actions == nil {
+		actions = []string{}
+	}
+
+	var coordSlice []float64
+	_ = json.Unmarshal(d.Coordinates, &coordSlice)
+	var coords [2]float64
+	if len(coordSlice) >= 2 {
+		coords = [2]float64{coordSlice[0], coordSlice[1]}
+	}
+
+	return models.Incident{
+		ID:                    d.ID,
+		Title:                 d.Title,
+		HazardType:            models.HazardType(d.HazardType),
+		Severity:              models.Severity(d.Severity),
+		Location:              d.Location,
+		Coordinates:           coords,
+		ReportedAt:            d.ReportedAt,
+		Status:                models.IncidentStatus(d.Status),
+		Department:            models.Department(d.Department),
+		AssignedTo:            d.AssignedTo,
+		ActionsTaken:          actions,
+		AutomatedDispatchSent: d.AutomatedDispatchSent,
 	}
 }
 
 func (s *Store) GetIncidents() []models.Incident {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	out := make([]models.Incident, len(s.incidents))
-	copy(out, s.incidents)
-	return out
+	var dbIncidents []dbIncident
+	err := s.db.Select(&dbIncidents, "SELECT * FROM incidents ORDER BY reported_at DESC")
+	if err != nil {
+		log.Printf("Error fetching incidents: %v", err)
+		return []models.Incident{}
+	}
+
+	var incidents []models.Incident
+	for _, di := range dbIncidents {
+		incidents = append(incidents, toModelIncident(di))
+	}
+	return incidents
 }
 
 func (s *Store) GetIncidentByID(id string) *models.Incident {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	for i := range s.incidents {
-		if s.incidents[i].ID == id {
-			return &s.incidents[i]
+	var di dbIncident
+	err := s.db.Get(&di, "SELECT * FROM incidents WHERE id = $1", id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil
 		}
+		log.Printf("Error fetching incident %s: %v", id, err)
+		return nil
 	}
-	return nil
+	inc := toModelIncident(di)
+	return &inc
 }
 
 func (s *Store) CreateIncident(req models.CreateIncidentRequest) models.Incident {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	id := fmt.Sprintf("INC-%d", 1000+rand.Intn(9000))
 
-	inc := models.Incident{
-		ID:         fmt.Sprintf("INC-%d", 1000+rand.Intn(9000)),
-		Title:      req.Title,
-		HazardType: req.HazardType,
-		Severity:   req.Severity,
-		Location:   req.Location,
-		Coordinates: req.Coordinates,
-		ReportedAt: time.Now(),
-		Status:     models.StatusActive,
-		Department: req.Department,
-		AssignedTo: req.AssignedTo,
-		ActionsTaken: req.ActionsTaken,
+	title := req.Title
+	if title == "" {
+		title = "Automated Climate Anomaly Alert"
+	}
+	hazardType := req.HazardType
+	if hazardType == "" {
+		hazardType = models.HazardFlood
+	}
+	severity := req.Severity
+	if severity == "" {
+		severity = models.SeverityModerate
+	}
+	location := req.Location
+	if location == "" {
+		location = "Sector 7"
+	}
+	coords := req.Coordinates
+	if coords == [2]float64{} {
+		coords = [2]float64{51.5074, -0.1278}
+	}
+	department := req.Department
+	if department == "" {
+		department = models.DeptEmergencyMgmt
+	}
+	assignedTo := req.AssignedTo
+	if assignedTo == "" {
+		assignedTo = "Automated Dispatch System"
+	}
+	actions := req.ActionsTaken
+	if len(actions) == 0 {
+		actions = []string{"Dispatched automated early warning beacon", "Logged in municipal resilience ledger"}
+	}
+
+	actionsJSON, _ := json.Marshal(actions)
+	coordsJSON, _ := json.Marshal(coords)
+	now := time.Now()
+
+	_, err := s.db.Exec(`
+		INSERT INTO incidents (id, title, hazard_type, severity, location, coordinates, reported_at, status, department, assigned_to, actions_taken, automated_dispatch_sent)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+		id, title, hazardType, severity, location, coordsJSON, now, models.StatusActive, department, assignedTo, actionsJSON, true,
+	)
+
+	if err != nil {
+		log.Printf("Error creating incident: %v", err)
+	}
+
+	return models.Incident{
+		ID:                    id,
+		Title:                 title,
+		HazardType:            hazardType,
+		Severity:              severity,
+		Location:              location,
+		Coordinates:           coords,
+		ReportedAt:            now,
+		Status:                models.StatusActive,
+		Department:            department,
+		AssignedTo:            assignedTo,
+		ActionsTaken:          actions,
 		AutomatedDispatchSent: true,
 	}
-
-	if inc.Title == "" {
-		inc.Title = "Automated Climate Anomaly Alert"
-	}
-	if inc.HazardType == "" {
-		inc.HazardType = models.HazardFlood
-	}
-	if inc.Severity == "" {
-		inc.Severity = models.SeverityModerate
-	}
-	if inc.Location == "" {
-		inc.Location = "Sector 7"
-	}
-	if inc.Coordinates == [2]float64{} {
-		inc.Coordinates = [2]float64{51.5074, -0.1278}
-	}
-	if inc.Department == "" {
-		inc.Department = models.DeptEmergencyMgmt
-	}
-	if inc.AssignedTo == "" {
-		inc.AssignedTo = "Automated Dispatch System"
-	}
-	if len(inc.ActionsTaken) == 0 {
-		inc.ActionsTaken = []string{
-			"Dispatched automated early warning beacon",
-			"Logged in municipal resilience ledger",
-		}
-	}
-
-	s.incidents = append([]models.Incident{inc}, s.incidents...)
-	return inc
 }
 
 func (s *Store) UpdateIncident(id string, req models.UpdateIncidentRequest) *models.Incident {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	existing := s.GetIncidentByID(id)
+	if existing == nil {
+		return nil
+	}
 
-	for i := range s.incidents {
-		if s.incidents[i].ID == id {
-			if req.Status != nil {
-				s.incidents[i].Status = *req.Status
-			}
-			if req.ActionsTaken != nil {
-				s.incidents[i].ActionsTaken = append(s.incidents[i].ActionsTaken, req.ActionsTaken...)
-			}
-			if req.AssignedTo != nil {
-				s.incidents[i].AssignedTo = *req.AssignedTo
-			}
-			return &s.incidents[i]
+	status := existing.Status
+	if req.Status != nil {
+		status = *req.Status
+	}
+
+	assignedTo := existing.AssignedTo
+	if req.AssignedTo != nil {
+		assignedTo = *req.AssignedTo
+	}
+
+	actions := existing.ActionsTaken
+	if req.ActionsTaken != nil {
+		actions = append(actions, req.ActionsTaken...)
+	}
+
+	actionsJSON, _ := json.Marshal(actions)
+
+	_, err := s.db.Exec(`
+		UPDATE incidents 
+		SET status = $1, assigned_to = $2, actions_taken = $3, updated_at = NOW()
+		WHERE id = $4`,
+		status, assignedTo, actionsJSON, id,
+	)
+
+	if err != nil {
+		log.Printf("Error updating incident %s: %v", id, err)
+		return nil
+	}
+
+	existing.Status = status
+	existing.AssignedTo = assignedTo
+	existing.ActionsTaken = actions
+	return existing
+}
+
+// In-memory user store for JWT auth (will be migrated to DB later)
+func (s *Store) CreateUser(user models.User) error {
+	for _, u := range s.users {
+		if u.Username == user.Username {
+			return fmt.Errorf("username already exists")
 		}
 	}
+	user.ID = len(s.users) + 1
+	user.CreatedAt = time.Now()
+	s.users = append(s.users, user)
 	return nil
+}
+
+func (s *Store) GetUserByUsername(username string) (*models.User, error) {
+	for i := range s.users {
+		if s.users[i].Username == username {
+			return &s.users[i], nil
+		}
+	}
+	return nil, fmt.Errorf("user not found")
 }
