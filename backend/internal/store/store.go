@@ -12,6 +12,7 @@ import (
 type Store struct {
 	mu        sync.RWMutex
 	incidents []models.Incident
+    users     []models.User
 }
 
 func New() *Store {
