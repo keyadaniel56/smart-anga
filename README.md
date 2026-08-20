@@ -117,7 +117,7 @@ npm run start        # Serves from backend/node on port 3000
 
 ## Frontend Issues
 
-### Assigned to Bellah
+### Bug Fixes
 
 #### 1. Fix Weather API Response Parsing
 **Priority: High**
@@ -127,7 +127,27 @@ The `fetchLiveClimate` function returns the full API envelope `{success, coordin
 
 **Task:** Transform the Open-Meteo API response into the `LiveWeatherData` interface shape. Map `response.weather.current` fields to the flat `LiveWeatherData` structure and attach `response.flood` data to `floodForecast`.
 
-#### 2. Implement Scenario Simulator Output Panel
+#### 2. Persist Incident Creation to Backend
+**Priority: Medium**
+**File:** `frontend/src/App.tsx`
+
+`handleCreateIncident` adds incidents to local state only. They disappear on refresh.
+
+**Task:** Call the `createIncident` API function (already in `api.ts`) from `handleCreateIncident` so new incidents are persisted to the backend. After the POST succeeds, update local state with the server-returned incident (which includes the proper ID and timestamp).
+
+#### 3. Fix SME Profile Toggle Persistence
+**Priority: Low**
+**File:** `frontend/src/components/SMEPreparednessModule.tsx`
+
+The `toggleMeasure` function updates local React state only. There is no backend endpoint to persist SME facility changes.
+
+**Task:** Since no backend endpoint exists yet, either:
+- Add a `PATCH /api/sme/:id` endpoint to the Node backend for persisting SME profile changes, or
+- Document this as a known limitation and add a visual indicator that changes are session-only
+
+### Features
+
+#### 4. Implement Scenario Simulator Output Panel
 **Priority: High**
 **File:** `frontend/src/components/ScenarioSimulator.tsx`
 
@@ -141,38 +161,7 @@ The simulator has 4 input sliders and 3 presets but renders no output. When the 
 - Recommended mitigation actions
 - A "Run Simulation" button that computes impacts client-side based on slider values
 
-#### 3. Persist Incident Creation to Backend
-**Priority: Medium**
-**File:** `frontend/src/App.tsx`
-
-`handleCreateIncident` adds incidents to local state only. They disappear on refresh.
-
-**Task:** Call the `createIncident` API function (already in `api.ts`) from `handleCreateIncident` so new incidents are persisted to the backend. After the POST succeeds, update local state with the server-returned incident (which includes the proper ID and timestamp).
-
-#### 4. Connect Overview Dashboard to Live State
-**Priority: Medium**
-**File:** `frontend/src/App.tsx`
-
-The Overview tab has hardcoded "Early Warning Feed" items and a static "Historical Trends" bar chart. These should reflect actual app state.
-
-**Task:**
-- Replace the hardcoded early warning feed with the first 3 items from the `alerts` state array
-- Wire the "Automated Report" card to open a downloadable summary (or remove if not needed)
-- Make the "Data Integration" panel reflect actual API connection status
-
-#### 5. Fix SME Profile Toggle Persistence
-**Priority: Low**
-**File:** `frontend/src/components/SMEPreparednessModule.tsx`
-
-The `toggleMeasure` function updates local React state only. There is no backend endpoint to persist SME facility changes.
-
-**Task:** Since no backend endpoint exists yet, either:
-- Add a `PATCH /api/sme/:id` endpoint to the Node backend for persisting SME profile changes, or
-- Document this as a known limitation and add a visual indicator that changes are session-only
-
-### Assigned to Tedy
-
-#### 1. Add Real-Time Data Polling
+#### 5. Add Real-Time Data Polling
 **Priority: High**
 **File:** `frontend/src/App.tsx`
 
@@ -184,7 +173,7 @@ All data is fetched once on mount. The UI labels say "REAL-TIME TELEMETRY" and "
 - Show a "Last updated" timestamp in the header or footer
 - Consider adding a visual indicator when new data arrives
 
-#### 2. Add Incident Detail View
+#### 6. Add Incident Detail View
 **Priority: High**
 **File:** `frontend/src/components/EarlyWarningModule.tsx`
 
@@ -195,7 +184,18 @@ The Incident Command Board shows incidents but the detail view is minimal. Users
 - Add ability to log new actions that get persisted via the PATCH endpoint
 - Show the incident lifecycle (active -> in_progress -> mitigated -> resolved) as a visual timeline
 
-#### 3. Improve Sensor Telemetry with Live Updates
+#### 7. Connect Overview Dashboard to Live State
+**Priority: Medium**
+**File:** `frontend/src/App.tsx`
+
+The Overview tab has hardcoded "Early Warning Feed" items and a static "Historical Trends" bar chart. These should reflect actual app state.
+
+**Task:**
+- Replace the hardcoded early warning feed with the first 3 items from the `alerts` state array
+- Wire the "Automated Report" card to open a downloadable summary (or remove if not needed)
+- Make the "Data Integration" panel reflect actual API connection status
+
+#### 8. Improve Sensor Telemetry with Live Updates
 **Priority: Medium**
 **File:** `frontend/src/components/LiveSensorFeed.tsx`
 
@@ -206,7 +206,9 @@ The sensor feed shows static mock data. Manual gauge logging works locally but h
 - Show sensor offline/warning/critical states more prominently
 - Add a "sensor health" summary bar at the top showing total online/offline/critical counts
 
-#### 4. Add Mobile Responsive Improvements
+### UI/UX
+
+#### 9. Add Mobile Responsive Improvements
 **Priority: Medium**
 **Files:** All components
 
@@ -220,7 +222,7 @@ Several components have layout issues on small screens:
 - Stack radar chart and VaR chart vertically on small screens
 - Improve tab navigation UX on mobile (horizontal scroll with snap)
 
-#### 5. Add Loading States and Error Boundaries
+#### 10. Add Loading States and Error Boundaries
 **Priority: Medium**
 **Files:** `App.tsx`, `api.ts`, all components
 
@@ -232,7 +234,9 @@ Currently, failed API calls log to console but the UI shows no feedback. Users s
 - Add skeleton loading states for weather data and incidents
 - Show a "Using cached data" banner when live data is unavailable
 
-#### 6. Write Component Tests
+### Testing
+
+#### 11. Write Component Tests
 **Priority: Low**
 **Files:** All components
 
