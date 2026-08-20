@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/anga/backend/internal/config"
+	"github.com/anga/backend/internal/database"
 	"github.com/anga/backend/internal/router"
 	"github.com/anga/backend/internal/services"
 	"github.com/anga/backend/internal/store"
@@ -19,7 +20,14 @@ import (
 func main() {
 	cfg := config.Load()
 
-	s := store.New()
+	// Initialize PostgreSQL database connection pool
+	db, err := database.ConnectDB()
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	defer db.Close()
+
+	s := store.New(db)
 	om := services.NewOpenMeteoService(cfg)
 
 	handler := router.NewRouter(cfg, s, om)
