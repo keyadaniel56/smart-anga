@@ -12,7 +12,9 @@
     "dev:backend": "npm run dev --workspace=backend/node",
     "build": "npm run build --workspace=frontend && npm run build --workspace=backend/node",
     "start": "npm run start --workspace=backend/node",
-    "lint": "npm run lint --workspace=frontend && npm run lint --workspace=backend/node"
+    "lint": "npm run lint --workspace=frontend && npm run lint --workspace=backend/node",
+    "test": "npm run test --workspace=anga-frontend",
+    "test:ui": "npm run test:ui --workspace=anga-frontend"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.1",
