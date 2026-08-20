@@ -1,0 +1,6 @@
+{
+  "name": "Climate Risk Intelligence & Resilience Platform",
+  "description": "An end-to-end climate intelligence and resilience platform featuring flood prediction, drought assessment, vulnerability dashboards, community early warning systems, SME preparedness, and AI-powered emergency coordination.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
