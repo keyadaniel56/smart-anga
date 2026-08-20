@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { EarlyWarningAlert, DepartmentIncident } from '../types/climate';
 import { RiskBadge } from './ui/RiskBadge';
+import { useTranslation } from '../context/LanguageContext';
 
 interface EarlyWarningModuleProps {
   alerts: EarlyWarningAlert[];
@@ -30,6 +31,7 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
   onBroadcastAlert,
   onUpdateIncidentStatus
 }) => {
+  const { t } = useTranslation();
   const [activeSubTab, setActiveSubTab] = useState<'incident_command' | 'broadcast_studio'>('incident_command');
   const [selectedIncident, setSelectedIncident] = useState<DepartmentIncident | null>(incidents[0] || null);
   const [newActionInput, setNewActionInput] = useState('');
@@ -73,7 +75,7 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
     };
 
     onBroadcastAlert(newAlert);
-    setBroadcastSuccessMessage(`CAP Early Warning successfully broadcasted via ${selectedChannels.join(', ')}.`);
+    setBroadcastSuccessMessage(`Emergency Warning successfully broadcasted via ${selectedChannels.join(', ')}.`);
     setAlertTitle('');
     setHeadline('');
     setInstruction('');
@@ -97,14 +99,14 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold text-ink-900 font-serif">
-                Community Early Warning & Inter-Agency Command
+                {t('earlyWarning.heading', 'Community Emergency Warnings & Response Team')}
               </h2>
               <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-mono font-bold tracking-wide border border-rose-200">
-                CAP v1.2 MESH
+                {t('earlyWarning.badge', 'EMERGENCY DISPATCH')}
               </span>
             </div>
             <p className="text-xs text-ink-500 mt-0.5">
-              Multi-channel alerting protocols, acoustic siren triggers & departmental incident response
+              {t('earlyWarning.subheading', 'Public sirens, SMS broadcasts, and emergency dispatch tracking')}
             </p>
           </div>
         </div>
@@ -119,7 +121,7 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
                 : 'text-ink-600 hover:text-ink-900'
             }`}
           >
-            <span>Incident Command</span>
+            <span>{t('earlyWarning.tabCommand', 'Active Response Log')}</span>
             <span className={`text-[10px] px-1.5 py-0.2 rounded-md font-mono ${
               activeSubTab === 'incident_command' ? 'bg-forest-800 text-teal-300' : 'bg-sand-200 text-ink-700'
             }`}>
@@ -134,7 +136,7 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
                 : 'text-ink-600 hover:text-ink-900'
             }`}
           >
-            <span>CAP Broadcast Studio</span>
+            <span>{t('earlyWarning.tabBroadcast', 'Send Warning Alert')}</span>
           </button>
         </div>
       </div>
@@ -147,9 +149,9 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
             <div className="flex items-center justify-between pb-4 border-b border-sand-200">
               <h3 className="text-base font-bold text-ink-900 font-serif flex items-center gap-2">
                 <Megaphone className="w-5 h-5 text-rose-700" />
-                Issue Emergency Early Warning (Common Alerting Protocol)
+                {t('earlyWarning.broadcastHeading', 'Send Public Emergency Warning')}
               </h3>
-              <span className="text-xs text-forest-800 font-mono font-bold">Zero-Latency Sync</span>
+              <span className="text-xs text-forest-800 font-mono font-bold">{t('earlyWarning.instantDelivery', 'Instant Delivery')}</span>
             </div>
 
             {broadcastSuccessMessage && (
@@ -162,14 +164,14 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
             <form onSubmit={handleSendBroadcast} className="space-y-4 mt-4 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-ink-700 font-bold mb-1.5">Hazard Category</label>
+                  <label className="block text-ink-700 font-bold mb-1.5">{t('earlyWarning.hazardCategory', 'Hazard Type')}</label>
                   <select
                     value={hazard}
                     onChange={(e) => setHazard(e.target.value as any)}
                     className="w-full bg-sand-50 border border-sand-300 rounded-xl p-2.5 text-ink-900 focus:border-forest-700 focus:outline-none"
                   >
-                    <option value="Flood">🌊 Flash Flood / River Inundation</option>
-                    <option value="Extreme Heat">🌡️ Extreme Heatwave / WBGT Spike</option>
+                    <option value="Flood">🌊 Flood / River Inundation</option>
+                    <option value="Extreme Heat">🌡️ Extreme Heatwave</option>
                     <option value="Drought">☀️ Agricultural Drought Emergency</option>
                     <option value="Flash Storm">⚡ Severe Convective Thunderstorm</option>
                     <option value="Wildfire">🔥 Fire Weather / Wildfire Front</option>
@@ -177,7 +179,7 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-ink-700 font-bold mb-1.5">Severity Tier</label>
+                  <label className="block text-ink-700 font-bold mb-1.5">{t('earlyWarning.severityTier', 'Urgency Level')}</label>
                   <select
                     value={severity}
                     onChange={(e) => setSeverity(e.target.value as any)}
@@ -192,7 +194,7 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
               </div>
 
               <div>
-                <label className="block text-ink-700 font-bold mb-1.5">Alert Headline / Title</label>
+                <label className="block text-ink-700 font-bold mb-1.5">{t('earlyWarning.headlineLabel', 'Warning Headline')}</label>
                 <input
                   type="text"
                   placeholder="e.g. FLASH INUNDATION RED ALERT: Lower Basalt Basin Evacuation Required"
@@ -204,7 +206,7 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
               </div>
 
               <div>
-                <label className="block text-ink-700 font-bold mb-1.5">Affected Catchments & Districts</label>
+                <label className="block text-ink-700 font-bold mb-1.5">{t('earlyWarning.districtsLabel', 'Affected Neighborhoods & Areas')}</label>
                 <input
                   type="text"
                   placeholder="e.g. Valley Reach #4, Riverside SME Hub, Estuary Marsh Sector"
@@ -215,7 +217,7 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
               </div>
 
               <div>
-                <label className="block text-ink-700 font-bold mb-1.5">Public Action Instructions</label>
+                <label className="block text-ink-700 font-bold mb-1.5">{t('earlyWarning.instructionsLabel', 'Public Safety Instructions')}</label>
                 <textarea
                   rows={3}
                   placeholder="e.g. Engage commercial flood barriers immediately. Evacuate sub-grade equipment to high ground. Avoid low-elevation bridges."
@@ -227,14 +229,14 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
 
               {/* Multi-Channel Distribution Selector */}
               <div>
-                <label className="block text-ink-700 font-bold mb-2">Automated Multi-Channel Broadcast Selection</label>
+                <label className="block text-ink-700 font-bold mb-2">{t('earlyWarning.channelsLabel', 'Choose Broadcast Channels')}</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                   {[
                     { id: 'Sirens' as const, label: 'Acoustic Siren Array', icon: Volume2 },
-                    { id: 'SMS Cell Broadcast' as const, label: 'Cell Broadcast (WEA)', icon: Smartphone },
+                    { id: 'SMS Cell Broadcast' as const, label: 'Cell Broadcast (SMS)', icon: Smartphone },
                     { id: 'Mobile Push' as const, label: 'Mobile App Push', icon: Radio },
-                    { id: 'WhatsApp Business' as const, label: 'WhatsApp & SMS Direct', icon: MessageSquare },
-                    { id: 'EAS Radio' as const, label: 'EAS Radio / TV Override', icon: Tv }
+                    { id: 'WhatsApp Business' as const, label: 'WhatsApp Direct', icon: MessageSquare },
+                    { id: 'EAS Radio' as const, label: 'Radio Broadcast', icon: Tv }
                   ].map((ch) => {
                     const Icon = ch.icon;
                     const isSelected = selectedChannels.includes(ch.id);
@@ -263,7 +265,7 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
                   className="w-full py-3 bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
                 >
                   <Send className="w-4 h-4" />
-                  Broadcast Common Alerting Protocol (CAP) Message
+                  {t('earlyWarning.sendBroadcastBtn', 'Send Public Emergency Warning Now')}
                 </button>
               </div>
             </form>
@@ -274,10 +276,10 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
             <div>
               <div className="pb-3 border-b border-sand-200 flex items-center justify-between">
                 <h3 className="text-base font-bold text-ink-900 font-serif">
-                  Active Broadcast Ledger
+                  {t('earlyWarning.activeLedgerHeading', 'Active Public Warnings')}
                 </h3>
                 <span className="text-xs bg-sand-100 text-ink-700 px-2.5 py-0.5 rounded-lg font-mono border border-sand-200">
-                  {alerts.length} Active
+                  {alerts.length} {t('common.active', 'Active')}
                 </span>
               </div>
 
@@ -308,10 +310,10 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
           <div className="lg:col-span-1 bg-white/90 border border-sand-200 rounded-3xl p-5 shadow-sm space-y-3">
             <div className="flex items-center justify-between pb-3 border-b border-sand-200">
               <h3 className="text-xs font-bold uppercase tracking-wider text-ink-500 font-mono">
-                Departmental Dispatch Log
+                {t('earlyWarning.dispatchLogHeading', 'Emergency Response Dispatches')}
               </h3>
               <span className="text-[10px] text-forest-800 font-mono font-bold bg-forest-50 px-2 py-0.5 rounded-md border border-forest-200">
-                LIVE SYNC
+                {t('common.live', 'Live')}
               </span>
             </div>
 
@@ -382,15 +384,15 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
               {/* Departmental Metadata Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs bg-sand-50/80 p-4 rounded-2xl border border-sand-200">
                 <div>
-                  <span className="text-ink-400 block text-[10px] font-mono uppercase font-bold">Assigned Department</span>
+                  <span className="text-ink-400 block text-[10px] font-mono uppercase font-bold">{t('earlyWarning.assignedDept', 'Assigned Team')}</span>
                   <strong className="text-ink-900">{selectedIncident.department}</strong>
                 </div>
                 <div>
-                  <span className="text-ink-400 block text-[10px] font-mono uppercase font-bold">Responder Unit</span>
+                  <span className="text-ink-400 block text-[10px] font-mono uppercase font-bold">{t('earlyWarning.responderUnit', 'Response Crew')}</span>
                   <strong className="text-ink-900">{selectedIncident.assignedTo}</strong>
                 </div>
                 <div>
-                  <span className="text-ink-400 block text-[10px] font-mono uppercase font-bold">Target Sector</span>
+                  <span className="text-ink-400 block text-[10px] font-mono uppercase font-bold">{t('earlyWarning.targetSector', 'Location Area')}</span>
                   <strong className="text-ink-900">{selectedIncident.location}</strong>
                 </div>
               </div>
@@ -398,7 +400,7 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
               {/* Actions Taken Audit Trail */}
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-wider text-ink-500 font-mono mb-2.5">
-                  Inter-Agency Response Protocol Audit Trail
+                  {t('earlyWarning.actionsAuditHeading', 'Actions Taken by Emergency Crews')}
                 </h4>
                 <div className="space-y-2">
                   {selectedIncident.actionsTaken.map((action, i) => (
@@ -413,7 +415,7 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
                 <div className="mt-3.5 flex items-center gap-2">
                   <input
                     type="text"
-                    placeholder="Log coordinated response action (e.g. Deployed 3 mobile flood barriers)..."
+                    placeholder={t('earlyWarning.logActionPlaceholder', 'Log action taken (e.g. Set up sandbags near clinic)...')}
                     value={newActionInput}
                     onChange={(e) => setNewActionInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddIncidentAction()}
@@ -424,7 +426,7 @@ export const EarlyWarningModule: React.FC<EarlyWarningModuleProps> = ({
                     className="px-4 py-2.5 bg-forest-900 hover:bg-forest-800 text-sand-50 font-bold text-xs rounded-xl transition-colors flex items-center gap-1 shadow-sm"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    Log Action
+                    {t('earlyWarning.logActionBtn', 'Log Action')}
                   </button>
                 </div>
               </div>

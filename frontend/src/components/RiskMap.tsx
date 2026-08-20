@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { LocationProfile, SensorNode, CriticalAsset, DepartmentIncident } from '../types/climate';
 import { RiskBadge } from './ui/RiskBadge';
+import { useTranslation } from '../context/LanguageContext';
 
 interface RiskMapProps {
   location: LocationProfile;
@@ -31,6 +32,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
   assets,
   incidents
 }) => {
+  const { t } = useTranslation();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<any>(null);
   const layerGroupsRef = useRef<{ [key: string]: any }>({});
@@ -341,7 +343,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
         className="sm:hidden absolute top-3 right-3 z-30 bg-white/95 border border-sand-200 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md"
       >
         <SlidersHorizontal className="w-3.5 h-3.5 text-forest-700" />
-        <span>Layers ({Object.values(layersVisibility).filter(Boolean).length})</span>
+        <span>{t('map.layersBtn', 'Map Layers')} ({Object.values(layersVisibility).filter(Boolean).length})</span>
       </button>
 
       {/* Floating Layer Controls Panel (Always visible on sm+, expandable on mobile) */}
@@ -353,11 +355,11 @@ export const RiskMap: React.FC<RiskMapProps> = ({
         <div className="flex items-center justify-between border-b border-sand-200 pb-2">
           <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ink-900 font-mono">
             <Layers className="w-3.5 h-3.5 text-forest-700" />
-            GIS Overlays
+            {t('map.layersTitle', 'Map Layers')}
           </div>
           <div className="flex items-center gap-1">
             <span className="text-[10px] text-emerald-800 font-mono font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-              LIVE
+              {t('common.live', 'Live')}
             </span>
             <button
               onClick={() => setMobileControlsOpen(false)}
@@ -372,7 +374,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           <label className="flex items-center justify-between text-ink-700 hover:text-ink-900 cursor-pointer select-none">
             <span className="flex items-center gap-1.5">
               <Waves className="w-3.5 h-3.5 text-cyan-600" />
-              Flood Inundation
+              {t('map.floodInundation', 'Flood Danger Zones')}
             </span>
             <input
               type="checkbox"
@@ -385,7 +387,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           <label className="flex items-center justify-between text-ink-700 hover:text-ink-900 cursor-pointer select-none">
             <span className="flex items-center gap-1.5">
               <Sun className="w-3.5 h-3.5 text-amber-600" />
-              Drought & Soil
+              {t('map.droughtSoil', 'Dry Soil Areas')}
             </span>
             <input
               type="checkbox"
@@ -398,7 +400,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           <label className="flex items-center justify-between text-ink-700 hover:text-ink-900 cursor-pointer select-none">
             <span className="flex items-center gap-1.5">
               <Flame className="w-3.5 h-3.5 text-rose-600" />
-              Heat Island (UHI)
+              {t('map.heatIslands', 'Extreme Heat Areas')}
             </span>
             <input
               type="checkbox"
@@ -411,7 +413,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           <label className="flex items-center justify-between text-ink-700 hover:text-ink-900 cursor-pointer select-none">
             <span className="flex items-center gap-1.5">
               <Building className="w-3.5 h-3.5 text-forest-700" />
-              Critical Assets ({assets.length})
+              {t('map.criticalAssets', 'Protected Buildings')} ({assets.length})
             </span>
             <input
               type="checkbox"
@@ -424,7 +426,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           <label className="flex items-center justify-between text-ink-700 hover:text-ink-900 cursor-pointer select-none">
             <span className="flex items-center gap-1.5">
               <Radio className="w-3.5 h-3.5 text-teal-600" />
-              IoT Hydro Sensors ({sensors.length})
+              {t('map.sensors', 'Water & Weather Sensors')} ({sensors.length})
             </span>
             <input
               type="checkbox"
@@ -437,7 +439,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           <label className="flex items-center justify-between text-ink-700 hover:text-ink-900 cursor-pointer select-none">
             <span className="flex items-center gap-1.5">
               <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
-              Incidents ({incidents.length})
+              {t('map.incidents', 'Active Warnings')} ({incidents.length})
             </span>
             <input
               type="checkbox"
@@ -456,7 +458,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
               mapStyle === 'light' ? 'bg-forest-900 text-sand-50 font-bold' : 'bg-sand-100 text-ink-600 hover:bg-sand-200'
             }`}
           >
-            Light
+            {t('map.styleLight', 'Light')}
           </button>
           <button
             onClick={() => setMapStyle('satellite')}
@@ -464,7 +466,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
               mapStyle === 'satellite' ? 'bg-forest-900 text-sand-50 font-bold' : 'bg-sand-100 text-ink-600 hover:bg-sand-200'
             }`}
           >
-            Satellite
+            {t('map.styleSatellite', 'Satellite')}
           </button>
           <button
             onClick={() => setMapStyle('terrain')}
@@ -472,7 +474,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
               mapStyle === 'terrain' ? 'bg-forest-900 text-sand-50 font-bold' : 'bg-sand-100 text-ink-600 hover:bg-sand-200'
             }`}
           >
-            Terrain
+            {t('map.styleTerrain', 'Terrain')}
           </button>
         </div>
       </div>
@@ -480,23 +482,23 @@ export const RiskMap: React.FC<RiskMapProps> = ({
       {/* Bottom Map Legend Bar */}
       <div className="absolute bottom-3 left-3 right-16 z-20 bg-white/90 border border-sand-200 rounded-2xl p-2.5 sm:p-3 shadow-md backdrop-blur-md flex flex-wrap items-center justify-between gap-2 text-xs">
         <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-          <span className="font-semibold text-ink-500 text-[10px] uppercase tracking-wider font-mono">Key:</span>
+          <span className="font-semibold text-ink-500 text-[10px] uppercase tracking-wider font-mono">{t('map.keyLabel', 'Key')}:</span>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-cyan-600 border border-white"></span>
-            <span className="text-ink-700 text-[11px]">Flood Inundation</span>
+            <span className="text-ink-700 text-[11px]">{t('map.floodInundation', 'Flood Danger Zones')}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500 border border-white"></span>
-            <span className="text-ink-700 text-[11px]">Drought Deficit</span>
+            <span className="text-ink-700 text-[11px]">{t('map.droughtSoil', 'Dry Soil Areas')}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-600 border border-white animate-ping"></span>
-            <span className="text-ink-900 font-bold text-[11px]">Active Emergency</span>
+            <span className="text-ink-900 font-bold text-[11px]">{t('map.activeEmergency', 'Active Warning')}</span>
           </div>
         </div>
 
         <div className="hidden md:block text-[11px] font-mono text-ink-500">
-          Catchment: <span className="text-forest-900 font-bold">{location.name}</span> ({location.elevationM}m ASL)
+          Area: <span className="text-forest-900 font-bold">{location.name}</span> ({location.elevationM}m ASL)
         </div>
       </div>
     </div>

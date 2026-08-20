@@ -23,6 +23,7 @@ import {
 import { LocationProfile, SensorNode, LiveWeatherData } from '../types/climate';
 import { RiskBadge } from './ui/RiskBadge';
 import { RiskDial } from './ui/RiskDial';
+import { useTranslation } from '../context/LanguageContext';
 
 interface FloodPredictionModuleProps {
   location: LocationProfile;
@@ -36,6 +37,7 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
   sensors,
   onTriggerEmergencyDispatch
 }) => {
+  const { t } = useTranslation();
   const [returnPeriodScenario, setReturnPeriodScenario] = useState<'current' | '10yr' | '50yr' | '100yr'>('current');
   const [activeDefenses, setActiveDefenses] = useState<{
     floodGates: boolean;
@@ -109,14 +111,14 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold text-ink-900 font-serif">
-                Flood Prediction & River Catchment Hydrograph
+                {t('flood.heading', 'River Flow & Flood Water Forecast')}
               </h2>
               <span className="px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 text-[10px] font-mono font-bold tracking-wide border border-cyan-200">
-                LIVE DISCHARGE
+                {t('flood.badge', 'LIVE RIVER FLOW')}
               </span>
             </div>
             <p className="text-xs text-ink-500 mt-0.5">
-              Hydrological streamflow modeling, bankfull overtopping thresholds & mobile pump coordination
+              {t('flood.subheading', 'Live river height, flood overflow limits, and water pump status')}
             </p>
           </div>
         </div>
@@ -125,7 +127,7 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
           <RiskBadge
             level={isBreachProjected ? 'critical' : 'high'}
             size="md"
-            label={isBreachProjected ? 'Breach Threshold Exceeded' : 'Channel Overtopping Watch'}
+            label={isBreachProjected ? t('flood.breachExceeded', 'River Overflow Danger') : t('flood.channelWatch', 'River Overflow Watch')}
           />
         </div>
       </div>
@@ -135,9 +137,9 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
         {/* River Stage Elevation */}
         <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between text-xs text-ink-500 mb-1">
-            <span className="font-semibold uppercase tracking-wider font-mono">River Stage Level</span>
+            <span className="font-semibold uppercase tracking-wider font-mono">{t('flood.stageLevel', 'Current River Height')}</span>
             <span className="flex items-center gap-1 text-cyan-700 font-mono text-[11px] font-bold">
-              <Radio className="w-3 h-3 animate-pulse text-cyan-600" /> Live
+              <Radio className="w-3 h-3 animate-pulse text-cyan-600" /> {t('common.live', 'Live')}
             </span>
           </div>
           <div className="flex items-baseline gap-2">
@@ -149,8 +151,8 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
             </span>
           </div>
           <div className="mt-2 text-xs text-ink-600 flex items-center justify-between">
-            <span>Bankfull Limit: <strong>3.80m</strong></span>
-            <span className="text-rose-700 font-bold font-mono">1.02m Over</span>
+            <span>{t('flood.bankfullLimit', 'River Overflow Threshold')}: <strong>3.80m</strong></span>
+            <span className="text-rose-700 font-bold font-mono">1.02m {t('flood.metersOver', 'Over Safe Limit')}</span>
           </div>
           <div className="w-full bg-sand-200 h-1.5 rounded-full mt-2 overflow-hidden">
             <div className="bg-gradient-to-r from-teal-500 to-rose-600 h-full rounded-full w-[85%]"></div>
@@ -160,17 +162,17 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
         {/* Catchment Saturation */}
         <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between text-xs text-ink-500 mb-1">
-            <span className="font-semibold uppercase tracking-wider font-mono">Soil Saturation</span>
+            <span className="font-semibold uppercase tracking-wider font-mono">{t('flood.soilSaturation', 'Soil Water Saturation')}</span>
             <Droplets className="w-4 h-4 text-forest-700" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-extrabold font-mono text-forest-800">
               {catchmentSaturationPct}%
             </span>
-            <span className="text-xs text-amber-700 font-semibold">Near Capacity</span>
+            <span className="text-xs text-amber-700 font-semibold">{t('flood.nearCapacity', 'Nearly Full of Water')}</span>
           </div>
           <div className="mt-2 text-xs text-ink-600">
-            Runoff Coefficient: <strong className="text-ink-900 font-mono">0.82 (High Runoff)</strong>
+            {t('flood.runoffLabel', 'Water Runoff Risk')}: <strong className="text-ink-900 font-mono">0.82 ({t('flood.highRunoff', 'High Runoff')})</strong>
           </div>
           <div className="w-full bg-sand-200 h-1.5 rounded-full mt-2 overflow-hidden">
             <div className="bg-forest-600 h-full rounded-full w-[88%]"></div>
@@ -180,7 +182,7 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
         {/* Peak Inundation Forecast */}
         <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between text-xs text-ink-500 mb-1">
-            <span className="font-semibold uppercase tracking-wider font-mono">Projected Peak Discharge</span>
+            <span className="font-semibold uppercase tracking-wider font-mono">{t('flood.peakDischarge', 'Expected Peak Water Flow')}</span>
             <Clock className="w-4 h-4 text-ochre-600" />
           </div>
           <div className="flex items-baseline gap-2">
@@ -190,7 +192,7 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
             <span className="text-xs text-ink-500 font-semibold font-mono">in ~{timeToPeakHours}h</span>
           </div>
           <div className="mt-2 text-xs text-ink-600">
-            Safe Channel Flow: <strong className="text-ink-900 font-mono">250 m³/s</strong>
+            {t('flood.safeFlowLimit', 'Safe River Flow Limit')}: <strong className="text-ink-900 font-mono">250 m³/s</strong>
           </div>
           <div className="w-full bg-sand-200 h-1.5 rounded-full mt-2 overflow-hidden">
             <div className={`h-full rounded-full ${isBreachProjected ? 'bg-rose-600' : 'bg-ochre-500'} w-[94%]`}></div>
@@ -201,16 +203,16 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
         <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between text-xs text-ink-500 mb-1">
-              <span className="font-semibold uppercase tracking-wider font-mono">Defense Readiness</span>
+              <span className="font-semibold uppercase tracking-wider font-mono">{t('flood.defenseReadiness', 'Flood Barrier Readiness')}</span>
               <ShieldCheck className="w-4 h-4 text-forest-700" />
             </div>
             <div className="text-sm font-bold text-ink-900 mt-1">
               {activeDefenses.floodGates && activeDefenses.highVolumePumps 
-                ? 'High Barrier Deployed' 
-                : 'Defenses Standby'}
+                ? t('flood.barrierDeployed', 'High Barriers in Place') 
+                : t('flood.defensesStandby', 'Defenses on Standby')}
             </div>
             <p className="text-xs text-ink-500 mt-0.5">
-              SME perimeter barrier: <strong>Active</strong>
+              {t('flood.smeBarrierStatus', 'Local business area barriers')}: <strong>{t('common.active', 'Active')}</strong>
             </p>
           </div>
           <button
@@ -218,7 +220,7 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
             className="mt-3 w-full py-2 px-3 bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm"
           >
             <AlertTriangle className="w-3.5 h-3.5" />
-            Dispatch Flood Response SOP
+            {t('flood.dispatchSop', 'Dispatch Flood Response Team')}
           </button>
         </div>
       </div>
@@ -230,17 +232,17 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
             <div className="flex items-center gap-2">
               <Waves className="w-5 h-5 text-cyan-700" />
               <h3 className="text-base font-bold text-ink-900 font-serif">
-                Hydrological Discharge & Runoff Hydrograph
+                {t('flood.chartHeading', '48-Hour River Flow Forecast')}
               </h3>
             </div>
             <p className="text-xs text-ink-500 mt-0.5">
-              Streamflow vs. critical bankfull thresholds for {location.riverBasin || location.name}
+              {t('flood.chartSubheading', 'Expected river water volume compared to safe bank limits')}
             </p>
           </div>
 
           {/* Scenario Return Period Selector */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-ink-500 font-semibold font-mono">Scenario:</span>
+            <span className="text-xs text-ink-500 font-semibold font-mono">{t('flood.scenarioLabel', 'Forecast Scenario')}:</span>
             <div className="flex items-center bg-sand-100 p-1 rounded-xl border border-sand-200 text-xs">
               <button
                 onClick={() => setReturnPeriodScenario('current')}
@@ -248,7 +250,7 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
                   returnPeriodScenario === 'current' ? 'bg-forest-900 text-sand-50 font-bold' : 'text-ink-600 hover:text-ink-900'
                 }`}
               >
-                Live
+                {t('common.live', 'Live')}
               </button>
               <button
                 onClick={() => setReturnPeriodScenario('10yr')}
@@ -290,16 +292,16 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#e7e2d6" />
               <XAxis dataKey="time" stroke="#6f7a72" tick={{ fontSize: 11 }} />
-              <YAxis yAxisId="discharge" stroke="#0891b2" tick={{ fontSize: 11 }} label={{ value: 'Discharge (m³/s)', angle: -90, position: 'insideLeft', fill: '#0891b2', fontSize: 11 }} />
-              <YAxis yAxisId="rain" orientation="right" stroke="#2563eb" tick={{ fontSize: 11 }} label={{ value: 'Rainfall (mm)', angle: 90, position: 'insideRight', fill: '#2563eb', fontSize: 11 }} />
+              <YAxis yAxisId="discharge" stroke="#0891b2" tick={{ fontSize: 11 }} label={{ value: t('flood.dischargeUnit', 'River Flow (m³/s)'), angle: -90, position: 'insideLeft', fill: '#0891b2', fontSize: 11 }} />
+              <YAxis yAxisId="rain" orientation="right" stroke="#2563eb" tick={{ fontSize: 11 }} label={{ value: t('flood.precipUnit', 'Rainfall (mm)'), angle: 90, position: 'insideRight', fill: '#2563eb', fontSize: 11 }} />
               <Tooltip 
                 contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e7e2d6', borderRadius: '0.875rem', color: '#191c1a', fontSize: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} 
               />
-              <ReferenceLine y={250} yAxisId="discharge" label={{ value: 'Safe Limit (250 m³/s)', fill: '#15803d', fontSize: 11 }} stroke="#15803d" strokeDasharray="4 4" />
-              <ReferenceLine y={380} yAxisId="discharge" label={{ value: 'Breach Limit (380 m³/s)', fill: '#b91c1c', fontSize: 11 }} stroke="#b91c1c" strokeWidth={2} />
+              <ReferenceLine y={250} yAxisId="discharge" label={{ value: t('flood.safeLimitLabel', 'Safe Limit (250 m³/s)'), fill: '#15803d', fontSize: 11 }} stroke="#15803d" strokeDasharray="4 4" />
+              <ReferenceLine y={380} yAxisId="discharge" label={{ value: t('flood.breachLimitLabel', 'Overflow Limit (380 m³/s)'), fill: '#b91c1c', fontSize: 11 }} stroke="#b91c1c" strokeWidth={2} />
               
-              <Area yAxisId="discharge" type="monotone" dataKey="discharge" stroke="#0891b2" strokeWidth={3} fillOpacity={1} fill="url(#dischargeGradientLight)" name="Discharge (m³/s)" />
-              <Line yAxisId="rain" type="monotone" dataKey="rainfallMm" stroke="#3b82f6" strokeWidth={2} strokeDasharray="3 3" name="Precipitation (mm)" />
+              <Area yAxisId="discharge" type="monotone" dataKey="discharge" stroke="#0891b2" strokeWidth={3} fillOpacity={1} fill="url(#dischargeGradientLight)" name={t('flood.dischargeUnit', 'River Flow (m³/s)')} />
+              <Line yAxisId="rain" type="monotone" dataKey="rainfallMm" stroke="#3b82f6" strokeWidth={2} strokeDasharray="3 3" name={t('flood.precipUnit', 'Rainfall (mm)')} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -308,8 +310,8 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-4 border-t border-sand-200">
           <div className="bg-sand-50/80 border border-sand-200 rounded-2xl p-3.5 flex items-center justify-between">
             <div>
-              <div className="text-xs font-bold text-ink-900">Demountable Flood Gates</div>
-              <div className="text-[11px] text-ink-500">Riverside Logistics Corridor</div>
+              <div className="text-xs font-bold text-ink-900">{t('flood.floodGates', 'Moveable Flood Gates')}</div>
+              <div className="text-[11px] text-ink-500">{t('flood.floodGatesLocation', 'Riverside Business District')}</div>
             </div>
             <button
               onClick={() => handleToggleDefense('floodGates')}
@@ -317,14 +319,14 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
                 activeDefenses.floodGates ? 'bg-forest-900 text-sand-50 shadow-xs' : 'bg-sand-200 text-ink-600'
               }`}
             >
-              {activeDefenses.floodGates ? 'DEPLOYED' : 'STANDBY'}
+              {activeDefenses.floodGates ? t('flood.deployed', 'DEPLOYED') : t('flood.standby', 'STANDBY')}
             </button>
           </div>
 
           <div className="bg-sand-50/80 border border-sand-200 rounded-2xl p-3.5 flex items-center justify-between">
             <div>
-              <div className="text-xs font-bold text-ink-900">High-Volume Mobile Pumps</div>
-              <div className="text-[11px] text-ink-500">40,000 L/min Submersible Array</div>
+              <div className="text-xs font-bold text-ink-900">{t('flood.pumps', 'High-Capacity Water Pumps')}</div>
+              <div className="text-[11px] text-ink-500">{t('flood.pumpsDesc', 'Pumps excess flood water away (40,000 L/min)')}</div>
             </div>
             <button
               onClick={() => handleToggleDefense('highVolumePumps')}
@@ -332,14 +334,14 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
                 activeDefenses.highVolumePumps ? 'bg-forest-900 text-sand-50 shadow-xs' : 'bg-sand-200 text-ink-600'
               }`}
             >
-              {activeDefenses.highVolumePumps ? 'ACTIVE' : 'OFFLINE'}
+              {activeDefenses.highVolumePumps ? t('flood.active', 'ACTIVE') : t('flood.offline', 'OFFLINE')}
             </button>
           </div>
 
           <div className="bg-sand-50/80 border border-sand-200 rounded-2xl p-3.5 flex items-center justify-between">
             <div>
-              <div className="text-xs font-bold text-ink-900">Upstream Retention Sluice</div>
-              <div className="text-[11px] text-ink-500">Diverts 45 m³/s into Wetland</div>
+              <div className="text-xs font-bold text-ink-900">{t('flood.sluice', 'Upstream Water Overflow Gate')}</div>
+              <div className="text-[11px] text-ink-500">{t('flood.sluiceDesc', 'Redirects high water into natural wetlands')}</div>
             </div>
             <button
               onClick={() => handleToggleDefense('diversionSluice')}
@@ -347,7 +349,7 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
                 activeDefenses.diversionSluice ? 'bg-forest-900 text-sand-50 shadow-xs' : 'bg-sand-200 text-ink-600'
               }`}
             >
-              {activeDefenses.diversionSluice ? 'OPEN' : 'CLOSED'}
+              {activeDefenses.diversionSluice ? t('flood.open', 'OPEN') : t('flood.closed', 'CLOSED')}
             </button>
           </div>
         </div>

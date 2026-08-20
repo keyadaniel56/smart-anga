@@ -18,6 +18,7 @@ import {
 } from 'recharts';
 import { SensorNode } from '../types/climate';
 import { RiskBadge } from './ui/RiskBadge';
+import { useTranslation } from '../context/LanguageContext';
 
 interface LiveSensorFeedProps {
   sensors: SensorNode[];
@@ -29,6 +30,7 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
   sensors,
   onAddSensorReading
 }) => {
+  const { t } = useTranslation();
   const [selectedSensor, setSelectedSensor] = useState<SensorNode>(sensors[0] || null);
   const [manualInputVal, setManualInputVal] = useState<string>('');
   const [manualErrorWarning, setManualErrorWarning] = useState<string | null>(null);
@@ -73,24 +75,24 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold text-ink-900 font-serif">
-                IoT Sensor Telemetry & Anomaly Filtering
+                {t('sensors.heading', 'Live Weather & River Sensors')}
               </h2>
               <span className="px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-mono font-bold tracking-wide border border-teal-200">
-                EDGE MESH
+                {t('sensors.badge', 'LIVE SENSORS')}
               </span>
             </div>
             <p className="text-xs text-ink-500 mt-0.5">
-              Real-time stream gauge, soil moisture array & micro-climate network with error validation
+              {t('sensors.subheading', 'Live readings from river height gauges, soil moisture probes, and weather stations')}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="text-xs bg-sand-100 text-ink-700 px-3 py-1.5 rounded-xl border border-sand-200 font-mono">
-            {sensors.length} Active Nodes
+            {sensors.length} {t('sensors.activeNodes', 'Sensors Online')}
           </span>
           {anomaliesCount > 0 && (
-            <RiskBadge level="high" size="md" label={`${anomaliesCount} Anomaly Alerts`} />
+            <RiskBadge level="high" size="md" label={`${anomaliesCount} ${t('sensors.anomalyAlerts', 'Unusual Readings')}`} />
           )}
         </div>
       </div>
@@ -100,8 +102,8 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
         {/* Sensor List */}
         <div className="bg-white/90 border border-sand-200 rounded-3xl p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between pb-3 border-b border-sand-200 text-xs font-bold text-ink-500 font-mono">
-            <span>Hardware Telemetry Nodes</span>
-            <span className="text-[10px] text-forest-800">10s Polling</span>
+            <span>{t('sensors.listHeading', 'Weather & Water Gauges')}</span>
+            <span className="text-[10px] text-forest-800">{t('sensors.pollingInterval', 'Updates every 10s')}</span>
           </div>
 
           <div className="space-y-2.5 max-h-[520px] overflow-y-auto pr-1">
@@ -154,7 +156,7 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
                 <h3 className="text-lg font-bold text-ink-900 font-serif mt-1">{selectedSensor.name}</h3>
               </div>
               <div className="text-right">
-                <span className="text-xs text-ink-500 block font-mono">Current Telemetry</span>
+                <span className="text-xs text-ink-500 block font-mono">{t('sensors.currentReading', 'Latest Reading')}</span>
                 <span className="text-2xl font-extrabold font-mono text-forest-900">
                   {selectedSensor.currentValue} <span className="text-xs text-ink-500 font-sans">{selectedSensor.unit}</span>
                 </span>
@@ -164,8 +166,8 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
             {/* 24-Hour Telemetry History Chart */}
             <div>
               <div className="flex items-center justify-between text-xs text-ink-500 mb-2 font-mono">
-                <span className="font-semibold">Continuous Telemetry Stream</span>
-                <span>Normal: {selectedSensor.normalRange[0]} - {selectedSensor.normalRange[1]} {selectedSensor.unit}</span>
+                <span className="font-semibold">{t('sensors.historyHeading', '24-Hour Reading History')}</span>
+                <span>{t('sensors.normalRange', 'Normal')}: {selectedSensor.normalRange[0]} - {selectedSensor.normalRange[1]} {selectedSensor.unit}</span>
               </div>
               <div className="h-60 w-full bg-sand-50/80 p-3 rounded-2xl border border-sand-200">
                 <ResponsiveContainer width="100%" height="100%">
@@ -185,9 +187,9 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-ink-900 font-mono flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-forest-700" />
-                  Manual Gauge Logging with Automated Anomaly Filter
+                  {t('sensors.manualFormHeading', 'Manual Gauge Reading with Typo Check')}
                 </h4>
-                <span className="text-[10px] text-ink-400 font-mono">Physical range validation</span>
+                <span className="text-[10px] text-ink-400 font-mono">{t('sensors.validationDesc', 'Checks for reasonable numbers')}</span>
               </div>
 
               {manualErrorWarning && (
@@ -201,7 +203,7 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
                 <input
                   type="number"
                   step="0.01"
-                  placeholder={`Enter reading in ${selectedSensor.unit}...`}
+                  placeholder={`${t('sensors.manualPlaceholder', 'Enter reading in')} ${selectedSensor.unit}...`}
                   value={manualInputVal}
                   onChange={(e) => setManualInputVal(e.target.value)}
                   className="w-full sm:flex-1 bg-white border border-sand-300 rounded-xl px-3.5 py-2.5 text-xs text-ink-900 placeholder-ink-400 focus:outline-none focus:border-forest-700 font-mono"
@@ -211,7 +213,7 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
                   className="w-full sm:w-auto px-4 py-2.5 bg-forest-900 hover:bg-forest-800 text-sand-50 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  Validate & Log Telemetry
+                  {t('sensors.saveReadingBtn', 'Check and Save Reading')}
                 </button>
               </form>
             </div>

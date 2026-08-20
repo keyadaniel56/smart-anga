@@ -3,15 +3,16 @@ import {
   MapPin, 
   Search, 
   Compass, 
-  AlertTriangle,
-  ChevronDown,
-  Sparkles,
-  Layers,
-  Thermometer
+  AlertTriangle, 
+  ChevronDown, 
+  Sparkles, 
+  Thermometer,
+  Languages
 } from 'lucide-react';
 import { LocationProfile, EarlyWarningAlert, LiveWeatherData } from '../types/climate';
 import { GLOBAL_HOTSPOTS } from '../data/mockClimateData';
 import { RiskBadge } from './ui/RiskBadge';
+import { useTranslation } from '../context/LanguageContext';
 
 interface HeaderProps {
   locations?: LocationProfile[];
@@ -29,9 +30,9 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectLocation,
   activeAlerts = [],
   liveWeather,
-  weatherLoading = false,
   activeIncidentCount = 0
 }) => {
+  const { t, language, setLanguage } = useTranslation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTime, setCurrentTime] = useState('');
@@ -109,7 +110,7 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
             <span className="font-bold uppercase tracking-wider text-rose-800 flex items-center gap-1 font-mono text-[11px]">
               <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
-              Active Alert:
+              {t('header.activeAlertLabel', 'Emergency Weather Alert')}:
             </span>
             <span className="truncate font-medium text-rose-950">
               {criticalAlerts[0].title} — {criticalAlerts[0].headline}
@@ -119,7 +120,7 @@ export const Header: React.FC<HeaderProps> = ({
             <RiskBadge
               level="critical"
               size="xs"
-              label={activeIncidentCount > 0 ? `${activeIncidentCount} Dispatched` : 'Active'}
+              label={activeIncidentCount > 0 ? `${activeIncidentCount} Dispatched` : t('common.active', 'Active')}
             />
           </div>
         </div>
@@ -136,29 +137,43 @@ export const Header: React.FC<HeaderProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-lg sm:text-xl font-bold tracking-tight text-forest-900 font-serif">
-                  SmartAnga
+                  {t('header.title', 'SmartAnga')}
                 </h1>
                 <span className="hidden sm:inline-block px-2 py-0.5 rounded-full bg-forest-100 text-forest-800 text-[10px] font-mono font-bold tracking-wide border border-forest-200">
-                  CLIMASHIELD
+                  {t('header.badge', 'COMMUNITY SAFETY')}
                 </span>
               </div>
               <p className="text-ink-500 text-[11px] font-medium tracking-wide">
-                Environmental & Climate Risk Intelligence
+                {t('header.subtitle', 'Community Climate & Weather Safety Platform')}
               </p>
             </div>
           </div>
 
-          {/* Mobile Live Status & Temperature */}
+          {/* Mobile Live Status & Language Toggle */}
           <div className="flex md:hidden items-center gap-2">
+            <div className="flex items-center bg-sand-100 p-0.5 rounded-lg border border-sand-200 text-xs">
+              <button
+                onClick={() => setLanguage('en')}
+                className={`px-2 py-0.5 rounded font-mono font-bold text-[10px] transition-all ${
+                  language === 'en' ? 'bg-forest-900 text-sand-50 shadow-2xs' : 'text-ink-500'
+                }`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => setLanguage('sw')}
+                className={`px-2 py-0.5 rounded font-mono font-bold text-[10px] transition-all ${
+                  language === 'sw' ? 'bg-forest-900 text-sand-50 shadow-2xs' : 'text-ink-500'
+                }`}
+              >
+                SW
+              </button>
+            </div>
             {liveWeather && (
               <span className="font-mono text-xs font-bold text-forest-900 bg-sand-100 px-2 py-1 rounded-lg border border-sand-200">
                 {liveWeather.temperature.toFixed(1)}°C
               </span>
             )}
-            <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-              <span>LIVE</span>
-            </div>
           </div>
         </div>
 
@@ -202,7 +217,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <Search className="w-4 h-4 text-ink-400" />
                 <input
                   type="text"
-                  placeholder="Search river basin, city or country..."
+                  placeholder={t('header.searchPlaceholder', 'Search town, neighborhood, or river area...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-transparent text-xs text-ink-900 placeholder-ink-400 focus:outline-none"
@@ -217,13 +232,13 @@ export const Header: React.FC<HeaderProps> = ({
                   className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-forest-800 hover:bg-sand-100 rounded-xl transition-colors border border-dashed border-sand-300 mb-1"
                 >
                   <Compass className="w-3.5 h-3.5 text-forest-700" />
-                  Use Current Device GPS Telemetry
+                  {t('header.useGps', 'Use My Current Device Location')}
                 </button>
               </div>
 
               <div className="max-h-60 overflow-y-auto space-y-1 py-1">
                 <div className="px-2 py-1 text-[10px] font-bold text-ink-400 uppercase tracking-wider font-mono">
-                  Global Catchment Hotspots & River Basins
+                  {t('header.selectHotspot', 'Select Monitored Town or Catchment Area')}
                 </div>
                 {filteredHotspots.map((spot) => (
                   <button
@@ -258,8 +273,33 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Live System Telemetry & UTC Time */}
+        {/* Live System Telemetry, UTC Time & Desktop Language Switcher */}
         <div className="hidden md:flex items-center gap-3 justify-end">
+          {/* Language Switcher Pill */}
+          <div className="flex items-center bg-white/90 border border-sand-200 p-1 rounded-xl shadow-xs">
+            <Languages className="w-3.5 h-3.5 text-forest-800 ml-1 mr-1.5" />
+            <div className="flex items-center bg-sand-100 p-0.5 rounded-lg border border-sand-200 text-xs">
+              <button
+                id="lang-btn-en"
+                onClick={() => setLanguage('en')}
+                className={`px-2.5 py-1 rounded-md font-mono font-bold text-xs transition-all ${
+                  language === 'en' ? 'bg-forest-900 text-sand-50 shadow-xs' : 'text-ink-600 hover:text-ink-900'
+                }`}
+              >
+                EN
+              </button>
+              <button
+                id="lang-btn-sw"
+                onClick={() => setLanguage('sw')}
+                className={`px-2.5 py-1 rounded-md font-mono font-bold text-xs transition-all ${
+                  language === 'sw' ? 'bg-forest-900 text-sand-50 shadow-xs' : 'text-ink-600 hover:text-ink-900'
+                }`}
+              >
+                SW
+              </button>
+            </div>
+          </div>
+
           {liveWeather && (
             <div className="flex items-center gap-2 bg-white/90 border border-sand-200 px-3 py-1.5 rounded-xl text-xs shadow-xs">
               <Thermometer className="w-3.5 h-3.5 text-ochre-600" />

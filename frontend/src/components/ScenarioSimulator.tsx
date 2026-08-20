@@ -17,6 +17,7 @@ import {
 import { LocationProfile } from '../types/climate';
 import { RiskBadge, RiskLevel } from './ui/RiskBadge';
 import { RiskDial } from './ui/RiskDial';
+import { useTranslation } from '../context/LanguageContext';
 
 interface ScenarioSimulatorProps {
   location: LocationProfile;
@@ -35,6 +36,7 @@ interface SimulationResults {
 export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
   location
 }) => {
+  const { t } = useTranslation();
   const [precipDelta, setPrecipDelta] = useState<number>(40);
   const [tempDelta, setTempDelta] = useState<number>(2.8);
   const [droughtWeeks, setDroughtWeeks] = useState<number>(4);
@@ -95,19 +97,19 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
 
     const actions: string[] = [];
     if (p > 20 || r > 1.5) {
-      actions.push('Deploy demountable flood gates at logistics zones and stage mobile pumps (40k L/min).');
+      actions.push('Deploy moveable flood gates at business zones and position mobile water pumps.');
     }
     if (r >= 2.0) {
-      actions.push('Open upstream retention sluices to divert peak streamflow away from commercial district.');
+      actions.push('Open upstream overflow gate to redirect river water into wetlands.');
     }
     if (t >= 3.0) {
-      actions.push('Activate municipal public cooling shelters and mandate hourly worker hydration breaks.');
+      actions.push('Open public cooling shelters and mandate regular hydration breaks for outdoor workers.');
     }
     if (d >= 4) {
-      actions.push('Implement Tier-2 agricultural water rationing and switch to twilight pulsed drip irrigation.');
+      actions.push('Start farm water rationing and switch to evening drip irrigation.');
     }
     if (actions.length === 0) {
-      actions.push('Maintain standard baseline monitoring and continuous telemetry validation.');
+      actions.push('Maintain regular weather monitoring and sensor checks.');
     }
 
     return {
@@ -160,14 +162,14 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold text-ink-900 font-serif">
-                Climate Stress-Testing & Cascade Studio
+                {t('simulator.heading', 'Weather ' + "'What-If'" + ' Simulator')}
               </h2>
               <span className="px-2 py-0.5 rounded-full bg-forest-100 text-forest-800 text-[10px] font-mono font-bold tracking-wide border border-forest-200">
-                PROJECTION ENGINE
+                {t('simulator.badge', 'WEATHER SIMULATOR')}
               </span>
             </div>
             <p className="text-xs text-ink-500 mt-0.5">
-              Deterministic multi-shock stress simulation for {location.name} ({location.country})
+              {t('simulator.subheading', 'Test how severe storms, heatwaves, or drought would affect ' + location.name)}
             </p>
           </div>
         </div>
@@ -178,7 +180,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
             className="px-3.5 py-2 rounded-xl bg-sand-100 hover:bg-sand-200 text-ink-700 text-xs font-semibold transition-all border border-sand-200 flex items-center gap-1.5"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            Reset Baseline
+            {t('simulator.resetBtn', 'Reset to Normal')}
           </button>
           <button
             onClick={handleRunSimulation}
@@ -186,7 +188,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
             className="px-5 py-2 rounded-xl bg-forest-900 hover:bg-forest-800 text-sand-50 text-xs font-bold transition-all shadow-sm flex items-center gap-2"
           >
             <Play className={`w-3.5 h-3.5 fill-current ${isRunning ? 'animate-spin' : ''}`} />
-            Run Simulation
+            {t('simulator.runBtn', 'Run Simulation')}
           </button>
         </div>
       </div>
@@ -194,7 +196,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
       {/* Preset Archetypes */}
       <div className="space-y-2">
         <div className="text-xs font-bold uppercase tracking-wider text-ink-500 font-mono">
-          Stress Preset Archetypes
+          {t('simulator.presetsHeading', 'Example Severe Weather Scenarios')}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {presets.map((p, idx) => (
@@ -205,7 +207,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
             >
               <div className="flex items-center justify-between text-xs font-bold text-ink-900 group-hover:text-forest-900">
                 <span>{p.name}</span>
-                <span className="font-mono text-[10px] text-forest-700">Apply &rarr;</span>
+                <span className="font-mono text-[10px] text-forest-700">{t('simulator.applyPreset', 'Test This')} &rarr;</span>
               </div>
               <p className="text-[11px] text-ink-500 mt-1">{p.desc}</p>
             </button>
@@ -218,7 +220,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
         {/* Precipitation Anomaly */}
         <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-xs space-y-3">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-ink-900">Precipitation Anomaly</span>
+            <span className="font-bold text-ink-900">{t('simulator.rainfallChange', 'Rainfall Change')}</span>
             <span className={`font-mono font-bold px-2 py-0.5 rounded-md ${
               precipDelta > 0 ? 'bg-cyan-50 text-cyan-800 border border-cyan-200' : 'bg-amber-50 text-amber-800 border border-amber-200'
             }`}>
@@ -235,15 +237,15 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
             className="w-full accent-teal-600 bg-sand-200 cursor-pointer h-2 rounded-lg"
           />
           <div className="flex justify-between text-[10px] text-ink-400 font-mono">
-            <span>-50% (Drought)</span>
-            <span>+100% (Deluge)</span>
+            <span>-50% ({t('common.drought', 'Drought')})</span>
+            <span>+100% ({t('simulator.heavyRain', 'Heavy Rain')})</span>
           </div>
         </div>
 
         {/* Thermal Anomaly */}
         <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-xs space-y-3">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-ink-900">Thermal Anomaly</span>
+            <span className="font-bold text-ink-900">{t('simulator.tempIncrease', 'Temperature Rise')}</span>
             <span className="font-mono font-bold px-2 py-0.5 rounded-md bg-rose-50 text-rose-800 border border-rose-200">
               +{tempDelta.toFixed(1)}°C
             </span>
@@ -259,16 +261,16 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
           />
           <div className="flex justify-between text-[10px] text-ink-400 font-mono">
             <span>+0.5°C</span>
-            <span>+6.0°C (Extreme)</span>
+            <span>+6.0°C ({t('simulator.extremeHeat', 'Extreme Heat')})</span>
           </div>
         </div>
 
         {/* Soil Drought Duration */}
         <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-xs space-y-3">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-ink-900">Drought Duration</span>
+            <span className="font-bold text-ink-900">{t('simulator.droughtWeeks', 'Dry Spell Length')}</span>
             <span className="font-mono font-bold px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200">
-              {droughtWeeks} Wks
+              {droughtWeeks} {t('simulator.weeks', 'Weeks')}
             </span>
           </div>
           <input
@@ -281,15 +283,15 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
             className="w-full accent-amber-600 bg-sand-200 cursor-pointer h-2 rounded-lg"
           />
           <div className="flex justify-between text-[10px] text-ink-400 font-mono">
-            <span>0 Wks</span>
-            <span>16 Wks (Severe)</span>
+            <span>0 {t('simulator.weeks', 'Wks')}</span>
+            <span>16 {t('simulator.weeks', 'Wks')} ({t('drought.severe', 'Severe')})</span>
           </div>
         </div>
 
         {/* River Peak Multiplier */}
         <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-xs space-y-3">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-ink-900">River Multiplier</span>
+            <span className="font-bold text-ink-900">{t('simulator.riverSurge', 'River Surge Level')}</span>
             <span className="font-mono font-bold px-2 py-0.5 rounded-md bg-forest-50 text-forest-800 border border-forest-200">
               {riverMultiplier.toFixed(1)}x Peak
             </span>
@@ -305,7 +307,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
           />
           <div className="flex justify-between text-[10px] text-ink-400 font-mono">
             <span>0.5x</span>
-            <span>3.5x (Breach)</span>
+            <span>3.5x ({t('simulator.overflowRisk', 'Overflow Danger')})</span>
           </div>
         </div>
       </div>
@@ -316,16 +318,16 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 font-mono text-[10px] font-bold border border-amber-200">
-                SIMULATED MODEL OUTPUT
+                {t('simulator.resultsBadge', 'SIMULATION RESULTS')}
               </span>
-              <span className="text-xs text-ink-500 font-mono">Calculated at {results.simulatedAt}</span>
+              <span className="text-xs text-ink-500 font-mono">{t('simulator.calculatedAt', 'Simulated at')} {results.simulatedAt}</span>
             </div>
             <h3 className="text-base font-bold text-ink-900 font-serif mt-1">
-              Projected Shock Impact & Cascade Diagnostics
+              {t('simulator.resultsHeading', 'Simulated Weather Impact & Safety Advice')}
             </h3>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-ink-500 font-medium">Cascade Risk Level:</span>
+            <span className="text-xs text-ink-500 font-medium">{t('simulator.riskLevel', 'Overall Danger Level')}:</span>
             <RiskBadge level={results.cascadeRiskLevel} size="md" pulse={results.cascadeRiskLevel === 'critical'} />
           </div>
         </div>
@@ -335,7 +337,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
           {/* Compound Stress Score Dial */}
           <div className="bg-sand-50/70 border border-sand-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-xs">
             <span className="text-[11px] font-bold uppercase tracking-wider text-ink-500 font-mono mb-1">
-              Compound Stress Index
+              {t('simulator.stressScore', 'Overall Climate Risk Score (combines all weather shocks)')}
             </span>
             <RiskDial
               score={results.stressScore}
@@ -343,14 +345,14 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
               riskLevel={results.cascadeRiskLevel}
             />
             <span className="text-[11px] text-ink-500 mt-2">
-              Multi-hazard exposure score
+              {t('simulator.stressExplainer', 'Combined risk across flood, heat, and drought')}
             </span>
           </div>
 
           {/* Inundation Area */}
           <div className="bg-sand-50/70 border border-sand-200 rounded-2xl p-4 flex flex-col justify-between shadow-xs">
             <div className="flex items-center justify-between text-xs text-ink-500 mb-1">
-              <span className="font-bold uppercase tracking-wider font-mono">Inundation Area</span>
+              <span className="font-bold uppercase tracking-wider font-mono">{t('simulator.floodedArea', 'Expected Flooded Area')}</span>
               <Droplets className="w-4 h-4 text-cyan-600" />
             </div>
             <div className="my-2">
@@ -358,7 +360,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
                 {results.inundationAreaKm2} <span className="text-sm font-sans font-medium text-ink-500">km²</span>
               </div>
               <p className="text-xs text-ink-500 mt-1">
-                Projected active flood plume footprint
+                {t('simulator.floodedAreaDesc', 'Estimated land covered by flood water')}
               </p>
             </div>
             <div className="w-full bg-sand-200 h-1.5 rounded-full overflow-hidden">
@@ -372,7 +374,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
           {/* Economic Exposure */}
           <div className="bg-sand-50/70 border border-sand-200 rounded-2xl p-4 flex flex-col justify-between shadow-xs">
             <div className="flex items-center justify-between text-xs text-ink-500 mb-1">
-              <span className="font-bold uppercase tracking-wider font-mono">Economic Exposure</span>
+              <span className="font-bold uppercase tracking-wider font-mono">{t('simulator.financialRisk', 'Estimated Financial Risk')}</span>
               <DollarSign className="w-4 h-4 text-ochre-600" />
             </div>
             <div className="my-2">
@@ -380,7 +382,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
                 ${results.economicExposureMillionsUSD} <span className="text-sm font-sans font-medium text-ink-500">M</span>
               </div>
               <p className="text-xs text-ink-500 mt-1">
-                Direct physical damage & 14-day business halt
+                {t('simulator.financialRiskDesc', 'Building repairs and business closures')}
               </p>
             </div>
             <div className="w-full bg-sand-200 h-1.5 rounded-full overflow-hidden">
@@ -394,7 +396,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
           {/* Crop Yield Shock */}
           <div className="bg-sand-50/70 border border-sand-200 rounded-2xl p-4 flex flex-col justify-between shadow-xs">
             <div className="flex items-center justify-between text-xs text-ink-500 mb-1">
-              <span className="font-bold uppercase tracking-wider font-mono">Crop Yield Shock</span>
+              <span className="font-bold uppercase tracking-wider font-mono">{t('simulator.cropLoss', 'Expected Harvest Loss')}</span>
               <Sprout className="w-4 h-4 text-forest-700" />
             </div>
             <div className="my-2">
@@ -402,7 +404,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
                 -{results.cropYieldImpactPct}%
               </div>
               <p className="text-xs text-ink-500 mt-1">
-                Agricultural yield loss across arable acreage
+                {t('simulator.cropLossDesc', 'Crop loss across local farms')}
               </p>
             </div>
             <div className="w-full bg-sand-200 h-1.5 rounded-full overflow-hidden">
@@ -418,7 +420,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
         <div className="bg-sand-50/90 border border-sand-200 rounded-2xl p-4 space-y-2.5">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-forest-900 font-mono">
             <ShieldCheck className="w-4 h-4 text-forest-700" />
-            Recommended Operational Mitigation Directives
+            {t('simulator.mitigationHeading', 'Recommended Actions for This Scenario')}
           </div>
           <div className="space-y-1.5">
             {results.mitigationActions.map((action, i) => (

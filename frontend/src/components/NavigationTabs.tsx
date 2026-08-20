@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { NavigationTabType } from '../types/climate';
 import { RiskBadge } from './ui/RiskBadge';
+import { useTranslation } from '../context/LanguageContext';
 
 interface NavigationTabsProps {
   activeTab: NavigationTabType;
@@ -28,71 +29,6 @@ interface NavigationTabsProps {
   onToggleMobileDrawer?: () => void;
 }
 
-export const NAV_ITEMS: {
-  id: NavigationTabType;
-  label: string;
-  shortLabel: string;
-  icon: React.ElementType;
-  description: string;
-}[] = [
-  {
-    id: 'overview_gis',
-    label: 'Overview & GIS',
-    shortLabel: 'Overview',
-    icon: Map,
-    description: 'Multi-hazard regional map & live telemetry matrix'
-  },
-  {
-    id: 'flood_prediction',
-    label: 'Flood Prediction',
-    shortLabel: 'Flood',
-    icon: Waves,
-    description: 'Stream discharge, hydrographs & flood defense'
-  },
-  {
-    id: 'drought_assessment',
-    label: 'Drought & Agro Risk',
-    shortLabel: 'Drought',
-    icon: Sun,
-    description: 'SPEI index, soil moisture horizons & crop stress'
-  },
-  {
-    id: 'vulnerability_var',
-    label: 'Vulnerability & VaR',
-    shortLabel: 'Vulnerability',
-    icon: ShieldAlert,
-    description: 'Financial Value-at-Risk & infrastructure registry'
-  },
-  {
-    id: 'early_warning',
-    label: 'EWS & Dispatch',
-    shortLabel: 'EWS',
-    icon: Radio,
-    description: 'CAP protocol broadcast & inter-agency dispatch'
-  },
-  {
-    id: 'sme_preparedness',
-    label: 'SME Preparedness',
-    shortLabel: 'SME',
-    icon: Building2,
-    description: 'Facility hardening & business continuity plans'
-  },
-  {
-    id: 'scenario_simulator',
-    label: 'Climate Stress Studio',
-    shortLabel: 'Simulator',
-    icon: FlaskConical,
-    description: 'Cascade impact simulation & adaptation modeling'
-  },
-  {
-    id: 'sensor_telemetry',
-    label: 'IoT Sensors & Feed',
-    shortLabel: 'Sensors',
-    icon: Cpu,
-    description: 'Live hardware stream gauges & anomaly detection'
-  }
-];
-
 export const NavigationTabs: React.FC<NavigationTabsProps> = ({
   activeTab,
   onSelectTab,
@@ -102,20 +38,86 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
   activeIncidentCount = 0,
   anomaliesDetectedCount = 0
 }) => {
+  const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const alertsTotal = activeAlertsCount || activeAlertCount;
   const incidentsTotal = activeIncidentsCount || activeIncidentCount;
 
+  const navItems: {
+    id: NavigationTabType;
+    label: string;
+    shortLabel: string;
+    icon: React.ElementType;
+    description: string;
+  }[] = [
+    {
+      id: 'overview_gis',
+      label: t('nav.overview', 'Overview & Map'),
+      shortLabel: t('nav.overview', 'Overview'),
+      icon: Map,
+      description: t('nav.overviewDesc', 'Community map and live local conditions')
+    },
+    {
+      id: 'flood_prediction',
+      label: t('nav.flood', 'River & Flood Watch'),
+      shortLabel: t('nav.flood', 'Flood Watch'),
+      icon: Waves,
+      description: t('nav.floodDesc', 'River height, water flow forecast, and flood defense')
+    },
+    {
+      id: 'drought_assessment',
+      label: t('nav.drought', 'Drought & Farming'),
+      shortLabel: t('nav.drought', 'Drought'),
+      icon: Sun,
+      description: t('nav.droughtDesc', 'Soil dryness, reservoir levels, and crop water guides')
+    },
+    {
+      id: 'vulnerability_var',
+      label: t('nav.vulnerability', 'Area Risk & Losses'),
+      shortLabel: t('nav.vulnerability', 'Risk & Loss'),
+      icon: ShieldAlert,
+      description: t('nav.vulnerabilityDesc', 'Estimated damage risk to homes, clinics, power, and farms')
+    },
+    {
+      id: 'early_warning',
+      label: t('nav.earlyWarning', 'Alerts & Dispatches'),
+      shortLabel: t('nav.earlyWarning', 'Alerts'),
+      icon: Radio,
+      description: t('nav.earlyWarningDesc', 'Official warnings and emergency team responses')
+    },
+    {
+      id: 'sme_preparedness',
+      label: t('nav.sme', 'Business Readiness'),
+      shortLabel: t('nav.sme', 'Business'),
+      icon: Building2,
+      description: t('nav.smeDesc', 'Safety checklists and protection for local businesses')
+    },
+    {
+      id: 'scenario_simulator',
+      label: t('nav.simulator', 'Weather Shock Test'),
+      shortLabel: t('nav.simulator', 'Shock Test'),
+      icon: FlaskConical,
+      description: t('nav.simulatorDesc', 'Test what happens in severe storms or dry spells')
+    },
+    {
+      id: 'sensor_telemetry',
+      label: t('nav.sensors', 'Local Sensor Network'),
+      shortLabel: t('nav.sensors', 'Sensors'),
+      icon: Cpu,
+      description: t('nav.sensorsDesc', 'Live river gauges, soil monitors, and weather sensors')
+    }
+  ];
+
   const getBadgeForTab = (id: NavigationTabType) => {
     if (id === 'overview_gis' && alertsTotal > 0) {
-      return <RiskBadge level="critical" size="xs" label={`${alertsTotal} Alert${alertsTotal > 1 ? 's' : ''}`} />;
+      return <RiskBadge level="critical" size="xs" label={`${alertsTotal} ${t('common.active', 'Active')}`} />;
     }
     if (id === 'early_warning' && incidentsTotal > 0) {
-      return <RiskBadge level="high" size="xs" label={`${incidentsTotal} Active`} />;
+      return <RiskBadge level="high" size="xs" label={`${incidentsTotal} ${t('common.active', 'Active')}`} />;
     }
     if (id === 'sensor_telemetry' && anomaliesDetectedCount > 0) {
-      return <RiskBadge level="moderate" size="xs" label={`${anomaliesDetectedCount} Anomaly`} />;
+      return <RiskBadge level="moderate" size="xs" label={`${anomaliesDetectedCount} Alert`} />;
     }
     return null;
   };
@@ -137,11 +139,11 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
       >
         <div className="space-y-1">
           <div className="px-3 py-1 text-[10px] font-mono font-bold tracking-wider text-ink-500 uppercase">
-            Operations & Analytics
+            {t('nav.operationsTitle', 'Navigation')}
           </div>
 
           <div className="space-y-1">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
               const badge = getBadgeForTab(item.id);
@@ -178,14 +180,14 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
           <div className="flex items-center justify-between text-[11px] font-bold text-forest-900 font-serif">
             <span className="flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-teal-600" />
-              SmartAnga Engine
+              SmartAnga
             </span>
             <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200">
               v2.4
             </span>
           </div>
           <p className="text-[11px] text-ink-500 leading-snug">
-            Integrated catchment hydrology & institutional resilience protocol.
+            {t('overview.reportCardDesc', 'Clear safety summary and risk assessment for your area.')}
           </p>
         </div>
       </aside>
@@ -197,7 +199,7 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
       >
         <div className="flex items-center justify-around">
           {primaryMobileTabs.map((tabId) => {
-            const item = NAV_ITEMS.find((n) => n.id === tabId)!;
+            const item = navItems.find((n) => n.id === tabId)!;
             const Icon = item.icon;
             const isActive = activeTab === tabId;
             const hasAlert =
@@ -248,7 +250,7 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
             >
               {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </div>
-            <span className="text-[10px] mt-0.5 font-medium">Modules</span>
+            <span className="text-[10px] mt-0.5 font-medium">{t('nav.allModules', 'Modules')}</span>
           </button>
         </div>
       </nav>
@@ -266,8 +268,8 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
           >
             <div className="flex items-center justify-between pb-3 border-b border-sand-200">
               <div>
-                <h3 className="text-base font-bold text-ink-900 font-serif">All System Modules</h3>
-                <p className="text-xs text-ink-500">Select a climate analytics & response domain</p>
+                <h3 className="text-base font-bold text-ink-900 font-serif">{t('nav.allModules', 'All System Modules')}</h3>
+                <p className="text-xs text-ink-500">{t('nav.selectDomain', 'Select a weather risk & safety area')}</p>
               </div>
               <button
                 onClick={() => setMobileMenuOpen(false)}
@@ -278,7 +280,7 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-6">
-              {NAV_ITEMS.map((item) => {
+              {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
                 const badge = getBadgeForTab(item.id);
