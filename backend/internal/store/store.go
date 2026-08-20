@@ -168,3 +168,32 @@ func (s *Store) UpdateIncident(id string, req models.UpdateIncidentRequest) *mod
 	}
 	return nil
 }
+
+func (s *Store) CreateUser(user models.User) error {
+        s.mu.Lock()
+        defer s.mu.Unlock()
+
+        // Check if username already exists
+        for _, u := range s.users {
+                if u.Username == user.Username {
+                        return fmt.Errorf("username already exists")
+                }
+        }
+
+        user.ID = len(s.users) + 1
+        user.CreatedAt = time.Now()
+        s.users = append(s.users, user)
+        return nil
+}
+
+func (s *Store) GetUserByUsername(username string) (*models.User, error) {
+        s.mu.RLock()
+        defer s.mu.RUnlock()
+
+        for i := range s.users {
+                if s.users[i].Username == username {
+                        return &s.users[i], nil
+                }
+        }
+        return nil, fmt.Errorf("user not found")
+}
