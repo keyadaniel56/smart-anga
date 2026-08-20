@@ -87,10 +87,10 @@ describe('SMEPreparednessModule Component', () => {
     expect(screen.getByText('40% Score')).toBeInTheDocument()
   })
 
-  it('switches current focus targets successfully when archetype cards are clicked', () => {
+    it('switches current focus targets successfully when archetype cards are clicked', () => {
     render(<SMEPreparednessModule location={mockLocation} />)
 
-    // ✅ FIXED: Used getAllByText for base state assertion 
+    // Initially selects first card profile structure
     expect(screen.getAllByText('AgroProcessing Co').length).toBe(2)
 
     // Click secondary item option container card track
@@ -99,7 +99,9 @@ describe('SMEPreparednessModule Component', () => {
 
     // Panel updates core layout view variables mapping details automatically
     expect(screen.getAllByText('Coastal Logistics Group').length).toBe(2)
-    expect(screen.getByText('120 Staff')).toBeInTheDocument()
+    
+    // ✅ FIXED: Using a RegExp with a text matcher to safely find the split layout text string
+    expect(screen.getByText(/120\s*Staff/i)).toBeInTheDocument()
   })
 
   it('toggles interactive checkboxes and triggers state mutators on click actions', () => {
