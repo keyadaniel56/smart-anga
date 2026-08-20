@@ -1,6 +1,18 @@
 # Smart Anga - Climate Risk Intelligence & Resilience Platform
 
 A full-stack climate monitoring and disaster resilience platform providing real-time climate risk assessment, flood/drought monitoring, SME business continuity planning, and incident command dispatch.
+API ref curl "https://archive-api.open-meteo.com/v1/era5?latitude=52.52&longitude=13.41&start_date=2021-01-01&end_date=2021-12-31&hourly=temperature_2m" 
+{
+  ...
+  "hourly": {
+    "time": ["2022-01-01T00:00","2022-01-01T01:00", ...],
+    "temperature_2m": [1.7,1.3,1.8,1.3,1.8, ...],
+  }
+}
+
+
+
+floods ..curl "https://flood-api.open-meteo.com/v1/flood?latitude=-1.2864&longitude=36.8172&daily=river_discharge&forecast_days=3"
 
 ## Tech Stack
 
@@ -14,7 +26,7 @@ A full-stack climate monitoring and disaster resilience platform providing real-
 | Backend (Prod) | Go 1.25, stdlib only (zero dependencies) |
 
 ## Project Structure
-
+a
 ```
 anga/
 ├── package.json                          # Root monorepo (workspaces)
