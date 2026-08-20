@@ -11,7 +11,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { LocationProfile } from '../types/climate';
-import { sendClimateChatMessage } from '../services/api';
+import { sendClimateChatMessage, fetchAiConfig } from '../services/api';
 
 interface ClimateAIChatDrawerProps {
   isOpen: boolean;
@@ -41,11 +41,22 @@ export const ClimateAIChatDrawer: React.FC<ClimateAIChatDrawerProps> = ({
   ]);
   const [inputVal, setInputVal] = useState('');
   const [loading, setLoading] = useState(false);
+  const [modelLabel, setModelLabel] = useState('OpenAI (gpt-oss-20b:free)');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    fetchAiConfig().then((cfg) => {
+      if (cfg) {
+        const shortModel = cfg.model.replace(/^openai\//, '');
+        setModelLabel(`${cfg.provider === 'openai' ? 'OpenRouter/OpenAI' : 'Gemini'} • ${shortModel}`);
+      }
+    });
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
 
   useEffect(() => {
     scrollToBottom();
@@ -115,7 +126,7 @@ export const ClimateAIChatDrawer: React.FC<ClimateAIChatDrawerProps> = ({
               Climate Resilience AI Copilot
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             </h3>
-            <p className="text-[10px] text-slate-400">Gemini 3.7 Flash • {location.name}</p>
+            <p className="text-[10px] text-teal-300/80 font-mono truncate max-w-[220px]">{modelLabel} • {location.name}</p>
           </div>
         </div>
 
