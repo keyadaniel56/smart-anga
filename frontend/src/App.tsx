@@ -7,8 +7,7 @@ import {
   CriticalAsset, 
   EarlyWarningAlert, 
   DepartmentIncident, 
-  SMEProfile,
-  GeminiRiskAssessment
+  SMEProfile
 } from './types/climate';
 import { 
   DEFAULT_LOCATIONS, 
@@ -18,7 +17,7 @@ import {
   DEFAULT_INCIDENTS,
   DEFAULT_SME_PROFILES 
 } from './data/mockClimateData';
-import { fetchLiveWeather, assessClimateRisk, fetchDepartmentIncidents, updateDepartmentIncident } from './services/api';
+import { fetchLiveWeather, fetchDepartmentIncidents, updateDepartmentIncident } from './services/api';
 
 import { Header } from './components/Header';
 import { NavigationTabs } from './components/NavigationTabs';
@@ -30,10 +29,7 @@ import { EarlyWarningModule } from './components/EarlyWarningModule';
 import { SMEPreparednessModule } from './components/SMEPreparednessModule';
 import { ScenarioSimulator } from './components/ScenarioSimulator';
 import { LiveSensorFeed } from './components/LiveSensorFeed';
-import { ReportGeneratorModal } from './components/ReportGeneratorModal';
-import { ClimateAIChatDrawer } from './components/ClimateAIChatDrawer';
 import { 
-  Sparkles, 
   ShieldAlert, 
   AlertTriangle, 
   RefreshCw, 
@@ -52,25 +48,16 @@ export default function App() {
   const [currentLocation, setCurrentLocation] = useState<LocationProfile>(DEFAULT_LOCATIONS[0]);
   const [activeTab, setActiveTab] = useState<NavigationTabType>('overview_gis');
   
-  // Real-time Data State
   const [liveWeather, setLiveWeather] = useState<LiveWeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
   const [sensors, setSensors] = useState<SensorNode[]>(DEFAULT_SENSORS);
   const [assets, setAssets] = useState<CriticalAsset[]>(DEFAULT_CRITICAL_ASSETS);
   const [alerts, setAlerts] = useState<EarlyWarningAlert[]>(DEFAULT_ALERTS);
   const [incidents, setIncidents] = useState<DepartmentIncident[]>(DEFAULT_INCIDENTS);
-  const [smeProfiles, setSmeProfiles] = useState<SMEProfile[]>(DEFAULT_SME_PROFILES);
+  const [smeProfiles] = useState<SMEProfile[]>(DEFAULT_SME_PROFILES);
 
-  // Modals and AI State
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [isChatDrawerOpen, setIsChatDrawerOpen] = useState(false);
-  const [aiAssessment, setAiAssessment] = useState<GeminiRiskAssessment | null>(null);
-  const [loadingAssessment, setLoadingAssessment] = useState(false);
-
-  // Historical trend bar hover state
   const [hoveredMonth, setHoveredMonth] = useState<string | null>(null);
 
-  // Load weather when location changes
   useEffect(() => {
     const loadWeather = async () => {
       setWeatherLoading(true);
@@ -88,7 +75,6 @@ export default function App() {
     loadWeather();
   }, [currentLocation]);
 
-  // Load server incidents on mount
   useEffect(() => {
     const loadIncidents = async () => {
       const serverIncidents = await fetchDepartmentIncidents();
@@ -99,27 +85,6 @@ export default function App() {
     loadIncidents();
   }, []);
 
-  // Quick AI risk assessment handler
-  const handleRunAiAssessment = async () => {
-    setLoadingAssessment(true);
-    try {
-      const result = await assessClimateRisk({
-        location: currentLocation,
-        liveWeather,
-        activeSensors: sensors,
-        criticalAssets: assets
-      });
-      if (result) {
-        setAiAssessment(result);
-      }
-    } catch (err) {
-      console.error('Error assessing climate risk:', err);
-    } finally {
-      setLoadingAssessment(false);
-    }
-  };
-
-  // Handler for incident updates
   const handleUpdateIncidentStatus = async (id: string, status: DepartmentIncident['status'], actionText?: string) => {
     const target = incidents.find(i => i.id === id);
     const updatedActions = actionText && target ? [...target.actionsTaken, actionText] : target?.actionsTaken;
@@ -141,7 +106,6 @@ export default function App() {
     });
   };
 
-  // Handler for creating incident
   const handleCreateIncident = (incidentData: Partial<DepartmentIncident>) => {
     const newIncident: DepartmentIncident = {
       id: `INC-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
@@ -161,12 +125,10 @@ export default function App() {
     setActiveTab('early_warning');
   };
 
-  // Handler for CAP alerts
   const handleBroadcastAlert = (newAlert: EarlyWarningAlert) => {
     setAlerts(prev => [newAlert, ...prev]);
   };
 
-  // Sensor reading updates
   const handleAddSensorReading = (sensorId: string, newValue: number) => {
     setSensors(prev => prev.map(s => {
       if (s.id === sensorId) {
@@ -198,7 +160,6 @@ export default function App() {
 
   return (
     <div id="climate-resilience-app" className="min-h-screen bg-slate-950 text-slate-200 flex flex-col font-sans selection:bg-emerald-500/30 selection:text-emerald-200 antialiased">
-      {/* Header matching Bento Grid theme */}
       <Header
         locations={DEFAULT_LOCATIONS}
         currentLocation={currentLocation}
@@ -206,12 +167,9 @@ export default function App() {
         activeAlerts={alerts}
         liveWeather={liveWeather}
         weatherLoading={weatherLoading}
-        onOpenReportGenerator={() => setIsReportModalOpen(true)}
-        onOpenAIChat={() => setIsChatDrawerOpen(true)}
         activeIncidentCount={incidents.filter(i => i.status === 'active' || i.status === 'in_progress').length}
       />
 
-      {/* Bento Navigation Bar */}
       <NavigationTabs
         activeTab={activeTab}
         onSelectTab={setActiveTab}
@@ -220,12 +178,9 @@ export default function App() {
         anomaliesDetectedCount={sensors.filter(s => s.isAnomalyDetected).length}
       />
 
-      {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-        {/* VIEW 1: Overview & GIS with pure Bento Grid structure */}
         {activeTab === 'overview_gis' && (
           <div className="space-y-5 animate-in fade-in duration-200">
-            {/* Top Tactical Intelligence Pill */}
             <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
@@ -240,76 +195,9 @@ export default function App() {
                   Integrated Climate Risk & Inter-Departmental Operations
                 </h2>
               </div>
-
-              <div className="flex items-center gap-2.5 flex-shrink-0">
-                <button
-                  id="run-quick-ai-btn"
-                  onClick={handleRunAiAssessment}
-                  disabled={loadingAssessment}
-                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md shadow-emerald-950/40 transition-all active:scale-95 disabled:opacity-50"
-                >
-                  {loadingAssessment ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Sparkles className="w-3.5 h-3.5" />
-                  )}
-                  <span>{loadingAssessment ? 'Synthesizing...' : 'Run Gemini Assessment'}</span>
-                </button>
-              </div>
             </div>
 
-            {/* AI Strategic Assessment Output (If requested) */}
-            {aiAssessment && (
-              <div className="bg-slate-900 border border-emerald-500/40 rounded-2xl p-5 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-emerald-400" />
-                    <h3 className="text-sm font-bold text-white">
-                      Gemini 3.7 Threat Assessment & Priority Action Directives
-                    </h3>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-400">Threat Classification:</span>
-                    <span className="px-2.5 py-0.5 rounded-lg bg-rose-500/20 text-rose-300 font-mono font-bold text-xs border border-rose-500/30 uppercase">
-                      {aiAssessment.threatLevel}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                  <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-1">
-                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">Executive Threat Summary</span>
-                    <p className="text-slate-300 leading-relaxed">{aiAssessment.summary}</p>
-                  </div>
-
-                  <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-1">
-                    <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">Immediate Priority Actions</span>
-                    <ul className="space-y-1 text-slate-300">
-                      {aiAssessment.priorityActions.map((act, i) => (
-                        <li key={i} className="flex items-start gap-1.5">
-                          <span className="text-amber-400 font-bold">•</span>
-                          <span>{act}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-1">
-                    <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">SME & Community Directives</span>
-                    <div className="text-slate-300">
-                      <strong>SME Action:</strong> {aiAssessment.smeRecommendations[0]}
-                    </div>
-                    <div className="text-slate-400 pt-1 text-[10px]">
-                      Confidence: <strong className="text-emerald-400">{aiAssessment.confidenceScore}%</strong>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* BENTO GRID PRIMARY ROW */}
             <div className="grid grid-cols-12 gap-4">
-              {/* BENTO CARD 1: Early Warning Feed (col-span-12 lg:col-span-3) */}
               <div className="col-span-12 lg:col-span-3 bg-slate-900/50 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-4">
@@ -360,9 +248,7 @@ export default function App() {
                 </div>
               </div>
 
-              {/* BENTO CARD 2: Regional Risk Visualization & Map (col-span-12 lg:col-span-6) */}
               <div className="col-span-12 lg:col-span-6 bg-slate-900 border border-slate-800 rounded-2xl relative overflow-hidden flex flex-col">
-                {/* Subtle Dot Matrix Backdrop */}
                 <div 
                   className="absolute inset-0 opacity-20 pointer-events-none" 
                   style={{
@@ -371,7 +257,6 @@ export default function App() {
                   }}
                 ></div>
 
-                {/* Card Header with Status Pills */}
                 <div className="relative z-10 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-sm">
                   <div>
                     <h2 className="text-base sm:text-lg font-bold text-white">Regional Risk Visualization</h2>
@@ -390,7 +275,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Embedded GIS Leaflet Map Container */}
                 <div className="flex-1 relative min-h-[340px] bg-slate-950">
                   <RiskMap
                     location={currentLocation}
@@ -400,7 +284,6 @@ export default function App() {
                   />
                 </div>
 
-                {/* Bottom Bento Metric Ribbon */}
                 <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900/90 border-t border-slate-800 relative z-10">
                   <div className="text-center">
                     <p className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Humidity</p>
@@ -429,7 +312,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* BENTO CARD 3: Resilience Score Radial Gauge (col-span-12 lg:col-span-3) */}
               <div className="col-span-12 lg:col-span-3 bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
                 <div>
                   <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Resilience Score</h2>
@@ -495,9 +377,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* BENTO GRID SECONDARY ROW */}
             <div className="grid grid-cols-12 gap-4">
-              {/* BENTO CARD 4: Automated Report Bento Box (col-span-12 lg:col-span-3) */}
               <div className="col-span-12 lg:col-span-3 bg-indigo-600 rounded-2xl p-5 text-white flex flex-col justify-between shadow-xl shadow-indigo-950/40">
                 <div>
                   <h2 className="text-xs font-bold uppercase tracking-wider text-indigo-200">Automated Report</h2>
@@ -519,17 +399,9 @@ export default function App() {
                       <p className="text-[10px] opacity-80 font-mono">Updated 10 mins ago</p>
                     </div>
                   </div>
-
-                  <button
-                    onClick={() => setIsReportModalOpen(true)}
-                    className="w-full py-3 bg-white text-indigo-600 font-bold rounded-xl text-xs uppercase tracking-widest shadow-lg hover:bg-slate-100 transition-all active:scale-95 cursor-pointer"
-                  >
-                    Generate PDF
-                  </button>
                 </div>
               </div>
 
-              {/* BENTO CARD 5: Historical Trends: Precipitation vs Heat (col-span-12 lg:col-span-6) */}
               <div className="col-span-12 lg:col-span-6 bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-4">
@@ -546,7 +418,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* 12-Month Stylized Bento Bar Chart */}
                   <div className="flex items-end gap-2 sm:gap-3 h-32 px-1 pt-4">
                     {[
                       { month: 'JAN', val: 40, color: 'bg-slate-800', note: '32mm precip' },
@@ -596,7 +467,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* BENTO CARD 6: Data Integration Hub (col-span-12 lg:col-span-3) */}
               <div className="col-span-12 lg:col-span-3 bg-slate-900/40 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-4">
@@ -637,7 +507,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* BENTO GRID MODULE SHORTCUTS ROW */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
               <div 
                 id="bento-shortcut-flood"
@@ -680,14 +549,13 @@ export default function App() {
                 </div>
                 <div className="font-bold text-white text-sm">SME Preparedness & Continuity Toolkit</div>
                 <p className="text-xs text-slate-400 mt-1">
-                  Facility flood-proofing diagnostics, recovery time objectives (RTO), and AI-generated continuity checklists.
+                  Facility flood-proofing diagnostics, recovery time objectives (RTO), and continuity checklists.
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* VIEW 2: Flood Prediction */}
         {activeTab === 'flood_prediction' && (
           <div className="animate-in fade-in duration-200">
             <FloodPredictionModule
@@ -699,7 +567,6 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW 3: Drought Assessment */}
         {activeTab === 'drought_assessment' && (
           <div className="animate-in fade-in duration-200">
             <DroughtAssessmentModule
@@ -710,7 +577,6 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW 4: Vulnerability & Asset VaR */}
         {activeTab === 'vulnerability_var' && (
           <div className="animate-in fade-in duration-200">
             <VulnerabilityDashboard
@@ -720,7 +586,6 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW 5: Community Early Warning System & Incident Command */}
         {activeTab === 'early_warning' && (
           <div className="animate-in fade-in duration-200">
             <EarlyWarningModule
@@ -733,7 +598,6 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW 6: SME Preparedness & Business Continuity */}
         {activeTab === 'sme_preparedness' && (
           <div className="animate-in fade-in duration-200">
             <SMEPreparednessModule
@@ -742,7 +606,6 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW 7: Scenario Simulator & Stress-Testing */}
         {activeTab === 'scenario_simulator' && (
           <div className="animate-in fade-in duration-200">
             <ScenarioSimulator
@@ -751,7 +614,6 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW 8: Sensor Telemetry & Anomaly Filtering */}
         {activeTab === 'sensor_telemetry' && (
           <div className="animate-in fade-in duration-200">
             <LiveSensorFeed
@@ -763,7 +625,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Bento-styled Footer */}
       <footer className="border-t border-slate-800/80 bg-slate-950 py-4 px-6 text-xs text-slate-500 font-mono">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
@@ -773,23 +634,6 @@ export default function App() {
           <span>Compliant with TCFD & Sendai Framework for Disaster Risk Reduction</span>
         </div>
       </footer>
-
-      {/* Modals & AI Drawers */}
-      <ReportGeneratorModal
-        isOpen={isReportModalOpen}
-        onClose={() => setIsReportModalOpen(false)}
-        location={currentLocation}
-        sensors={sensors}
-        assets={assets}
-        smeProfiles={smeProfiles}
-        incidents={incidents}
-      />
-
-      <ClimateAIChatDrawer
-        isOpen={isChatDrawerOpen}
-        onClose={() => setIsChatDrawerOpen(false)}
-        location={currentLocation}
-      />
     </div>
   );
 }

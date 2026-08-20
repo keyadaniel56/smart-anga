@@ -13,11 +13,11 @@ export interface LocationProfile {
   name: string;
   region: string;
   country: string;
-  coordinates: [number, number]; // [lat, lng]
+  coordinates: [number, number];
   elevationM: number;
   population: number;
   primaryRisk: 'flood' | 'drought' | 'heatwave' | 'wildfire' | 'coastal_surge';
-  vulnerabilityIndex: number; // 0-100
+  vulnerabilityIndex: number;
   riverBasin?: string;
   criticalAssetsCount: number;
 }
@@ -127,110 +127,4 @@ export interface SMEProfile {
   hasSupplyChainRedundancy: boolean;
   hasClimateInsurance: boolean;
   lastAuditDate: string;
-}
-
-export interface GeminiRiskAssessment {
-  compositeRiskScore: number;
-  riskRating: string;
-  hazardBreakdown: {
-    hazard: string;
-    score: number;
-    status: string;
-    drivers: string;
-    vulnerableAssets: string;
-  }[];
-  executiveSummary: string;
-  vulnerabilityVector: {
-    exposureScore: number;
-    sensitivityScore: number;
-    adaptiveCapacityScore: number;
-    criticalVulnerabilities: string[];
-  };
-  economicImpactProjections: {
-    estimatedAnnualLossMillions: number;
-    smeDisruptionRiskPercentage: number;
-    businessInterruptionDays: number;
-    infrastructureValueAtRiskMillions: number;
-  };
-  tacticalInterventions: {
-    timeframe: string;
-    actions: string[];
-    responsibleDepartment: string;
-    expectedRiskReductionPct: number;
-  }[];
-  communityEarlyWarningRecommendations: string[];
-}
-
-export interface GeminiScenarioSimulation {
-  scenarioName: string;
-  simulatedSeverityTier: string;
-  hydroImpacts: {
-    floodInundationAreaSqKm: number;
-    peakDischargeCubicMetersSec: number;
-    drainageOverloadPercentage: number;
-    breachProbability: number;
-  };
-  agriculturalAndWaterImpacts: {
-    soilMoistureDeficitPct: number;
-    cropYieldLossForecastPct: number;
-    reservoirDepletionDays: number;
-    irrigationDeficitMm: number;
-  };
-  infrastructureAndSMEImpacts: {
-    substationsAtFloodRisk: number;
-    smeFacilityDisruptionsEstimated: number;
-    transportRoadClosuresKm: number;
-    totalEconomicLossEstimateUSD: string;
-  };
-  criticalCascadeSequence: {
-    dayOrHour: string;
-    event: string;
-    severity: string;
-  }[];
-  optimalEmergencyMitigations: {
-    domain: string;
-    action: string;
-    timeline: string;
-    costBenefitRatio: string;
-  }[];
-}
-
-export interface SMEActionPlan {
-  preparednessScore: number;
-  readinessGrade: string;
-  criticalGaps: string[];
-  businessImpactAnalysis: {
-    estimatedDailyDowntimeCost: string;
-    recoveryTimeObjectiveHours: number;
-    vulnerableCriticalAssets: string[];
-  };
-  actionChecklist: {
-    category: string;
-    task: string;
-    priority: 'High' | 'Medium' | 'Urgent';
-    costTier: '$' | '$$' | '$$$';
-    timeline: string;
-  }[];
-  emergencyProtocolSOP: string;
-  climateInsuranceAdvice: string;
-}
-
-export interface AuditReportData {
-  reportTitle: string;
-  documentId: string;
-  auditDate: string;
-  executiveSummary: string;
-  riskRating: string;
-  overallResilienceIndex: number;
-  meteorologicalAndHydrologicalFindings: string;
-  vulnerableAssetsAndInfrastructure: string[];
-  smePreparednessIndex: number;
-  interDepartmentalCoordinationReview: string;
-  thirtySixtyNinetyDayRoadmap: {
-    day30: string[];
-    day60: string[];
-    day90: string[];
-  };
-  complianceAndFrameworks: string[];
-  signOffAuthority: string;
 }

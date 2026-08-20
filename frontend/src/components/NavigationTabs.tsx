@@ -78,7 +78,7 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
       id: 'sme_preparedness',
       label: 'SME Preparedness',
       icon: Building2,
-      badge: 'Resilience AI',
+      badge: 'Resilience',
       badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
     },
     {

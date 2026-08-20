@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { 
   Building2, 
   ShieldCheck, 
-  Sparkles, 
   CheckCircle2, 
   AlertTriangle, 
   DollarSign, 
@@ -10,12 +9,10 @@ import {
   FileText, 
   Layers, 
   Zap, 
-  ArrowRight,
-  RefreshCw
+  ArrowRight
 } from 'lucide-react';
-import { SMEProfile, SMEActionPlan, LocationProfile } from '../types/climate';
+import { SMEProfile, LocationProfile } from '../types/climate';
 import { DEFAULT_SME_PROFILES } from '../data/mockClimateData';
-import { generateSMEActionPlan } from '../services/api';
 
 interface SMEPreparednessModuleProps {
   location: LocationProfile;
@@ -24,41 +21,8 @@ interface SMEPreparednessModuleProps {
 export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
   location
 }) => {
-  const [smeProfiles, setSmeProfiles] = useState<SMEProfile[]>(DEFAULT_SME_PROFILES);
+  const [smeProfiles] = useState<SMEProfile[]>(DEFAULT_SME_PROFILES);
   const [selectedProfile, setSelectedProfile] = useState<SMEProfile>(DEFAULT_SME_PROFILES[0]);
-  const [loadingAIPlan, setLoadingAIPlan] = useState(false);
-  const [aiActionPlan, setAiActionPlan] = useState<SMEActionPlan | null>(null);
-
-  // Form customizer
-  const [customBusinessName, setCustomBusinessName] = useState('');
-  const [customIndustry, setCustomIndustry] = useState('');
-  const [customHeadcount, setCustomHeadcount] = useState('45');
-
-  const handleGenerateCustomPlan = async (profileToUse: SMEProfile) => {
-    setLoadingAIPlan(true);
-    try {
-      const plan = await generateSMEActionPlan({
-        businessName: customBusinessName || profileToUse.name,
-        industry: customIndustry || profileToUse.industry,
-        employeeCount: `${customHeadcount || profileToUse.headcount} employees`,
-        location: `${profileToUse.location} (${location.name})`,
-        primaryThreats: profileToUse.primaryHazards,
-        currentMeasures: {
-          hasFloodBarriers: profileToUse.hasFloodBarriers,
-          hasBackupGenerator: profileToUse.hasBackupGenerator,
-          hasSupplyChainRedundancy: profileToUse.hasSupplyChainRedundancy,
-          hasClimateInsurance: profileToUse.hasClimateInsurance
-        }
-      });
-      if (plan) {
-        setAiActionPlan(plan);
-      }
-    } catch (err) {
-      console.error('Error creating SME plan:', err);
-    } finally {
-      setLoadingAIPlan(false);
-    }
-  };
 
   const toggleMeasure = (field: keyof SMEProfile) => {
     const updated = {
@@ -66,12 +30,10 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
       [field]: !selectedProfile[field]
     };
     setSelectedProfile(updated);
-    setSmeProfiles(smeProfiles.map(p => p.id === updated.id ? updated : p));
   };
 
   return (
     <div id="sme-preparedness-container" className="space-y-6">
-      {/* Top Banner */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
@@ -82,28 +44,13 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
               SME Climate Preparedness & Business Continuity Engine
             </h2>
             <p className="text-xs text-slate-400">
-              Diagnostic risk assessment, facility hardening, supply chain buffers, and AI business continuity plans
+              Diagnostic risk assessment, facility hardening, supply chain buffers, and business continuity plans
             </p>
           </div>
         </div>
-
-        <button
-          onClick={() => handleGenerateCustomPlan(selectedProfile)}
-          disabled={loadingAIPlan}
-          className="flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-950/40 transition-all active:scale-95 disabled:opacity-50"
-        >
-          {loadingAIPlan ? (
-            <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
-          ) : (
-            <Sparkles className="w-4 h-4 text-slate-950" />
-          )}
-          <span>{loadingAIPlan ? 'Synthesizing DRI Action Plan...' : 'Generate AI Resilience Plan'}</span>
-        </button>
       </div>
 
-      {/* SME Profile Selector & Facility Diagnostic */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* SME Presets */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pb-2 border-b border-slate-800">
             Select SME Profile Archetype
@@ -113,10 +60,7 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
             {smeProfiles.map((p) => (
               <div
                 key={p.id}
-                onClick={() => {
-                  setSelectedProfile(p);
-                  setAiActionPlan(null);
-                }}
+                onClick={() => setSelectedProfile(p)}
                 className={`p-3 rounded-xl border cursor-pointer transition-all ${
                   selectedProfile.id === p.id 
                     ? 'bg-emerald-950/50 border-emerald-500/70 shadow-md' 
@@ -140,7 +84,6 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
           </div>
         </div>
 
-        {/* Facility Climate Hardening Diagnostic */}
         <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-800">
             <div>
@@ -153,7 +96,6 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
             </div>
           </div>
 
-          {/* Interactive Toggleable Readiness Measures */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2.5">
               Active Resilience & Business Continuity Controls
@@ -234,82 +176,6 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
           </div>
         </div>
       </div>
-
-      {/* AI Generated Action Plan Results */}
-      {aiActionPlan && (
-        <div className="bg-slate-900 border border-emerald-500/40 rounded-2xl p-5 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-emerald-400" />
-              <h3 className="text-base font-bold text-slate-100">
-                Gemini 3.7 Climate Resilience & Business Continuity Plan
-              </h3>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400">Readiness Grade:</span>
-              <span className="px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono font-bold text-sm border border-emerald-500/40">
-                Grade {aiActionPlan.readinessGrade} ({aiActionPlan.preparednessScore}%)
-              </span>
-            </div>
-          </div>
-
-          {/* Business Impact Analysis (BIA) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800">
-            <div>
-              <span className="text-slate-400 block text-[11px]">Est. Daily Downtime Cost:</span>
-              <strong className="text-amber-400 text-sm font-mono">{aiActionPlan.businessImpactAnalysis.estimatedDailyDowntimeCost}</strong>
-            </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">Recovery Time Objective (RTO):</span>
-              <strong className="text-cyan-300 text-sm font-mono">{aiActionPlan.businessImpactAnalysis.recoveryTimeObjectiveHours} Hours</strong>
-            </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">Vulnerable Core Assets:</span>
-              <strong className="text-slate-200 text-xs">{aiActionPlan.businessImpactAnalysis.vulnerableCriticalAssets.join(', ')}</strong>
-            </div>
-          </div>
-
-          {/* Priority Checklist */}
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
-              Tailored Climate Resilience Checklist
-            </h4>
-            <div className="divide-y divide-slate-800">
-              {aiActionPlan.actionChecklist.map((item, idx) => (
-                <div key={idx} className="py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-teal-400">{item.category}</span>
-                    <div className="font-semibold text-slate-200">{item.task}</div>
-                  </div>
-                  <div className="flex items-center gap-2 self-start sm:self-auto flex-shrink-0">
-                    <span className="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">
-                      Cost: {item.costTier}
-                    </span>
-                    <span className="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-medium">
-                      {item.timeline}
-                    </span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
-                      item.priority === 'Urgent' ? 'bg-red-500/20 text-red-300 border border-red-500/30' : 'bg-amber-500/20 text-amber-300'
-                    }`}>
-                      {item.priority}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Rapid Response SOP */}
-          <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1.5">
-            <span className="text-teal-400 font-bold uppercase tracking-wider text-[11px] block">
-              Emergency Level-3 Alert Protocol (SOP):
-            </span>
-            <p className="text-slate-300 leading-relaxed whitespace-pre-line">
-              {aiActionPlan.emergencyProtocolSOP}
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
