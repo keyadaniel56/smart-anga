@@ -33,7 +33,7 @@ func (s *Store) runMigrations() {
 		hazard_type VARCHAR(20) NOT NULL,
 		severity VARCHAR(20) NOT NULL,
 		location TEXT NOT NULL,
-		coordinates DOUBLE PRECISION[] NOT NULL,
+		coordinates JSONB NOT NULL,
 		reported_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 		status VARCHAR(20) NOT NULL DEFAULT 'active',
 		department VARCHAR(50) NOT NULL,
@@ -105,30 +105,33 @@ func (s *Store) seedDefaultIncidents() {
 
 	for _, inc := range initials {
 		actionsJSON, _ := json.Marshal(inc.ActionsTaken)
+		coordsJSON, _ := json.Marshal(inc.Coordinates)
 		_, _ = s.db.Exec(`
 			INSERT INTO incidents (id, title, hazard_type, severity, location, coordinates, reported_at, status, department, assigned_to, actions_taken, automated_dispatch_sent)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 			ON CONFLICT (id) DO NOTHING`,
-			inc.ID, inc.Title, inc.HazardType, inc.Severity, inc.Location, pqArray(inc.Coordinates[:]), inc.ReportedAt, inc.Status, inc.Department, inc.AssignedTo, actionsJSON, inc.AutomatedDispatchSent,
+			inc.ID, inc.Title, inc.HazardType, inc.Severity, inc.Location, coordsJSON, inc.ReportedAt, inc.Status, inc.Department, inc.AssignedTo, actionsJSON, inc.AutomatedDispatchSent,
 		)
 	}
 	log.Println("Default incidents seeded into PostgreSQL.")
 }
 
-// Helper struct for scanning database rows where JSONB actions are handled
+// Helper struct for scanning database rows
 type dbIncident struct {
 	ID                    string          `db:"id"`
 	Title                 string          `db:"title"`
 	HazardType            string          `db:"hazard_type"`
 	Severity              string          `db:"severity"`
 	Location              string          `db:"location"`
-	Coordinates           []float64       `db:"coordinates"`
+	Coordinates           json.RawMessage `db:"coordinates"`
 	ReportedAt            time.Time       `db:"reported_at"`
 	Status                string          `db:"status"`
 	Department            string          `db:"department"`
 	AssignedTo            string          `db:"assigned_to"`
 	ActionsTaken          json.RawMessage `db:"actions_taken"`
 	AutomatedDispatchSent bool            `db:"automated_dispatch_sent"`
+	CreatedAt             time.Time       `db:"created_at"`
+	UpdatedAt             time.Time       `db:"updated_at"`
 }
 
 func toModelIncident(d dbIncident) models.Incident {
@@ -138,9 +141,11 @@ func toModelIncident(d dbIncident) models.Incident {
 		actions = []string{}
 	}
 
+	var coordSlice []float64
+	_ = json.Unmarshal(d.Coordinates, &coordSlice)
 	var coords [2]float64
-	if len(d.Coordinates) >= 2 {
-		coords = [2]float64{d.Coordinates[0], d.Coordinates[1]}
+	if len(coordSlice) >= 2 {
+		coords = [2]float64{coordSlice[0], coordSlice[1]}
 	}
 
 	return models.Incident{
@@ -157,18 +162,6 @@ func toModelIncident(d dbIncident) models.Incident {
 		ActionsTaken:          actions,
 		AutomatedDispatchSent: d.AutomatedDispatchSent,
 	}
-}
-
-func pqArray(s []float64) string {
-	res := "{"
-	for i, v := range s {
-		if i > 0 {
-			res += ","
-		}
-		res += fmt.Sprintf("%f", v)
-	}
-	res += "}"
-	return res
 }
 
 func (s *Store) GetIncidents() []models.Incident {
@@ -237,12 +230,13 @@ func (s *Store) CreateIncident(req models.CreateIncidentRequest) models.Incident
 	}
 
 	actionsJSON, _ := json.Marshal(actions)
+	coordsJSON, _ := json.Marshal(coords)
 	now := time.Now()
 
 	_, err := s.db.Exec(`
 		INSERT INTO incidents (id, title, hazard_type, severity, location, coordinates, reported_at, status, department, assigned_to, actions_taken, automated_dispatch_sent)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
-		id, title, hazardType, severity, location, pqArray(coords[:]), now, models.StatusActive, department, assignedTo, actionsJSON, true,
+		id, title, hazardType, severity, location, coordsJSON, now, models.StatusActive, department, assignedTo, actionsJSON, true,
 	)
 
 	if err != nil {
