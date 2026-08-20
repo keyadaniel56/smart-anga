@@ -15,6 +15,11 @@
     "lint": "npm run lint --workspace=frontend && npm run lint --workspace=backend/node"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.5",
+    "concurrently": "^9.1.2",
+    "jsdom": "^29.1.1",
+    "vitest": "^4.1.11"
   }
 }
