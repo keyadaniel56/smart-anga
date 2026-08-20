@@ -1,44 +1,122 @@
 @import "tailwindcss";
 
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+@theme {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Fraunces', Georgia, serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  /* Forest Tones */
+  --color-forest-900: #14281d;
+  --color-forest-800: #1f3d24;
+  --color-forest-700: #2d5a37;
+  --color-forest-600: #3f7d4e;
+  --color-forest-50: #f4f8f5;
+
+  /* Teal Accents */
+  --color-teal-700: #0f5b5b;
+  --color-teal-600: #147d7d;
+  --color-teal-500: #1a9e9e;
+  --color-teal-100: #e0f2f1;
+  --color-teal-50: #f0fdfa;
+
+  /* Lake Blues */
+  --color-lake-800: #1e3a5f;
+  --color-lake-700: #2b5387;
+  --color-lake-600: #3b6ea8;
+  --color-lake-100: #e3edf7;
+  --color-lake-50: #f0f7ff;
+
+  /* Ochre Warmth */
+  --color-ochre-600: #b45309;
+  --color-ochre-500: #d97706;
+  --color-ochre-300: #fcd34d;
+  --color-ochre-100: #fef3c7;
+  --color-ochre-50: #fffbeb;
+
+  /* Sand Neutrals */
+  --color-sand-50: #fcfbf8;
+  --color-sand-100: #f5f2eb;
+  --color-sand-200: #e7e2d6;
+  --color-sand-300: #d5cebf;
+
+  /* Ink Hierarchy */
+  --color-ink-900: #191c1a;
+  --color-ink-700: #3d453f;
+  --color-ink-500: #6f7a72;
+  --color-ink-300: #a8b3ab;
+  --color-ink-100: #e2e7e3;
+
+  /* Semantic Risk Tokens */
+  --color-risk-low: #15803d;
+  --color-risk-low-bg: #f0fdf4;
+  --color-risk-low-border: #bbf7d0;
+
+  --color-risk-moderate: #b45309;
+  --color-risk-moderate-bg: #fffbeb;
+  --color-risk-moderate-border: #fde68a;
+
+  --color-risk-high: #c2410c;
+  --color-risk-high-bg: #fff7ed;
+  --color-risk-high-border: #fed7aa;
+
+  --color-risk-critical: #b91c1c;
+  --color-risk-critical-bg: #fef2f2;
+  --color-risk-critical-border: #fecaca;
+}
+
 @layer base {
   body {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-sans);
+    background-color: var(--color-sand-50);
+    color: var(--color-ink-900);
   }
-  code, kbd, samp, pre {
-    font-family: 'JetBrains Mono', monospace;
+  h1, h2, h3, .font-serif {
+    font-family: var(--font-serif);
+  }
+  code, kbd, samp, pre, .font-mono {
+    font-family: var(--font-mono);
   }
 }
 
-/* Dark mode Leaflet tile overlay adjustments */
+/* Light mode Leaflet tile overlay adjustments */
 .leaflet-container {
-  background-color: #020617 !important;
+  background-color: #f5f2eb !important;
   font-family: inherit !important;
 }
 
 .leaflet-popup-content-wrapper {
-  background: #0f172a !important;
-  color: #f1f5f9 !important;
-  border-radius: 0.75rem !important;
-  border: 1px solid #334155 !important;
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5) !important;
+  background: #ffffff !important;
+  color: #191c1a !important;
+  border-radius: 0.875rem !important;
+  border: 1px solid #e7e2d6 !important;
+  box-shadow: 0 10px 25px -5px rgba(25, 28, 26, 0.1), 0 8px 10px -6px rgba(25, 28, 26, 0.05) !important;
 }
 
 .leaflet-popup-tip {
-  background: #0f172a !important;
+  background: #ffffff !important;
+  border: 1px solid #e7e2d6 !important;
 }
 
-/* Custom scrollbar */
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+  line-height: 1.4 !important;
+}
+
+/* Custom warm scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: #f5f2eb;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #d5cebf;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #a8b3ab;
 }
