@@ -1,7 +1,6 @@
 package store
 
 import (
-	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -148,7 +147,7 @@ func toModelIncident(d dbIncident) models.Incident {
 		ID:                    d.ID,
 		Title:                 d.Title,
 		HazardType:            models.HazardType(d.HazardType),
-		Severity:              models.SeverityLevel(d.Severity),
+		Severity:              models.Severity(d.Severity),
 		Location:              d.Location,
 		Coordinates:           coords,
 		ReportedAt:            d.ReportedAt,
@@ -160,12 +159,7 @@ func toModelIncident(d dbIncident) models.Incident {
 	}
 }
 
-// Helper for postgres array formatting
-type float64SliceLiteral []float64
-
 func pqArray(s []float64) string {
-	bytes, _ := json.Marshal(s)
-	// Convert JSON array [a,b] to Postgres array format {a,b}
 	res := "{"
 	for i, v := range s {
 		if i > 0 {
@@ -174,7 +168,6 @@ func pqArray(s []float64) string {
 		res += fmt.Sprintf("%f", v)
 	}
 	res += "}"
-	_ = bytes
 	return res
 }
 
