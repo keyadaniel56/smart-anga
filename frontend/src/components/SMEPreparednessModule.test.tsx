@@ -17,7 +17,8 @@ vi.mock('lucide-react', () => ({
   ArrowRight: () => <div data-testid="arrow-icon" />
 }))
 
-const mockMockProfiles = [
+// Mock mock climate module data structures directly
+const mockMockProfiles: SMEProfile[] = [
   {
     id: 'sme-1',
     name: 'AgroProcessing Co',
@@ -31,7 +32,6 @@ const mockMockProfiles = [
     hasBackupGenerator: false,
     hasSupplyChainRedundancy: false,
     hasClimateInsurance: true
-    // You could also add: lastAuditDate: '2026-05-12'
   },
   {
     id: 'sme-2',
@@ -47,10 +47,9 @@ const mockMockProfiles = [
     hasSupplyChainRedundancy: true,
     hasClimateInsurance: false
   }
-] as unknown as SMEProfile[]; // 👈 Force type mapping to bypass the missing property error safely
+] as unknown as SMEProfile[];
 
-
-// Mock the external climate reference module data definitions using explicit casting structures
+// Mock the external climate reference module data definitions
 vi.mock('../data/mockClimateData', () => ({
   get DEFAULT_SME_PROFILES() {
     return mockMockProfiles
@@ -81,7 +80,8 @@ describe('SMEPreparednessModule Component', () => {
   it('renders standard lists of selectable archetype mock configuration tracks', () => {
     render(<SMEPreparednessModule location={mockLocation} />)
 
-    expect(screen.getByText('AgroProcessing Co')).toBeInTheDocument()
+    // ✅ FIXED: Used getAllByText to handle both occurrences safely
+    expect(screen.getAllByText('AgroProcessing Co')[0]).toBeInTheDocument()
     expect(screen.getByText('Coastal Logistics Group')).toBeInTheDocument()
     expect(screen.getByText('72% Score')).toBeInTheDocument()
     expect(screen.getByText('40% Score')).toBeInTheDocument()
@@ -90,15 +90,15 @@ describe('SMEPreparednessModule Component', () => {
   it('switches current focus targets successfully when archetype cards are clicked', () => {
     render(<SMEPreparednessModule location={mockLocation} />)
 
-    // Initially selects first card profile structure
-    expect(screen.getAllByText('AgroProcessing Co')[1]).toBeInTheDocument()
+    // ✅ FIXED: Used getAllByText for base state assertion 
+    expect(screen.getAllByText('AgroProcessing Co').length).toBe(2)
 
     // Click secondary item option container card track
     const trackingCard = screen.getByText('Coastal Logistics Group')
     fireEvent.click(trackingCard)
 
     // Panel updates core layout view variables mapping details automatically
-    expect(screen.getAllByText('Coastal Logistics Group')[1]).toBeInTheDocument()
+    expect(screen.getAllByText('Coastal Logistics Group').length).toBe(2)
     expect(screen.getByText('120 Staff')).toBeInTheDocument()
   })
 
