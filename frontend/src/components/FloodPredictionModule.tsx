@@ -6,25 +6,23 @@ import {
   Clock, 
   ShieldCheck, 
   Droplets, 
-  Compass, 
   CheckCircle2, 
-  RefreshCw,
-  Sliders,
   Radio
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
-  AreaChart, 
+  ComposedChart, 
   Area, 
   XAxis, 
   YAxis, 
   Tooltip, 
   CartesianGrid, 
   Line, 
-  ComposedChart, 
   ReferenceLine 
 } from 'recharts';
 import { LocationProfile, SensorNode, LiveWeatherData } from '../types/climate';
+import { RiskBadge } from './ui/RiskBadge';
+import { RiskDial } from './ui/RiskDial';
 
 interface FloodPredictionModuleProps {
   location: LocationProfile;
@@ -35,7 +33,6 @@ interface FloodPredictionModuleProps {
 
 export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
   location,
-  liveWeather,
   sensors,
   onTriggerEmergencyDispatch
 }) => {
@@ -50,7 +47,7 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
     diversionSluice: false
   });
 
-  const [simulatedRainfallBoost, setSimulatedRainfallBoost] = useState<number>(0);
+  const simulatedRainfallBoost = 0;
 
   // Hydrograph discharge data (m3/s over 48 hours)
   const hydrographData = [
@@ -69,7 +66,6 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
 
   // River stage sensor
   const riverSensor = sensors.find(s => s.type === 'river_stage') || sensors[0];
-  const precipitationSensor = sensors.find(s => s.type === 'precipitation') || sensors[3];
 
   const peakDischarge = Math.max(...hydrographData.map(d => d.discharge));
   const isBreachProjected = peakDischarge > 380;
@@ -104,92 +100,122 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
 
   return (
     <div id="flood-prediction-container" className="space-y-6">
+      {/* Top Banner */}
+      <div className="bg-white/80 border border-sand-200 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-cyan-50 border border-cyan-200 text-cyan-800 flex items-center justify-center shadow-xs">
+            <Waves className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-bold text-ink-900 font-serif">
+                Flood Prediction & River Catchment Hydrograph
+              </h2>
+              <span className="px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 text-[10px] font-mono font-bold tracking-wide border border-cyan-200">
+                LIVE DISCHARGE
+              </span>
+            </div>
+            <p className="text-xs text-ink-500 mt-0.5">
+              Hydrological streamflow modeling, bankfull overtopping thresholds & mobile pump coordination
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <RiskBadge
+            level={isBreachProjected ? 'critical' : 'high'}
+            size="md"
+            label={isBreachProjected ? 'Breach Threshold Exceeded' : 'Channel Overtopping Watch'}
+          />
+        </div>
+      </div>
+
       {/* Top Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* River Stage Elevation */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span className="font-semibold uppercase tracking-wider">River Stage Level</span>
-            <span className="flex items-center gap-1 text-cyan-400 font-mono">
-              <Radio className="w-3 h-3 animate-pulse" /> Live Telemetry
+        <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-xs">
+          <div className="flex items-center justify-between text-xs text-ink-500 mb-1">
+            <span className="font-semibold uppercase tracking-wider font-mono">River Stage Level</span>
+            <span className="flex items-center gap-1 text-cyan-700 font-mono text-[11px] font-bold">
+              <Radio className="w-3 h-3 animate-pulse text-cyan-600" /> Live
             </span>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold font-mono text-cyan-400">
+            <span className="text-3xl font-extrabold font-mono text-cyan-800">
               {riverSensor ? riverSensor.currentValue.toFixed(2) : '4.82'}m
             </span>
-            <span className="text-xs text-red-400 font-semibold flex items-center">
+            <span className="text-xs text-rose-700 font-semibold flex items-center">
               <TrendingUp className="w-3 h-3 mr-0.5" /> +24 cm/hr
             </span>
           </div>
-          <div className="mt-2 text-xs text-slate-400 flex items-center justify-between">
-            <span>Bankfull Threshold: <strong>3.80m</strong></span>
-            <span className="text-red-400 font-bold">1.02m Exceeded</span>
+          <div className="mt-2 text-xs text-ink-600 flex items-center justify-between">
+            <span>Bankfull Limit: <strong>3.80m</strong></span>
+            <span className="text-rose-700 font-bold font-mono">1.02m Over</span>
           </div>
-          <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-            <div className="bg-gradient-to-r from-teal-500 to-red-500 h-full rounded-full w-[85%]"></div>
+          <div className="w-full bg-sand-200 h-1.5 rounded-full mt-2 overflow-hidden">
+            <div className="bg-gradient-to-r from-teal-500 to-rose-600 h-full rounded-full w-[85%]"></div>
           </div>
         </div>
 
         {/* Catchment Saturation */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span className="font-semibold uppercase tracking-wider">Catchment Saturation</span>
-            <Droplets className="w-4 h-4 text-teal-400" />
+        <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-xs">
+          <div className="flex items-center justify-between text-xs text-ink-500 mb-1">
+            <span className="font-semibold uppercase tracking-wider font-mono">Soil Saturation</span>
+            <Droplets className="w-4 h-4 text-forest-700" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold font-mono text-teal-300">
+            <span className="text-3xl font-extrabold font-mono text-forest-800">
               {catchmentSaturationPct}%
             </span>
-            <span className="text-xs text-amber-300 font-semibold">Near Soil Capacity</span>
+            <span className="text-xs text-amber-700 font-semibold">Near Capacity</span>
           </div>
-          <div className="mt-2 text-xs text-slate-400">
-            Soil Runoff Coefficient: <strong className="text-slate-200">0.82 (High Runoff)</strong>
+          <div className="mt-2 text-xs text-ink-600">
+            Runoff Coefficient: <strong className="text-ink-900 font-mono">0.82 (High Runoff)</strong>
           </div>
-          <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-            <div className="bg-teal-500 h-full rounded-full w-[88%]"></div>
+          <div className="w-full bg-sand-200 h-1.5 rounded-full mt-2 overflow-hidden">
+            <div className="bg-forest-600 h-full rounded-full w-[88%]"></div>
           </div>
         </div>
 
         {/* Peak Inundation Forecast */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span className="font-semibold uppercase tracking-wider">Projected Peak Discharge</span>
-            <Clock className="w-4 h-4 text-amber-400" />
+        <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-xs">
+          <div className="flex items-center justify-between text-xs text-ink-500 mb-1">
+            <span className="font-semibold uppercase tracking-wider font-mono">Projected Peak Discharge</span>
+            <Clock className="w-4 h-4 text-ochre-600" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className={`text-3xl font-extrabold font-mono ${isBreachProjected ? 'text-red-400' : 'text-amber-400'}`}>
+            <span className={`text-3xl font-extrabold font-mono ${isBreachProjected ? 'text-rose-700' : 'text-ochre-700'}`}>
               {peakDischarge.toFixed(0)} m³/s
             </span>
-            <span className="text-xs text-slate-300 font-semibold">in ~{timeToPeakHours}h</span>
+            <span className="text-xs text-ink-500 font-semibold font-mono">in ~{timeToPeakHours}h</span>
           </div>
-          <div className="mt-2 text-xs text-slate-400">
-            Safe Channel Flow: <strong className="text-slate-200">250 m³/s</strong>
+          <div className="mt-2 text-xs text-ink-600">
+            Safe Channel Flow: <strong className="text-ink-900 font-mono">250 m³/s</strong>
           </div>
-          <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-            <div className={`h-full rounded-full ${isBreachProjected ? 'bg-red-500' : 'bg-amber-500'} w-[94%]`}></div>
+          <div className="w-full bg-sand-200 h-1.5 rounded-full mt-2 overflow-hidden">
+            <div className={`h-full rounded-full ${isBreachProjected ? 'bg-rose-600' : 'bg-ochre-500'} w-[94%]`}></div>
           </div>
         </div>
 
-        {/* Inundation Risk Status */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg flex flex-col justify-between">
+        {/* Defense Readiness & SOP Dispatch */}
+        <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-              <span className="font-semibold uppercase tracking-wider">Defense Readiness</span>
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center justify-between text-xs text-ink-500 mb-1">
+              <span className="font-semibold uppercase tracking-wider font-mono">Defense Readiness</span>
+              <ShieldCheck className="w-4 h-4 text-forest-700" />
             </div>
-            <div className="text-sm font-bold text-slate-200 mt-1">
+            <div className="text-sm font-bold text-ink-900 mt-1">
               {activeDefenses.floodGates && activeDefenses.highVolumePumps 
-                ? 'High Barrier Mitigation Active' 
-                : 'Defenses Partially Deployed'}
+                ? 'High Barrier Deployed' 
+                : 'Defenses Standby'}
             </div>
-            <p className="text-xs text-slate-400 mt-1">
-              SME low-elevation flood barriers: <strong>Engaged</strong>
+            <p className="text-xs text-ink-500 mt-0.5">
+              SME perimeter barrier: <strong>Active</strong>
             </p>
           </div>
           <button
             onClick={handleTriggerFloodDispatch}
-            className="mt-3 w-full py-1.5 px-3 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-md shadow-red-900/40"
+            className="mt-3 w-full py-2 px-3 bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm"
           >
             <AlertTriangle className="w-3.5 h-3.5" />
             Dispatch Flood Response SOP
@@ -198,55 +224,55 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
       </div>
 
       {/* Hydrograph Forecast Chart */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="bg-white/90 border border-sand-200 rounded-3xl p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-sand-200">
           <div>
             <div className="flex items-center gap-2">
-              <Waves className="w-5 h-5 text-cyan-400" />
-              <h3 className="text-base font-bold text-slate-100">
-                Hydrological Discharge & Runoff Forecast (Hydrograph)
+              <Waves className="w-5 h-5 text-cyan-700" />
+              <h3 className="text-base font-bold text-ink-900 font-serif">
+                Hydrological Discharge & Runoff Hydrograph
               </h3>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Real-time streamflow vs. critical bankfull overtopping thresholds for {location.riverBasin || location.name}
+            <p className="text-xs text-ink-500 mt-0.5">
+              Streamflow vs. critical bankfull thresholds for {location.riverBasin || location.name}
             </p>
           </div>
 
           {/* Scenario Return Period Selector */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400 font-medium">Scenario:</span>
-            <div className="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 text-xs">
+            <span className="text-xs text-ink-500 font-semibold font-mono">Scenario:</span>
+            <div className="flex items-center bg-sand-100 p-1 rounded-xl border border-sand-200 text-xs">
               <button
                 onClick={() => setReturnPeriodScenario('current')}
-                className={`px-2.5 py-1 rounded font-medium transition-all ${
-                  returnPeriodScenario === 'current' ? 'bg-cyan-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-slate-200'
+                className={`px-3 py-1 rounded-lg font-semibold transition-all ${
+                  returnPeriodScenario === 'current' ? 'bg-forest-900 text-sand-50 font-bold' : 'text-ink-600 hover:text-ink-900'
                 }`}
               >
-                Live Baseline
+                Live
               </button>
               <button
                 onClick={() => setReturnPeriodScenario('10yr')}
-                className={`px-2.5 py-1 rounded font-medium transition-all ${
-                  returnPeriodScenario === '10yr' ? 'bg-cyan-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-slate-200'
+                className={`px-3 py-1 rounded-lg font-semibold transition-all ${
+                  returnPeriodScenario === '10yr' ? 'bg-forest-900 text-sand-50 font-bold' : 'text-ink-600 hover:text-ink-900'
                 }`}
               >
-                1-in-10 Yr
+                10-Yr
               </button>
               <button
                 onClick={() => setReturnPeriodScenario('50yr')}
-                className={`px-2.5 py-1 rounded font-medium transition-all ${
-                  returnPeriodScenario === '50yr' ? 'bg-cyan-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-slate-200'
+                className={`px-3 py-1 rounded-lg font-semibold transition-all ${
+                  returnPeriodScenario === '50yr' ? 'bg-forest-900 text-sand-50 font-bold' : 'text-ink-600 hover:text-ink-900'
                 }`}
               >
-                1-in-50 Yr
+                50-Yr
               </button>
               <button
                 onClick={() => setReturnPeriodScenario('100yr')}
-                className={`px-2.5 py-1 rounded font-medium transition-all ${
-                  returnPeriodScenario === '100yr' ? 'bg-red-500 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+                className={`px-3 py-1 rounded-lg font-semibold transition-all ${
+                  returnPeriodScenario === '100yr' ? 'bg-rose-700 text-white font-bold' : 'text-ink-600 hover:text-ink-900'
                 }`}
               >
-                1-in-100 Yr
+                100-Yr
               </button>
             </div>
           </div>
@@ -257,71 +283,71 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={hydrographData} margin={{ top: 20, right: 30, left: 10, bottom: 10 }}>
               <defs>
-                <linearGradient id="dischargeGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
-                  <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.0} />
+                <linearGradient id="dischargeGradientLight" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#0891b2" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#0891b2" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="time" stroke="#64748b" tick={{ fontSize: 11 }} />
-              <YAxis yAxisId="discharge" stroke="#06b6d4" tick={{ fontSize: 11 }} label={{ value: 'Discharge (m³/s)', angle: -90, position: 'insideLeft', fill: '#06b6d4', fontSize: 11 }} />
-              <YAxis yAxisId="rain" orientation="right" stroke="#3b82f6" tick={{ fontSize: 11 }} label={{ value: 'Rainfall (mm)', angle: 90, position: 'insideRight', fill: '#3b82f6', fontSize: 11 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e7e2d6" />
+              <XAxis dataKey="time" stroke="#6f7a72" tick={{ fontSize: 11 }} />
+              <YAxis yAxisId="discharge" stroke="#0891b2" tick={{ fontSize: 11 }} label={{ value: 'Discharge (m³/s)', angle: -90, position: 'insideLeft', fill: '#0891b2', fontSize: 11 }} />
+              <YAxis yAxisId="rain" orientation="right" stroke="#2563eb" tick={{ fontSize: 11 }} label={{ value: 'Rainfall (mm)', angle: 90, position: 'insideRight', fill: '#2563eb', fontSize: 11 }} />
               <Tooltip 
-                contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '0.75rem', color: '#f8fafc', fontSize: '12px' }} 
+                contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e7e2d6', borderRadius: '0.875rem', color: '#191c1a', fontSize: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} 
               />
-              <ReferenceLine y={250} yAxisId="discharge" label={{ value: 'Safe Channel Limit (250 m³/s)', fill: '#10b981', fontSize: 11 }} stroke="#10b981" strokeDasharray="4 4" />
-              <ReferenceLine y={380} yAxisId="discharge" label={{ value: 'Major Breach Threshold (380 m³/s)', fill: '#ef4444', fontSize: 11 }} stroke="#ef4444" strokeWidth={2} />
+              <ReferenceLine y={250} yAxisId="discharge" label={{ value: 'Safe Limit (250 m³/s)', fill: '#15803d', fontSize: 11 }} stroke="#15803d" strokeDasharray="4 4" />
+              <ReferenceLine y={380} yAxisId="discharge" label={{ value: 'Breach Limit (380 m³/s)', fill: '#b91c1c', fontSize: 11 }} stroke="#b91c1c" strokeWidth={2} />
               
-              <Area yAxisId="discharge" type="monotone" dataKey="discharge" stroke="#06b6d4" strokeWidth={3} fillOpacity={1} fill="url(#dischargeGradient)" name="Stream Discharge (m³/s)" />
-              <Line yAxisId="rain" type="monotone" dataKey="rainfallMm" stroke="#60a5fa" strokeWidth={2} strokeDasharray="3 3" name="Precipitation (mm)" />
+              <Area yAxisId="discharge" type="monotone" dataKey="discharge" stroke="#0891b2" strokeWidth={3} fillOpacity={1} fill="url(#dischargeGradientLight)" name="Discharge (m³/s)" />
+              <Line yAxisId="rain" type="monotone" dataKey="rainfallMm" stroke="#3b82f6" strokeWidth={2} strokeDasharray="3 3" name="Precipitation (mm)" />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Live Hydrological Defense Controls & Simulation Adjuster */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-4 border-t border-slate-800">
-          <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
+        {/* Live Defense Controls */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-4 border-t border-sand-200">
+          <div className="bg-sand-50/80 border border-sand-200 rounded-2xl p-3.5 flex items-center justify-between">
             <div>
-              <div className="text-xs font-bold text-slate-200">Demountable Flood Gates</div>
-              <div className="text-[11px] text-slate-400">Protects Riverside Logistics Corridor</div>
+              <div className="text-xs font-bold text-ink-900">Demountable Flood Gates</div>
+              <div className="text-[11px] text-ink-500">Riverside Logistics Corridor</div>
             </div>
             <button
               onClick={() => handleToggleDefense('floodGates')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeDefenses.floodGates ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400'
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                activeDefenses.floodGates ? 'bg-forest-900 text-sand-50 shadow-xs' : 'bg-sand-200 text-ink-600'
               }`}
             >
               {activeDefenses.floodGates ? 'DEPLOYED' : 'STANDBY'}
             </button>
           </div>
 
-          <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
+          <div className="bg-sand-50/80 border border-sand-200 rounded-2xl p-3.5 flex items-center justify-between">
             <div>
-              <div className="text-xs font-bold text-slate-200">High-Volume Mobile Pumps</div>
-              <div className="text-[11px] text-slate-400">40,000 L/min Submersible Array</div>
+              <div className="text-xs font-bold text-ink-900">High-Volume Mobile Pumps</div>
+              <div className="text-[11px] text-ink-500">40,000 L/min Submersible Array</div>
             </div>
             <button
               onClick={() => handleToggleDefense('highVolumePumps')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeDefenses.highVolumePumps ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400'
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                activeDefenses.highVolumePumps ? 'bg-forest-900 text-sand-50 shadow-xs' : 'bg-sand-200 text-ink-600'
               }`}
             >
               {activeDefenses.highVolumePumps ? 'ACTIVE' : 'OFFLINE'}
             </button>
           </div>
 
-          <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
+          <div className="bg-sand-50/80 border border-sand-200 rounded-2xl p-3.5 flex items-center justify-between">
             <div>
-              <div className="text-xs font-bold text-slate-200">Upstream Retention Sluice</div>
-              <div className="text-[11px] text-slate-400">Diverts 45 m³/s into Wetland Basin</div>
+              <div className="text-xs font-bold text-ink-900">Upstream Retention Sluice</div>
+              <div className="text-[11px] text-ink-500">Diverts 45 m³/s into Wetland</div>
             </div>
             <button
               onClick={() => handleToggleDefense('diversionSluice')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeDefenses.diversionSluice ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400'
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                activeDefenses.diversionSluice ? 'bg-forest-900 text-sand-50 shadow-xs' : 'bg-sand-200 text-ink-600'
               }`}
             >
-              {activeDefenses.diversionSluice ? 'OPEN (DIVERTING)' : 'CLOSED'}
+              {activeDefenses.diversionSluice ? 'OPEN' : 'CLOSED'}
             </button>
           </div>
         </div>
