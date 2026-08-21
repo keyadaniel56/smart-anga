@@ -17,19 +17,11 @@ export default defineConfig(() => {
         '/api': 'http://localhost:3000',
       },
     },
-<<<<<<< HEAD
     test: {
       environment: 'jsdom',
       globals: true,
       setupFiles: ['./src/test/setup.ts'],
       css: false,
-=======
-    // 👇 ADD THIS TEST BLOCK
-    test: {
-      globals: true,
-      environment: 'jsdom',
-      setupFiles: './src/test/setup.ts', // Adjust this path if your setup file lives elsewhere
->>>>>>> Ted7
     },
   };
 });

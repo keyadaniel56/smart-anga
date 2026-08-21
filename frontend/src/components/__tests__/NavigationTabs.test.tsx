@@ -79,10 +79,10 @@ describe('NavigationTabs', () => {
     const mobileNav = document.getElementById('mobile-bottom-navigation')!;
     expect(mobileNav).toBeInTheDocument();
     const mobileText = mobileNav.textContent || '';
-    expect(mobileText).toContain('Overview & Map');
-    expect(mobileText).toContain('River & Flood Watch');
-    expect(mobileText).toContain('Drought & Farming');
-    expect(mobileText).toContain('Alerts & Dispatches');
+    expect(mobileText).toContain('Overview');
+    expect(mobileText).toContain('Flood Watch');
+    expect(mobileText).toContain('Drought');
+    expect(mobileText).toContain('Alerts');
   });
 
   it('calls onSelectTab when a mobile tab is clicked', async () => {

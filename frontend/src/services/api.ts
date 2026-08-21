@@ -16,9 +16,9 @@ const notifyStatusChange = (live: boolean, msg?: string) => {
 export async function fetchLiveClimate(lat: number, lon: number, locationName?: string): Promise<LiveWeatherData | null> {
   try {
     const res = await fetch(`/api/climate/live?lat=${lat}&lon=${lon}`);
-<<<<<<< HEAD
     if (!res.ok) throw new Error('API request failed');
     const raw = await res.json();
+    notifyStatusChange(true);
     
     // If already flat LiveWeatherData
     if (raw && typeof raw.temperature === 'number' && raw.hourly && raw.daily) {
@@ -32,7 +32,6 @@ export async function fetchLiveClimate(lat: number, lon: number, locationName?: 
     const daily = weather?.daily || {};
     const floodDaily = flood?.daily || {};
 
-    // If critical current fields are missing, the backend payload is incomplete — return null
     if (current.temperature_2m == null && hourly.time == null && daily.time == null) {
       return null;
     }
@@ -75,14 +74,6 @@ export async function fetchLiveClimate(lat: number, lon: number, locationName?: 
 
     return transformed;
   } catch (err) {
-=======
-    if (!res.ok) throw new Error(`Server returned status code: ${res.status}`);
-    
-    const data = await res.json();
-    notifyStatusChange(true); // Signal connection is online
-    return data;
-  } catch (err: any) {
->>>>>>> Ted7
     console.warn('Fallback to local weather calculation:', err);
     notifyStatusChange(false, `Weather Telemetry Link Broken. ${err.message || 'Displaying cached fallback.'}`);
     return null;
