@@ -21,7 +21,7 @@ describe('SMEPreparednessModule', () => {
 
   it('renders preparedness toggle controls', () => {
     renderWithProviders(<SMEPreparednessModule {...defaultProps} />);
-    expect(screen.getByText(/Moveable Flood Gates/)).toBeInTheDocument();
+    expect(screen.getByText(/Moveable Flood Barriers/)).toBeInTheDocument();
     expect(screen.getByText(/Backup Emergency Generator/)).toBeInTheDocument();
   });
 

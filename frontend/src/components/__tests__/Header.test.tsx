@@ -56,7 +56,7 @@ describe('Header', () => {
     renderWithProviders(<Header {...defaultProps} />);
     const trigger = document.getElementById('location-selector-btn')!;
     await user.click(trigger);
-    const searchInput = screen.getByPlaceholderText(/Search any town/);
+    const searchInput = screen.getByPlaceholderText(/Search town/);
     await user.type(searchInput, 'Houston');
     expect(screen.getByText(/Houston/)).toBeInTheDocument();
   });

@@ -80,7 +80,7 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
         </div>
 
         {/* Clear Unobtrusive Session Indicator */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/100/10 border border-amber-500/20 text-amber-400 text-xs self-start md:self-auto shadow-2xs">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs self-start md:self-auto shadow-2xs">
           <Info className="w-4 h-4 text-amber-500 flex-shrink-0" />
           <span className="text-[11px] font-medium">
             <strong className="font-semibold">{t('sme.sessionNoticeTitle', 'Live Checklist Test')}:</strong> {t('sme.sessionNoticeDesc', 'Checking items updates the readiness score in memory for testing.')}
@@ -188,7 +188,7 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
                 onClick={() => toggleMeasure('hasFloodBarriers')}
                 className={`p-4 rounded-2xl border cursor-pointer flex items-center justify-between transition-all select-none ${
                   selectedProfile.hasFloodBarriers 
-                    ? 'bg-emerald-500/100/10/80 border-emerald-500/30 text-emerald-400 shadow-2xs' 
+                    ? 'bg-emerald-500/10/80 border-emerald-500/30 text-emerald-400 shadow-2xs' 
                     : 'bg-surface-950/80 border-surface-600 text-ink-600 hover:bg-surface-800'
                 }`}
               >
@@ -209,7 +209,7 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
                 onClick={() => toggleMeasure('hasBackupGenerator')}
                 className={`p-4 rounded-2xl border cursor-pointer flex items-center justify-between transition-all select-none ${
                   selectedProfile.hasBackupGenerator 
-                    ? 'bg-emerald-500/100/10/80 border-emerald-500/30 text-emerald-400 shadow-2xs' 
+                    ? 'bg-emerald-500/10/80 border-emerald-500/30 text-emerald-400 shadow-2xs' 
                     : 'bg-surface-950/80 border-surface-600 text-ink-600 hover:bg-surface-800'
                 }`}
               >
@@ -230,7 +230,7 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
                 onClick={() => toggleMeasure('hasSupplyChainRedundancy')}
                 className={`p-4 rounded-2xl border cursor-pointer flex items-center justify-between transition-all select-none ${
                   selectedProfile.hasSupplyChainRedundancy 
-                    ? 'bg-emerald-500/100/10/80 border-emerald-500/30 text-emerald-400 shadow-2xs' 
+                    ? 'bg-emerald-500/10/80 border-emerald-500/30 text-emerald-400 shadow-2xs' 
                     : 'bg-surface-950/80 border-surface-600 text-ink-600 hover:bg-surface-800'
                 }`}
               >
@@ -251,7 +251,7 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
                 onClick={() => toggleMeasure('hasClimateInsurance')}
                 className={`p-4 rounded-2xl border cursor-pointer flex items-center justify-between transition-all select-none ${
                   selectedProfile.hasClimateInsurance 
-                    ? 'bg-emerald-500/100/10/80 border-emerald-500/30 text-emerald-400 shadow-2xs' 
+                    ? 'bg-emerald-500/10/80 border-emerald-500/30 text-emerald-400 shadow-2xs' 
                     : 'bg-surface-950/80 border-surface-600 text-ink-600 hover:bg-surface-800'
                 }`}
               >

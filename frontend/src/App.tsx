@@ -177,7 +177,7 @@ export default function App() {
       <div id="climate-resilience-app" className="h-screen flex flex-col bg-surface-950 text-ink-900 font-sans antialiased selection:bg-teal-500/20 selection:text-forest-600 relative overflow-hidden">
         
         {!isLive && (
-          <div className="bg-amber-500/100/10 border-b border-amber-500/20 text-amber-300 px-4 py-2 text-xs flex items-center justify-center gap-2 font-medium tracking-wide animate-in slide-in-from-top duration-200 z-50">
+          <div className="bg-amber-500/10 border-b border-amber-500/20 text-amber-300 px-4 py-2 text-xs flex items-center justify-center gap-2 font-medium tracking-wide animate-in slide-in-from-top duration-200 z-50">
             <WifiOff className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 animate-pulse" />
             <span>Using cached data: Telemetry Link Down.</span>
           </div>
