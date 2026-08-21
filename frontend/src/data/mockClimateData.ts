@@ -425,4 +425,280 @@ export const DEFAULT_SENSORS = INITIAL_SENSORS;
 export const DEFAULT_CRITICAL_ASSETS = CRITICAL_ASSETS;
 export const DEFAULT_ALERTS = INITIAL_ALERTS;
 
+// ── Generate realistic data for any searched location ──
+
+function hashStr(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function seededRandom(seed: number) {
+  let s = seed;
+  return () => { s = (s * 16807 + 0) % 2147483647; return s / 2147483647; };
+}
+
+export function generateLocationData(loc: LocationProfile) {
+  const [lat, lng] = loc.coordinates;
+  const seed = hashStr(loc.id + loc.name);
+  const rand = seededRandom(seed);
+
+  const isCoastal = Math.abs(lat) < 30 || loc.primaryRisk === 'coastal_surge';
+  const isTropical = Math.abs(lat) < 23.5;
+  const isArid = loc.primaryRisk === 'drought';
+
+  const baseOffset = 0.008;
+
+  const sensors: SensorNode[] = [
+    {
+      id: `SN-RIVER-${seed.toString(16).slice(0,4).toUpperCase()}`,
+      name: `Main River Stage Gauge - ${loc.region}`,
+      type: 'river_stage',
+      locationName: `${loc.name} Upstream Reach`,
+      coordinates: [lat + rand() * baseOffset, lng + rand() * baseOffset],
+      currentValue: +(1.5 + rand() * 4.5).toFixed(2),
+      unit: 'm elevation',
+      normalRange: [0.8, 3.2],
+      status: rand() > 0.6 ? 'warning' : 'optimal',
+      batteryPct: Math.floor(80 + rand() * 20),
+      lastUpdated: `${Math.floor(1 + rand() * 5)} mins ago`,
+      history: Array.from({ length: 6 }, (_, i) => ({
+        timestamp: `${String(i * 4).padStart(2, '0')}:00`,
+        value: +(1.2 + rand() * 3.5 + i * 0.3).toFixed(1)
+      })),
+      isAnomalyDetected: rand() > 0.85
+    },
+    {
+      id: `SN-SOIL-${seed.toString(16).slice(0,4).toUpperCase()}`,
+      name: `Soil Moisture Sensor Array - ${loc.region}`,
+      type: 'soil_moisture',
+      locationName: `${loc.name} Agricultural Zone`,
+      coordinates: [lat - rand() * baseOffset, lng + rand() * baseOffset],
+      currentValue: isArid ? +(8 + rand() * 12).toFixed(1) : +(25 + rand() * 30).toFixed(1),
+      unit: '% saturation (0-25cm)',
+      normalRange: isArid ? [10, 25] : [30, 55],
+      status: isArid ? 'critical' : rand() > 0.5 ? 'optimal' : 'warning',
+      batteryPct: Math.floor(75 + rand() * 25),
+      lastUpdated: `${Math.floor(2 + rand() * 8)} mins ago`,
+      history: Array.from({ length: 6 }, (_, i) => ({
+        timestamp: `${String(i * 4).padStart(2, '0')}:00`,
+        value: isArid ? +(10 + rand() * 8 - i * 0.5).toFixed(1) : +(30 + rand() * 20 - i * 1.2).toFixed(1)
+      })),
+      isAnomalyDetected: false
+    },
+    {
+      id: `SN-HEAT-${seed.toString(16).slice(0,4).toUpperCase()}`,
+      name: `Urban Heat Island WBGT Sensor`,
+      type: 'wet_bulb_temp',
+      locationName: `${loc.name} City Center`,
+      coordinates: [lat + rand() * baseOffset * 0.5, lng - rand() * baseOffset * 0.5],
+      currentValue: isTropical ? +(28 + rand() * 6).toFixed(1) : +(20 + rand() * 12).toFixed(1),
+      unit: '°C WBGT',
+      normalRange: [18.0, 28.0],
+      status: (isTropical && rand() > 0.4) ? 'warning' : 'optimal',
+      batteryPct: Math.floor(90 + rand() * 10),
+      lastUpdated: 'Just now',
+      history: Array.from({ length: 6 }, (_, i) => ({
+        timestamp: `${String(i * 4).padStart(2, '0')}:00`,
+        value: +(18 + rand() * 10 + Math.sin(i * 0.8) * 4).toFixed(1)
+      })),
+      isAnomalyDetected: false
+    },
+    {
+      id: `SN-RAIN-${seed.toString(16).slice(0,4).toUpperCase()}`,
+      name: `Catchment Pluviometer - ${loc.region}`,
+      type: 'precipitation',
+      locationName: `${loc.name} Highland Ridge`,
+      coordinates: [lat + rand() * baseOffset * 1.5, lng + rand() * baseOffset * 1.5],
+      currentValue: isCoastal ? +(20 + rand() * 30).toFixed(1) : +(2 + rand() * 15).toFixed(1),
+      unit: 'mm / 6-hour accum',
+      normalRange: [0, isCoastal ? 25 : 15],
+      status: isCoastal && rand() > 0.3 ? 'critical' : 'optimal',
+      batteryPct: Math.floor(85 + rand() * 15),
+      lastUpdated: `${Math.floor(1 + rand() * 4)} mins ago`,
+      history: Array.from({ length: 6 }, (_, i) => ({
+        timestamp: `${String(i * 4).padStart(2, '0')}:00`,
+        value: +(rand() * 10 + i * 2).toFixed(1)
+      })),
+      isAnomalyDetected: false
+    },
+    {
+      id: `SN-AQUIF-${seed.toString(16).slice(0,4).toUpperCase()}`,
+      name: `Deep Aquifer Piezometer - ${loc.region}`,
+      type: 'groundwater_level',
+      locationName: `${loc.name} Valley Wellfield`,
+      coordinates: [lat - rand() * baseOffset, lng - rand() * baseOffset],
+      currentValue: isArid ? -(15 + rand() * 10) : -(4 + rand() * 10),
+      unit: 'm below surface',
+      normalRange: isArid ? [-20, -8] : [-12, -3],
+      status: isArid ? 'warning' : 'optimal',
+      batteryPct: Math.floor(70 + rand() * 30),
+      lastUpdated: `${Math.floor(5 + rand() * 15)} mins ago`,
+      history: Array.from({ length: 6 }, (_, i) => ({
+        timestamp: `${String(i * 4).padStart(2, '0')}:00`,
+        value: isArid ? -(14 + rand() * 6 + i * 0.5) : -(5 + rand() * 6 + i * 0.3)
+      })),
+      isAnomalyDetected: false
+    }
+  ];
+
+  const hazards: ('Flood' | 'Drought' | 'Extreme Heat' | 'Flash Storm' | 'Wildfire')[] =
+    loc.primaryRisk === 'drought' ? ['Drought', 'Extreme Heat', 'Flash Storm']
+    : loc.primaryRisk === 'coastal_surge' ? ['Flood', 'Flash Storm', 'Extreme Heat']
+    : loc.primaryRisk === 'heatwave' ? ['Extreme Heat', 'Drought', 'Wildfire']
+    : loc.primaryRisk === 'wildfire' ? ['Wildfire', 'Extreme Heat', 'Flash Storm']
+    : ['Flood', 'Flash Storm', 'Extreme Heat'];
+
+  const severityOrder: Record<string, number> = { Emergency: 4, Warning: 3, Watch: 2, Advisory: 1 };
+  const severities: Array<'Emergency' | 'Warning' | 'Watch' | 'Advisory'> = ['Emergency', 'Warning', 'Watch', 'Advisory'];
+  const channels: Array<'Sirens' | 'SMS Cell Broadcast' | 'Mobile Push' | 'WhatsApp Business' | 'EAS Radio'> = ['Sirens', 'SMS Cell Broadcast', 'Mobile Push', 'WhatsApp Business', 'EAS Radio'];
+
+  const districts = [
+    `${loc.name} North Sector`,
+    `${loc.name} Downtown Core`,
+    `${loc.name} Riverside District`,
+    `${loc.name} Eastern Corridor`,
+    `${loc.name} Highland Zone`
+  ];
+
+  const alertTitles: Record<string, string[]> = {
+    Flood: ['FLASH FLOOD WARNING: River Stage Exceeding Critical Threshold', 'FLOOD WATCH: Upstream Catchment Saturated', 'COASTAL SURGE ALERT: High Tide Combined with Storm Runoff'],
+    Drought: ['DROUGHT ADVISORY: Prolonged Precipitation Deficit', 'WATER RESTRICTION: Reservoir Levels Below 40%', 'AGRICULTURAL ALERT: Soil Moisture Critical Deficit'],
+    'Extreme Heat': ['HEAT EMERGENCY: Dangerous Urban Heat Island Effect', 'HEAT WAVE WARNING: WBGT Exceeding Safe Limits', 'HEAT ADVISORY: Prolonged高温 Period Expected'],
+    'Flash Storm': ['STORM WARNING: Severe Convective Activity Imminent', 'FLASH FLOOD WATCH: Intense Rainfall Expected', 'WIND ADVISORY: Damaging Gusts Projected'],
+    Wildfire: ['WILDFIRE ALERT: Elevated Fire Danger Conditions', 'SMOKE ADVISORY: Air Quality Deteriorating', 'EVACUATION WATCH: Fire Front Approaching Residential Zone']
+  };
+
+  const alertHeadlines: Record<string, string[]> = {
+    Flood: ['Upstream discharge at 95th percentile. River stage rising rapidly.', 'Monsoon rainfall 200% above seasonal average for 72 hours.', 'Storm surge combined with spring tide threatens low-lying areas.'],
+    Drought: ['30-day cumulative rainfall deficit exceeding 60%. Reservoir storage declining.', 'Groundwater table at record low. Agricultural wells stressed.', 'Municipal water restrictions may be required within 14 days.'],
+    'Extreme Heat': ['Wet-bulb temperatures projected to hit 33°C. Outdoor worker safety at risk.', 'Nighttime temperatures not dropping below 26°C for 5 consecutive nights.', 'Heat index values exceeding 42°C in urban core areas.'],
+    'Flash Storm': ['Atmospheric instability producing severe thunderstorms with >50mm/hr rainfall.', 'Downdraft potential with wind gusts up to 90 km/h.', 'Hail risk for exposed infrastructure and agriculture.'],
+    Wildfire: ['Fire weather index at Extreme level. Wind-driven spread possible.', 'Relative humidity below 15% with sustained winds >30 km/h.', 'Spot fire risk elevated. Ember attack possible 2km ahead of fire front.']
+  };
+
+  const activeAlerts = Math.min(3, 1 + Math.floor(rand() * 3));
+  const alerts: EarlyWarningAlert[] = Array.from({ length: activeAlerts }, (_, i) => {
+    const hazard = hazards[i % hazards.length];
+    const sev = severities[Math.min(i, 3)];
+    return {
+      id: `EWS-${loc.id.slice(0,8)}-${String(i + 1).padStart(3, '0')}`,
+      hazard,
+      severity: sev,
+      title: alertTitles[hazard][i % alertTitles[hazard].length],
+      headline: alertHeadlines[hazard][i % alertHeadlines[hazard].length],
+      instruction: `Monitor conditions closely. Follow local authority guidance for ${loc.region}.`,
+      affectedDistricts: districts.slice(0, 2 + Math.floor(rand() * 3)),
+      issuedAt: new Date(Date.now() - (20 + rand() * 200) * 60000).toISOString(),
+      expiresAt: new Date(Date.now() + (6 + rand() * 48) * 3600000).toISOString(),
+      channelsBroadcasted: channels.slice(0, 2 + Math.floor(rand() * 3)),
+      active: true
+    };
+  });
+
+  const incHazardTypes: Array<'flood' | 'drought' | 'heatwave' | 'wildfire' | 'storm'> =
+    loc.primaryRisk === 'drought' ? ['drought', 'heatwave', 'storm']
+    : loc.primaryRisk === 'wildfire' ? ['wildfire', 'heatwave', 'storm']
+    : ['flood', 'storm', 'heatwave'];
+
+  const incDepartments: Array<'Emergency Management' | 'Public Works' | 'Healthcare' | 'Agriculture' | 'SME Liaison'> = ['Emergency Management', 'Public Works', 'Healthcare', 'Agriculture', 'SME Liaison'];
+  const incStatuses: Array<'active' | 'in_progress' | 'mitigated' | 'resolved'> = ['in_progress', 'active', 'mitigated'];
+  const incSeverities: Array<'low' | 'moderate' | 'high' | 'critical'> = ['critical', 'high', 'moderate'];
+
+  const incidents: DepartmentIncident[] = Array.from({ length: 1 + Math.floor(rand() * 3) }, (_, i) => {
+    const ht = incHazardTypes[i % incHazardTypes.length];
+    const dept = incDepartments[i % incDepartments.length];
+    return {
+      id: `INC-${loc.id.slice(0,6).toUpperCase()}-${String(i + 1).padStart(3, '0')}`,
+      title: `${ht.charAt(0).toUpperCase() + ht.slice(1)} Response Deployment - ${districts[i % districts.length]}`,
+      hazardType: ht,
+      severity: incSeverities[i % incSeverities.length],
+      location: districts[i % districts.length],
+      coordinates: [lat + (rand() - 0.5) * baseOffset * 4, lng + (rand() - 0.5) * baseOffset * 4] as [number, number],
+      reportedAt: new Date(Date.now() - (15 + rand() * 300) * 60000).toISOString(),
+      status: incStatuses[i % incStatuses.length],
+      department: dept,
+      assignedTo: `${dept} Unit ${String.fromCharCode(65 + Math.floor(rand() * 6))}`,
+      actionsTaken: [
+        `Deployed response team to ${districts[i % districts.length]}`,
+        'Initiated emergency monitoring protocol',
+        'Pre-alerted adjacent zone command'
+      ],
+      automatedDispatchSent: true
+    };
+  });
+
+  const assetCategories: Array<{ category: CriticalAsset['category']; nameSuffix: string; baseRisk: CriticalAsset['riskRating'] }> = [
+    { category: 'energy_substation', nameSuffix: 'Regional Power Grid Node', baseRisk: 'Severe' },
+    { category: 'hospital', nameSuffix: 'Metropolitan Medical Center', baseRisk: 'Moderate' },
+    { category: 'water_treatment', nameSuffix: 'Water Purification Facility', baseRisk: 'Severe' },
+    { category: 'sme_cluster', nameSuffix: 'Industrial SME Logistics Park', baseRisk: 'High' },
+    { category: 'agricultural_zone', nameSuffix: 'Agricultural Production Zone', baseRisk: 'High' }
+  ];
+
+  const assets: CriticalAsset[] = assetCategories.map((ac, i) => ({
+    id: `AST-${loc.id.slice(0,4).toUpperCase()}-${String(i + 1).padStart(2, '0')}`,
+    name: `${loc.name} ${ac.nameSuffix}`,
+    category: ac.category,
+    coordinates: [lat + (rand() - 0.5) * baseOffset * 6, lng + (rand() - 0.5) * baseOffset * 6] as [number, number],
+    elevationM: +(loc.elevationM * (0.5 + rand())).toFixed(1),
+    floodBreachThresholdM: +(loc.elevationM * 0.4 + rand() * 3).toFixed(1),
+    heatToleranceC: 36 + Math.floor(rand() * 10),
+    estimatedAssetValueMillionsUSD: +(20 + rand() * 180).toFixed(1),
+    riskRating: ac.baseRisk,
+    backupPowerPresent: rand() > 0.3,
+    protectiveMeasures: ['Emergency Barriers', 'Automated Monitoring', 'Backup Systems'].slice(0, 1 + Math.floor(rand() * 3))
+  }));
+
+  const smeProfiles: SMEProfile[] = [
+    {
+      id: `sme-${loc.id.slice(0,6)}-01`,
+      name: `${loc.name} Logistics & Warehousing Co.`,
+      industry: 'Cold Chain & Freight Warehousing',
+      location: `${loc.name} Industrial Zone`,
+      headcount: 30 + Math.floor(rand() * 70),
+      facilityElevationM: +(loc.elevationM * 0.6).toFixed(1),
+      primaryHazards: hazards.slice(0, 3).map(h => h),
+      readinessScore: 40 + Math.floor(rand() * 45),
+      hasFloodBarriers: rand() > 0.4,
+      hasBackupGenerator: rand() > 0.3,
+      hasSupplyChainRedundancy: rand() > 0.5,
+      hasClimateInsurance: rand() > 0.5,
+      lastAuditDate: `2026-${String(1 + Math.floor(rand() * 8)).padStart(2, '0')}-${String(1 + Math.floor(rand() * 28)).padStart(2, '0')}`
+    },
+    {
+      id: `sme-${loc.id.slice(0,6)}-02`,
+      name: `${loc.name} Agriculture & Greenhouse`,
+      industry: 'High-Value Farming',
+      location: `${loc.name} Agricultural Belt`,
+      headcount: 15 + Math.floor(rand() * 40),
+      facilityElevationM: +(loc.elevationM * 1.2).toFixed(1),
+      primaryHazards: hazards.slice(0, 2).map(h => h),
+      readinessScore: 35 + Math.floor(rand() * 40),
+      hasFloodBarriers: rand() > 0.6,
+      hasBackupGenerator: rand() > 0.6,
+      hasSupplyChainRedundancy: rand() > 0.4,
+      hasClimateInsurance: rand() > 0.6,
+      lastAuditDate: `2026-${String(1 + Math.floor(rand() * 8)).padStart(2, '0')}-${String(1 + Math.floor(rand() * 28)).padStart(2, '0')}`
+    },
+    {
+      id: `sme-${loc.id.slice(0,6)}-03`,
+      name: `${loc.name} Micro-Electronics & Tech`,
+      industry: 'Precision Manufacturing',
+      location: `${loc.name} Tech Park`,
+      headcount: 40 + Math.floor(rand() * 60),
+      facilityElevationM: +(loc.elevationM * 0.8).toFixed(1),
+      primaryHazards: hazards.slice(0, 2).map(h => h),
+      readinessScore: 55 + Math.floor(rand() * 40),
+      hasFloodBarriers: rand() > 0.3,
+      hasBackupGenerator: rand() > 0.2,
+      hasSupplyChainRedundancy: rand() > 0.3,
+      hasClimateInsurance: rand() > 0.3,
+      lastAuditDate: `2026-${String(1 + Math.floor(rand() * 8)).padStart(2, '0')}-${String(1 + Math.floor(rand() * 28)).padStart(2, '0')}`
+    }
+  ];
+
+  return { sensors, alerts, incidents, assets, smeProfiles };
+}
+
 

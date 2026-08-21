@@ -15,7 +15,8 @@ import {
   DEFAULT_CRITICAL_ASSETS, 
   DEFAULT_ALERTS, 
   DEFAULT_INCIDENTS,
-  DEFAULT_SME_PROFILES 
+  DEFAULT_SME_PROFILES,
+  generateLocationData
 } from './data/mockClimateData';
 import { fetchLiveWeather, fetchDepartmentIncidents, updateDepartmentIncident } from './services/api';
 
@@ -56,9 +57,10 @@ export default function App() {
   const [weatherError, setWeatherError] = useState(false);
 
   const [sensors, setSensors] = useState<SensorNode[]>(DEFAULT_SENSORS);
-  const [assets] = useState<CriticalAsset[]>(DEFAULT_CRITICAL_ASSETS);
+  const [assets, setAssets] = useState<CriticalAsset[]>(DEFAULT_CRITICAL_ASSETS);
   const [alerts, setAlerts] = useState<EarlyWarningAlert[]>(DEFAULT_ALERTS);
   const [incidents, setIncidents] = useState<DepartmentIncident[]>(DEFAULT_INCIDENTS);
+  const [smeProfiles, setSmeProfiles] = useState<SMEProfile[]>(DEFAULT_SME_PROFILES);
   const [incidentsConnected, setIncidentsConnected] = useState<boolean>(true);
 
   const [hoveredMonth, setHoveredMonth] = useState<string | null>(null);
@@ -83,6 +85,19 @@ export default function App() {
     };
 
     loadWeather();
+  }, [currentLocation]);
+
+  // Regenerate sensors/alerts/incidents/assets when a searched (geocoded) location is selected
+  useEffect(() => {
+    if (currentLocation.id.startsWith('geocoded-') || !DEFAULT_LOCATIONS.find(l => l.id === currentLocation.id)) {
+      const data = generateLocationData(currentLocation);
+      setSensors(data.sensors);
+      setAlerts(data.alerts);
+      setIncidents(data.incidents);
+      setAssets(data.assets);
+      setSmeProfiles(data.smeProfiles);
+      addToast('info', `Loaded monitoring data for ${currentLocation.name}`);
+    }
   }, [currentLocation]);
 
   useEffect(() => {
