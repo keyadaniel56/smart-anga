@@ -3,11 +3,16 @@ import {
   MapPin, 
   Search, 
   Compass, 
-  AlertTriangle,
-  ChevronDown
+  AlertTriangle, 
+  ChevronDown, 
+  Sparkles, 
+  Thermometer,
+  Languages
 } from 'lucide-react';
 import { LocationProfile, EarlyWarningAlert, LiveWeatherData } from '../types/climate';
 import { GLOBAL_HOTSPOTS } from '../data/mockClimateData';
+import { RiskBadge } from './ui/RiskBadge';
+import { useTranslation } from '../context/LanguageContext';
 
 interface HeaderProps {
   locations?: LocationProfile[];
@@ -24,8 +29,10 @@ export const Header: React.FC<HeaderProps> = ({
   currentLocation,
   onSelectLocation,
   activeAlerts = [],
+  liveWeather,
   activeIncidentCount = 0
 }) => {
+  const { t, language, setLanguage } = useTranslation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTime, setCurrentTime] = useState('');
@@ -89,95 +96,131 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header id="platform-header" className="bg-slate-950 border-b border-slate-800/80 sticky top-0 z-40 backdrop-blur-md">
+    <header id="platform-header" className="bg-sand-50/95 border-b border-sand-200 sticky top-0 z-40 backdrop-blur-md">
+      {/* Critical Alert Ticker */}
       {criticalAlerts.length > 0 && (
-        <div id="critical-alert-ticker" className="bg-rose-950/80 border-b border-rose-800/60 px-4 py-1.5 flex items-center justify-between text-xs text-rose-200">
+        <div
+          id="critical-alert-ticker"
+          className="bg-rose-50 border-b border-rose-200 px-4 py-1.5 flex items-center justify-between text-xs text-rose-900 shadow-xs"
+        >
           <div className="flex items-center space-x-2 overflow-hidden">
             <span className="flex h-2 w-2 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600"></span>
             </span>
-            <span className="font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1">
-              <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
-              Active Climate Alert:
+            <span className="font-bold uppercase tracking-wider text-rose-800 flex items-center gap-1 font-mono text-[11px]">
+              <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+              {t('header.activeAlertLabel', 'Emergency Weather Alert')}:
             </span>
-            <span className="truncate font-medium">
+            <span className="truncate font-medium text-rose-950">
               {criticalAlerts[0].title} — {criticalAlerts[0].headline}
             </span>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <span className="bg-rose-900/60 text-rose-300 px-2 py-0.5 rounded font-mono text-[11px] border border-rose-700/50">
-              {activeIncidentCount > 0 ? `${activeIncidentCount} Active Dispatches` : 'Alert Active'}
-            </span>
+            <RiskBadge
+              level="critical"
+              size="xs"
+              label={activeIncidentCount > 0 ? `${activeIncidentCount} Dispatched` : t('common.active', 'Active')}
+            />
           </div>
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Main Header Container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        {/* Brand & Logo */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-emerald-500 rounded-sm rotate-45 flex-shrink-0 shadow-sm shadow-emerald-500/40"></div>
+            <div className="w-9 h-9 bg-forest-900 text-teal-300 rounded-xl flex items-center justify-center shadow-sm">
+              <Sparkles className="w-5 h-5" />
+            </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-                TERRA INTELLIGENCE
-                <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono font-bold tracking-wider border border-emerald-500/20">
-                  CLIMASHIELD
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg sm:text-xl font-bold tracking-tight text-forest-900 font-serif">
+                  {t('header.title', 'SmartAnga')}
+                </h1>
+                <span className="hidden sm:inline-block px-2 py-0.5 rounded-full bg-forest-100 text-forest-800 text-[10px] font-mono font-bold tracking-wide border border-forest-200">
+                  {t('header.badge', 'COMMUNITY SAFETY')}
                 </span>
-              </h1>
-              <p className="text-slate-400 text-[11px] uppercase tracking-widest mt-0.5 font-medium">
-                Climate Risk & Resilience Operations
+              </div>
+              <p className="text-ink-500 text-[11px] font-medium tracking-wide">
+                {t('header.subtitle', 'Community Climate & Weather Safety Platform')}
               </p>
             </div>
           </div>
 
-          <div className="flex md:hidden items-center gap-1.5 text-xs font-semibold text-emerald-400">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>LIVE</span>
+          {/* Mobile Live Status & Language Toggle */}
+          <div className="flex md:hidden items-center gap-2">
+            <div className="flex items-center bg-sand-100 p-0.5 rounded-lg border border-sand-200 text-xs">
+              <button
+                onClick={() => setLanguage('en')}
+                className={`px-2 py-0.5 rounded font-mono font-bold text-[10px] transition-all ${
+                  language === 'en' ? 'bg-forest-900 text-sand-50 shadow-2xs' : 'text-ink-500'
+                }`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => setLanguage('sw')}
+                className={`px-2 py-0.5 rounded font-mono font-bold text-[10px] transition-all ${
+                  language === 'sw' ? 'bg-forest-900 text-sand-50 shadow-2xs' : 'text-ink-500'
+                }`}
+              >
+                SW
+              </button>
+            </div>
+            {liveWeather && (
+              <span className="font-mono text-xs font-bold text-forest-900 bg-sand-100 px-2 py-1 rounded-lg border border-sand-200">
+                {liveWeather.temperature.toFixed(1)}°C
+              </span>
+            )}
           </div>
         </div>
 
+        {/* Location Selector */}
         <div className="relative flex-1 max-w-md">
           <button
             id="location-selector-btn"
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="w-full flex items-center justify-between bg-slate-900/90 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl px-3.5 py-2 text-left transition-all text-xs sm:text-sm group shadow-inner"
+            className="w-full flex items-center justify-between bg-white/90 hover:bg-white border border-sand-200 hover:border-sand-300 rounded-xl px-3.5 py-2 text-left transition-all text-xs sm:text-sm shadow-xs group"
           >
             <div className="flex items-center gap-2 truncate">
-              <MapPin className="w-4 h-4 text-emerald-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
+              <MapPin className="w-4 h-4 text-forest-700 flex-shrink-0 group-hover:scale-110 transition-transform" />
               <div className="truncate">
-                <span className="font-semibold text-slate-200">{currentLocation.name}</span>
-                <span className="text-xs text-slate-400 ml-1.5 hidden sm:inline">
+                <span className="font-bold text-ink-900">{currentLocation.name}</span>
+                <span className="text-xs text-ink-500 ml-1.5 hidden sm:inline font-mono">
                   ({currentLocation.coordinates[0].toFixed(2)}°, {currentLocation.coordinates[1].toFixed(2)}°)
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <span className={`text-[11px] px-2 py-0.5 rounded-lg font-mono font-semibold ${
-                currentLocation.vulnerabilityIndex > 75 
-                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                  : currentLocation.vulnerabilityIndex > 60
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                  : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-              }`}>
-                Risk {currentLocation.vulnerabilityIndex}
-              </span>
-              <ChevronDown className="w-4 h-4 text-slate-400" />
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <RiskBadge
+                level={
+                  currentLocation.vulnerabilityIndex > 75 ? 'critical' :
+                  currentLocation.vulnerabilityIndex > 60 ? 'high' :
+                  currentLocation.vulnerabilityIndex > 40 ? 'moderate' : 'low'
+                }
+                size="xs"
+                label={`Risk ${currentLocation.vulnerabilityIndex}`}
+              />
+              <ChevronDown className="w-4 h-4 text-ink-400" />
             </div>
           </button>
 
+          {/* Location Dropdown Modal */}
           {dropdownOpen && (
             <div 
               id="location-dropdown-panel"
-              className="absolute left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-50 p-2 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+              className="absolute left-0 right-0 mt-2 bg-white border border-sand-200 rounded-2xl shadow-xl z-50 p-2 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             >
-              <div className="p-2 border-b border-slate-800 flex items-center gap-2">
-                <Search className="w-4 h-4 text-slate-400" />
+              <div className="p-2 border-b border-sand-200 flex items-center gap-2 bg-sand-50/50 rounded-t-xl">
+                <Search className="w-4 h-4 text-ink-400" />
                 <input
                   type="text"
-                  placeholder="Search river basin, city or country..."
+                  placeholder={t('header.searchPlaceholder', 'Search town, neighborhood, or river area...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-transparent text-xs text-slate-200 placeholder-slate-500 focus:outline-none"
+                  className="w-full bg-transparent text-xs text-ink-900 placeholder-ink-400 focus:outline-none"
                   autoFocus
                 />
               </div>
@@ -186,16 +229,16 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   id="gps-locate-btn"
                   onClick={handleUseCurrentLocation}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-emerald-300 hover:bg-emerald-950/50 rounded-xl transition-colors border border-dashed border-emerald-800/60 mb-1"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-forest-800 hover:bg-sand-100 rounded-xl transition-colors border border-dashed border-sand-300 mb-1"
                 >
-                  <Compass className="w-3.5 h-3.5 text-emerald-400" />
-                  Use Current Device GPS Telemetry
+                  <Compass className="w-3.5 h-3.5 text-forest-700" />
+                  {t('header.useGps', 'Use My Current Device Location')}
                 </button>
               </div>
 
               <div className="max-h-60 overflow-y-auto space-y-1 py-1">
-                <div className="px-2 py-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  Global Hotspots & River Basins
+                <div className="px-2 py-1 text-[10px] font-bold text-ink-400 uppercase tracking-wider font-mono">
+                  {t('header.selectHotspot', 'Select Monitored Town or Catchment Area')}
                 </div>
                 {filteredHotspots.map((spot) => (
                   <button
@@ -206,20 +249,20 @@ export const Header: React.FC<HeaderProps> = ({
                       setDropdownOpen(false);
                       setSearchQuery('');
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-xs transition-colors ${
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs transition-colors ${
                       currentLocation.id === spot.id 
-                        ? 'bg-emerald-950/60 border border-emerald-700/50 text-emerald-200' 
-                        : 'hover:bg-slate-800/80 text-slate-300'
+                        ? 'bg-forest-50 border border-forest-200 text-forest-900 font-bold' 
+                        : 'hover:bg-sand-100 text-ink-700'
                     }`}
                   >
                     <div>
-                      <div className="font-semibold text-slate-100">{spot.name}</div>
-                      <div className="text-[11px] text-slate-400">
+                      <div className="font-bold text-ink-900">{spot.name}</div>
+                      <div className="text-[11px] text-ink-500 font-sans">
                         {spot.region}, {spot.country} • Basin: {spot.riverBasin || 'Regional Catchment'}
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="capitalize text-[10px] px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 font-medium">
+                      <span className="capitalize text-[10px] px-2 py-0.5 rounded-md bg-sand-100 text-ink-700 border border-sand-200 font-medium">
                         {spot.primaryRisk.replace('_', ' ')}
                       </span>
                     </div>
@@ -230,16 +273,46 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap justify-between sm:justify-end">
-          <div className="hidden lg:flex items-center gap-2 text-xs font-semibold text-emerald-400 tracking-wide">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>SYSTEM OPERATIONAL</span>
+        {/* Live System Telemetry, UTC Time & Desktop Language Switcher */}
+        <div className="hidden md:flex items-center gap-3 justify-end">
+          {/* Language Switcher Pill */}
+          <div className="flex items-center bg-white/90 border border-sand-200 p-1 rounded-xl shadow-xs">
+            <Languages className="w-3.5 h-3.5 text-forest-800 ml-1 mr-1.5" />
+            <div className="flex items-center bg-sand-100 p-0.5 rounded-lg border border-sand-200 text-xs">
+              <button
+                id="lang-btn-en"
+                onClick={() => setLanguage('en')}
+                className={`px-2.5 py-1 rounded-md font-mono font-bold text-xs transition-all ${
+                  language === 'en' ? 'bg-forest-900 text-sand-50 shadow-xs' : 'text-ink-600 hover:text-ink-900'
+                }`}
+              >
+                EN
+              </button>
+              <button
+                id="lang-btn-sw"
+                onClick={() => setLanguage('sw')}
+                className={`px-2.5 py-1 rounded-md font-mono font-bold text-xs transition-all ${
+                  language === 'sw' ? 'bg-forest-900 text-sand-50 shadow-xs' : 'text-ink-600 hover:text-ink-900'
+                }`}
+              >
+                SW
+              </button>
+            </div>
           </div>
 
-          <div className="hidden sm:flex bg-slate-900 border border-slate-800 px-3.5 py-1.5 rounded-xl items-center gap-3 text-slate-300 text-xs font-mono">
+          {liveWeather && (
+            <div className="flex items-center gap-2 bg-white/90 border border-sand-200 px-3 py-1.5 rounded-xl text-xs shadow-xs">
+              <Thermometer className="w-3.5 h-3.5 text-ochre-600" />
+              <span className="font-mono font-bold text-ink-900">{liveWeather.temperature.toFixed(1)}°C</span>
+              <span className="text-ink-400">|</span>
+              <span className="text-[11px] text-ink-500 font-mono">{liveWeather.humidity}% RH</span>
+            </div>
+          )}
+
+          <div className="flex bg-white/90 border border-sand-200 px-3 py-1.5 rounded-xl items-center gap-2 text-ink-700 text-xs font-mono shadow-xs">
             <span>{currentDate || 'OCT 24, 2026'}</span>
-            <span className="text-slate-600">|</span>
-            <span className="text-emerald-400 font-medium">{currentTime || '14:32:05 UTC'}</span>
+            <span className="text-sand-300">|</span>
+            <span className="text-forest-800 font-bold">{currentTime || '14:32:05 UTC'}</span>
           </div>
         </div>
       </div>
