@@ -8,7 +8,7 @@ export interface RiskDialProps {
   label?: string;
   sublabel?: string;
   unit?: string;
-  riskLevel?: RiskLevel | string;
+  riskLevel?: RiskLevel | 'Low' | 'Moderate' | 'High' | 'Severe' | 'Emergency' | 'Warning' | 'Watch' | 'Advisory' | 'optimal' | 'warning';
   invertColor?: boolean; // True for Readiness/Resilience (higher = greener), False for Hazard/Vulnerability (higher = redder)
   className?: string;
   showTicks?: boolean;
@@ -102,6 +102,12 @@ export const RiskDial: React.FC<RiskDialProps> = ({
   const activeArcAngle = startAngle + totalArc * percentage;
   const activeArc = describeArc(center, center, radius, startAngle, activeArcAngle);
 
+  // Compute arc path length for stroke-dashoffset animation
+  const circumference = 2 * Math.PI * radius;
+  const arcLengthFraction = totalArc / 360;
+  const totalTrackLength = circumference * arcLengthFraction;
+  const activeLength = totalTrackLength * percentage;
+
   // Generate tick marks
   const tickCount = 18;
   const ticks = Array.from({ length: tickCount + 1 }).map((_, i) => {
@@ -122,8 +128,8 @@ export const RiskDial: React.FC<RiskDialProps> = ({
   });
 
   return (
-    <div className={`relative flex flex-col items-center justify-center select-none ${className}`}>
-      <svg width={size} height={size} className="overflow-visible">
+    <div className={`relative flex flex-col items-center justify-center select-none ${className}`} role="img" aria-label={`${label || 'Risk'}: ${Math.round(normalizedScore)} out of ${maxScore}`}>
+      <svg width={size} height={size} className="overflow-visible" aria-hidden="true">
         {/* Background track */}
         <path
           d={backgroundArc}
@@ -148,14 +154,16 @@ export const RiskDial: React.FC<RiskDialProps> = ({
             />
           ))}
 
-        {/* Active Arc with smooth stroke */}
+        {/* Active Arc with stroke-dashoffset animation */}
         {percentage > 0.01 && (
           <path
-            d={activeArc}
+            d={backgroundArc}
             fill="none"
             stroke={currentColor.stroke}
             strokeWidth={strokeWidth}
             strokeLinecap="round"
+            strokeDasharray={`${totalTrackLength}`}
+            strokeDashoffset={`${totalTrackLength - activeLength}`}
             className="transition-all duration-700 ease-out"
           />
         )}

@@ -18,14 +18,19 @@ export async function fetchLiveClimate(lat: number, lon: number, locationName?: 
     const daily = weather?.daily || {};
     const floodDaily = flood?.daily || {};
 
+    // If critical current fields are missing, the backend payload is incomplete — return null
+    if (current.temperature_2m == null && hourly.time == null && daily.time == null) {
+      return null;
+    }
+
     const transformed: LiveWeatherData = {
-      temperature: current.temperature_2m ?? 21.5,
-      apparentTemperature: current.apparent_temperature ?? current.temperature_2m ?? 21.5,
-      humidity: current.relative_humidity_2m ?? 65,
+      temperature: current.temperature_2m ?? 0,
+      apparentTemperature: current.apparent_temperature ?? current.temperature_2m ?? 0,
+      humidity: current.relative_humidity_2m ?? 0,
       precipitationMm: current.precipitation ?? 0,
-      windSpeedKmh: current.wind_speed_10m ?? 12,
-      windDirection: current.wind_direction_10m ?? 180,
-      surfacePressureHpa: current.surface_pressure ?? 1013.25,
+      windSpeedKmh: current.wind_speed_10m ?? 0,
+      windDirection: current.wind_direction_10m ?? 0,
+      surfacePressureHpa: current.surface_pressure ?? 0,
       weatherCode: current.weather_code ?? 0,
       hourly: {
         time: Array.isArray(hourly.time) ? hourly.time : [],
@@ -48,7 +53,7 @@ export async function fetchLiveClimate(lat: number, lon: number, locationName?: 
       },
       floodForecast: floodDaily.time && Array.isArray(floodDaily.time) ? {
         time: floodDaily.time,
-        riverDischarge: Array.isArray(floodDaily.river_discharge) ? floodDaily.river_discharge : (floodDaily.river_discharge_mean || []),
+        riverDischarge: Array.isArray(floodDaily.river_discharge) ? floodDaily.river_discharge : Array.isArray(floodDaily.river_discharge_mean) ? floodDaily.river_discharge_mean : [],
         riverDischargeMax: Array.isArray(floodDaily.river_discharge_max) ? floodDaily.river_discharge_max : [],
         riverDischargeMin: Array.isArray(floodDaily.river_discharge_min) ? floodDaily.river_discharge_min : []
       } : undefined

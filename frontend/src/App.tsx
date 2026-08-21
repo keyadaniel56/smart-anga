@@ -49,14 +49,13 @@ export default function App() {
   
   const [liveWeather, setLiveWeather] = useState<LiveWeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
-  const [, setWeatherError] = useState(false);
+  const [weatherError, setWeatherError] = useState(false);
 
   const [sensors, setSensors] = useState<SensorNode[]>(DEFAULT_SENSORS);
   const [assets] = useState<CriticalAsset[]>(DEFAULT_CRITICAL_ASSETS);
   const [alerts, setAlerts] = useState<EarlyWarningAlert[]>(DEFAULT_ALERTS);
   const [incidents, setIncidents] = useState<DepartmentIncident[]>(DEFAULT_INCIDENTS);
   const [incidentsConnected, setIncidentsConnected] = useState<boolean>(true);
-  const [] = useState<SMEProfile[]>(DEFAULT_SME_PROFILES);
 
   const [hoveredMonth, setHoveredMonth] = useState<string | null>(null);
   const [reportModalOpen, setReportModalOpen] = useState(false);
@@ -171,7 +170,7 @@ export default function App() {
   };
 
   const activeAlertsList = alerts.filter(a => a.active);
-  const firstThreeAlerts = alerts.slice(0, 3);
+  const firstThreeAlerts = activeAlertsList.slice(0, 3);
   const resilienceScore = Math.max(20, Math.min(95, 100 - Math.round(currentLocation.vulnerabilityIndex * 0.4)));
   const activeIncidentsList = incidents.filter(i => i.status === 'active' || i.status === 'in_progress');
 
@@ -730,7 +729,7 @@ export default function App() {
               </h4>
               <p className="leading-relaxed bg-sand-50 p-4 rounded-2xl border border-sand-200">
                 {language === 'sw'
-                  ? `[TODO: Needs native review] Eneo la ${currentLocation.name} lina alama ya jumla ya hatari ya ${currentLocation.vulnerabilityIndex}/100, hasa kutokana na hatari ya ${currentLocation.primaryRisk}. Mifumo ya sasa ya kinga za maji na tahadhari za mapema inatoa ulinzi madhubuti kwa miundombinu muhimu ya jamii.`
+                  ? `Eneo la ${currentLocation.name} lina alama ya jumla ya hatari ya ${currentLocation.vulnerabilityIndex}/100, hasa kutokana na hatari ya ${currentLocation.primaryRisk}. Mifumo ya sasa ya kinga za maji na tahadhari za mapema inatoa ulinzi madhubuti kwa miundombinu muhimu ya jamii.`
                   : `The ${currentLocation.name} area has an overall climate hazard rating of ${currentLocation.vulnerabilityIndex}/100, primarily driven by ${currentLocation.primaryRisk.replace('_', ' ')} exposure. Current local flood defenses and automated community warning systems provide high coverage for essential neighborhood facilities.`}
               </p>
 
@@ -742,7 +741,7 @@ export default function App() {
                   <CheckCircle2 className="w-4 h-4 text-forest-700 flex-shrink-0 mt-0.5" />
                   <span>
                     {language === 'sw'
-                      ? '[TODO: Needs native review] Dumisha utayari wa vizuizi vya mafuriko kwenye maeneo ya chini ya kibiashara.'
+                      ? 'Dumisha utayari wa vizuizi vya mafuriko kwenye maeneo ya chini ya kibiashara.'
                       : 'Maintain moveable flood barrier readiness at low-lying warehouses and clinics.'}
                   </span>
                 </div>
@@ -750,7 +749,7 @@ export default function App() {
                   <CheckCircle2 className="w-4 h-4 text-forest-700 flex-shrink-0 mt-0.5" />
                   <span>
                     {language === 'sw'
-                      ? '[TODO: Needs native review] Washa ving\'ora vya umma na ujumbe wa SMS mto unapofikia kina cha mita 3.8.'
+                      ? 'Washa ving\'ora vya umma na ujumbe wa SMS mto unapofikia kina cha mita 3.8.'
                       : 'Trigger public sirens and mobile SMS broadcasts when local river depth reaches 3.80m.'}
                   </span>
                 </div>

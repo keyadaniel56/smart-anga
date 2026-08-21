@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 import enTranslations from '../i18n/en.json';
 import swTranslations from '../i18n/sw.json';
 
@@ -20,13 +20,21 @@ const dictionaries: Record<Language, any> = {
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem('smartanga_language');
-    return (saved === 'sw' || saved === 'en') ? saved : 'en';
+    try {
+      const saved = localStorage.getItem('smartanga_language');
+      return (saved === 'sw' || saved === 'en') ? saved : 'en';
+    } catch {
+      return 'en';
+    }
   });
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem('smartanga_language', lang);
+    try {
+      localStorage.setItem('smartanga_language', lang);
+    } catch {
+      // localStorage unavailable — silently continue
+    }
   };
 
   const getNestedValue = (obj: any, path: string): string | undefined => {
@@ -61,8 +69,15 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return fallback || keyPath;
   };
 
+  const contextValue = useMemo(() => ({
+    language,
+    setLanguage,
+    t,
+    isSwahili: language === 'sw'
+  }), [language, setLanguage, t]);
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, isSwahili: language === 'sw' }}>
+    <LanguageContext.Provider value={contextValue}>
       {children}
     </LanguageContext.Provider>
   );

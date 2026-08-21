@@ -3,7 +3,7 @@ import React from 'react';
 export type RiskLevel = 'low' | 'moderate' | 'high' | 'critical';
 
 export interface RiskBadgeProps {
-  level: RiskLevel | 'Low' | 'Moderate' | 'High' | 'Severe' | 'Emergency' | 'Warning' | 'Watch' | 'Advisory' | 'optimal' | 'warning' | string;
+  level: RiskLevel | 'Low' | 'Moderate' | 'High' | 'Severe' | 'Emergency' | 'Warning' | 'Watch' | 'Advisory' | 'optimal' | 'warning';
   label?: string;
   size?: 'xs' | 'sm' | 'md';
   dot?: boolean;
@@ -17,7 +17,7 @@ export function normalizeRiskLevel(level: string): RiskLevel {
   if (l === 'critical' || l === 'severe' || l === 'emergency') return 'critical';
   if (l === 'high' || l === 'warning') return 'high';
   if (l === 'moderate' || l === 'watch' || l === 'elevated') return 'moderate';
-  return 'low';
+  return 'moderate';
 }
 
 export const RiskBadge: React.FC<RiskBadgeProps> = ({
