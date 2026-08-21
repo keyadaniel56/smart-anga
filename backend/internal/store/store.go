@@ -168,3 +168,47 @@ func (s *Store) UpdateIncident(id string, req models.UpdateIncidentRequest) *mod
 	}
 	return nil
 }
+
+// ──────────────────────────────── Asset store ────────────────────────────────
+
+// AssetRecord is a vulnerable infrastructure asset in the internal database.
+type AssetRecord struct {
+	ID          string
+	Name        string
+	Type        string
+	Coordinates [2]float64
+}
+
+var seededAssets = []AssetRecord{
+	// Schools
+	{"school-001", "Nairobi Primary School", "school", [2]float64{-1.2830, 36.8200}},
+	{"school-002", "Westlands Academy", "school", [2]float64{-1.2680, 36.8100}},
+	// Hospitals
+	{"hospital-001", "Kenyatta National Hospital", "hospital", [2]float64{-1.3010, 36.8070}},
+	{"hospital-002", "Nairobi West Hospital", "hospital", [2]float64{-1.3120, 36.8150}},
+	// Roads & Bridges
+	{"road-001", "Uhuru Highway Junction", "road", [2]float64{-1.2900, 36.8220}},
+	{"bridge-001", "Nairobi River Bridge A", "bridge", [2]float64{-1.2850, 36.8300}},
+	{"bridge-002", "Ngong Road Overpass", "bridge", [2]float64{-1.3005, 36.7990}},
+	// Farms
+	{"farm-001", "Kikuyu Agricultural Zone", "farm", [2]float64{-1.2500, 36.7800}},
+	{"farm-002", "Ruiru Grain Corridor", "farm", [2]float64{-1.1450, 36.9600}},
+	// Businesses
+	{"business-001", "CBD Commercial Hub", "business", [2]float64{-1.2833, 36.8172}},
+	{"business-002", "Industrial Area SME Park", "business", [2]float64{-1.3100, 36.8400}},
+	// Water infrastructure
+	{"water-001", "Nairobi Water Treatment Plant", "water", [2]float64{-1.2600, 36.8050}},
+	{"water-002", "Embakasi Pumping Station", "water", [2]float64{-1.3200, 36.8900}},
+	// Population centres
+	{"pop-001", "Kibera Residential Zone", "population", [2]float64{-1.3120, 36.7870}},
+	{"pop-002", "Eastleigh District", "population", [2]float64{-1.2740, 36.8490}},
+	// Energy
+	{"energy-001", "Nairobi Power Substation #1", "energy", [2]float64{-1.2960, 36.8260}},
+	// Utilities
+	{"utilities-001", "Sewage Treatment Works", "utilities", [2]float64{-1.3050, 36.8320}},
+}
+
+// GetAssets returns all asset records from the internal database.
+func (s *Store) GetAssets() []AssetRecord {
+	return seededAssets
+}
