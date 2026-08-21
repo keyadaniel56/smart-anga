@@ -67,7 +67,7 @@ export const DroughtAssessmentModule: React.FC<DroughtAssessmentModuleProps> = (
       {/* Top Banner */}
       <div className="bg-surface-800/80 border border-surface-600 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-500/20 text-amber-400 flex items-center justify-center shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shadow-xs">
             <Sun className="w-6 h-6" />
           </div>
           <div>
@@ -75,7 +75,7 @@ export const DroughtAssessmentModule: React.FC<DroughtAssessmentModuleProps> = (
               <h2 className="text-lg font-bold text-ink-900 font-serif">
                 {t('drought.heading', 'Drought Tracking & Farm Water Advisory')}
               </h2>
-              <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-400 text-[10px] font-mono font-bold tracking-wide border border-amber-500/20">
+              <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-mono font-bold tracking-wide border border-amber-500/20">
                 {t('drought.badge', 'DROUGHT MONITOR')}
               </span>
             </div>
@@ -106,13 +106,13 @@ export const DroughtAssessmentModule: React.FC<DroughtAssessmentModuleProps> = (
             <span className="text-3xl font-extrabold font-mono text-amber-500">
               -1.82
             </span>
-            <span className="text-xs text-rose-700 font-semibold font-mono">{t('drought.severe', 'Severe Dryness')}</span>
+            <span className="text-xs text-rose-400 font-semibold font-mono">{t('drought.severe', 'Severe Dryness')}</span>
           </div>
           <div className="mt-2 text-xs text-ink-600">
             {t('drought.evapoLabel', 'Daily Water Loss from Soil')}: <strong className="text-ink-900 font-mono">+3.4 mm/day</strong>
           </div>
           <div className="w-full bg-surface-600 h-1.5 rounded-full mt-2 overflow-hidden">
-            <div className="bg-amber-500 h-full rounded-full w-[78%]"></div>
+            <div className="bg-amber-500/100 h-full rounded-full w-[78%]"></div>
           </div>
         </div>
 
@@ -123,14 +123,14 @@ export const DroughtAssessmentModule: React.FC<DroughtAssessmentModuleProps> = (
             <Sprout className="w-4 h-4 text-forest-600" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold font-mono text-rose-700">
+            <span className="text-3xl font-extrabold font-mono text-rose-400">
               16.8%
             </span>
             <span className="text-xs text-ink-500 font-mono">/ 42% Opt.</span>
           </div>
           <div className="mt-2 text-xs text-ink-600 flex items-center justify-between">
             <span>{t('drought.wiltingPoint', 'Crop Wilting Danger Level')}: <strong>14.0%</strong></span>
-            <span className="text-rose-700 font-bold font-mono">+2.8% {t('drought.wiltingMargin', 'Above Wilting Point')}</span>
+            <span className="text-rose-400 font-bold font-mono">+2.8% {t('drought.wiltingMargin', 'Above Wilting Point')}</span>
           </div>
           <div className="w-full bg-surface-600 h-1.5 rounded-full mt-2 overflow-hidden">
             <div className="bg-rose-600 h-full rounded-full w-[38%]"></div>
@@ -165,7 +165,7 @@ export const DroughtAssessmentModule: React.FC<DroughtAssessmentModuleProps> = (
               <ShieldAlert className="w-4 h-4 text-amber-600" />
             </div>
             <div className="text-sm font-bold text-ink-900 mt-1">
-              {t('drought.estimatedLoss', 'Estimated Crop Loss')}: <strong className="text-rose-700 font-mono">$18.4M</strong>
+              {t('drought.estimatedLoss', 'Estimated Crop Loss')}: <strong className="text-rose-400 font-mono">$18.4M</strong>
             </div>
             <p className="text-xs text-ink-500 mt-0.5">
               {t('drought.farmlandAffected', 'Affecting 12,400 hectares of local farmland')}
@@ -299,7 +299,7 @@ export const DroughtAssessmentModule: React.FC<DroughtAssessmentModuleProps> = (
                 <RiskBadge level={item.risk} size="xs" label={item.stage} />
               </div>
               <div className="flex items-center justify-between text-xs text-ink-700">
-                <span>{t('drought.moistureDeficit', 'Water Shortage')}: <strong className="text-rose-700 font-mono">{item.waterDeficitMm}</strong></span>
+                <span>{t('drought.moistureDeficit', 'Water Shortage')}: <strong className="text-rose-400 font-mono">{item.waterDeficitMm}</strong></span>
                 <span>{t('drought.impact', 'Expected Harvest Loss')}: <strong className="text-amber-400">{item.stressLevel}</strong></span>
               </div>
               <div className="text-xs text-ink-700 bg-surface-700 p-3 rounded-xl border border-surface-600">

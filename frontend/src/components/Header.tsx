@@ -215,7 +215,7 @@ export const Header: React.FC<HeaderProps> = ({
       {criticalAlerts.length > 0 && (
         <div
           id="critical-alert-ticker"
-          className="bg-rose-500/10 border-b border-rose-500/20 px-4 py-1.5 flex items-center justify-between text-xs text-rose-400 shadow-xs"
+          className="bg-rose-500/100/10 border-b border-rose-500/20 px-4 py-1.5 flex items-center justify-between text-xs text-rose-400 shadow-xs"
         >
           <div className="flex items-center space-x-2 overflow-hidden">
             <span className="flex h-2 w-2 relative">

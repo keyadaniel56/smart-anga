@@ -105,7 +105,7 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
       {/* Top Banner */}
       <div className="bg-surface-800/80 border border-surface-600 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-cyan-50 border border-cyan-200 text-cyan-400 flex items-center justify-center shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center shadow-xs">
             <Waves className="w-6 h-6" />
           </div>
           <div>
@@ -113,7 +113,7 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
               <h2 className="text-lg font-bold text-ink-900 font-serif">
                 {t('flood.heading', 'River Flow & Flood Water Forecast')}
               </h2>
-              <span className="px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-400 text-[10px] font-mono font-bold tracking-wide border border-cyan-200">
+              <span className="px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-400 text-[10px] font-mono font-bold tracking-wide border border-cyan-500/20">
                 {t('flood.badge', 'LIVE RIVER FLOW')}
               </span>
             </div>
@@ -146,13 +146,13 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
             <span className="text-3xl font-extrabold font-mono text-cyan-400">
               {riverSensor ? riverSensor.currentValue.toFixed(2) : '4.82'}m
             </span>
-            <span className="text-xs text-rose-700 font-semibold flex items-center">
+            <span className="text-xs text-rose-400 font-semibold flex items-center">
               <TrendingUp className="w-3 h-3 mr-0.5" /> +24 cm/hr
             </span>
           </div>
           <div className="mt-2 text-xs text-ink-600 flex items-center justify-between">
             <span>{t('flood.bankfullLimit', 'River Overflow Threshold')}: <strong>3.80m</strong></span>
-            <span className="text-rose-700 font-bold font-mono">1.02m {t('flood.metersOver', 'Over Safe Limit')}</span>
+            <span className="text-rose-400 font-bold font-mono">1.02m {t('flood.metersOver', 'Over Safe Limit')}</span>
           </div>
           <div className="w-full bg-surface-600 h-1.5 rounded-full mt-2 overflow-hidden">
             <div className="bg-gradient-to-r from-teal-500 to-rose-600 h-full rounded-full w-[85%]"></div>
@@ -186,7 +186,7 @@ export const FloodPredictionModule: React.FC<FloodPredictionModuleProps> = ({
             <Clock className="w-4 h-4 text-ochre-600" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className={`text-3xl font-extrabold font-mono ${isBreachProjected ? 'text-rose-700' : 'text-ochre-700'}`}>
+            <span className={`text-3xl font-extrabold font-mono ${isBreachProjected ? 'text-rose-400' : 'text-ochre-700'}`}>
               {peakDischarge.toFixed(0)} m³/s
             </span>
             <span className="text-xs text-ink-500 font-semibold font-mono">in ~{timeToPeakHours}h</span>

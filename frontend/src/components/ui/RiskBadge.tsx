@@ -39,10 +39,10 @@ export const RiskBadge: React.FC<RiskBadgeProps> = ({
       dot: 'bg-emerald-500'
     },
     moderate: {
-      bg: 'bg-amber-500/10',
+      bg: 'bg-amber-500/100/10',
       text: 'text-amber-400',
       border: 'border-amber-500/20',
-      dot: 'bg-amber-500'
+      dot: 'bg-amber-500/100'
     },
     high: {
       bg: 'bg-orange-500/10',
@@ -51,10 +51,10 @@ export const RiskBadge: React.FC<RiskBadgeProps> = ({
       dot: 'bg-orange-500'
     },
     critical: {
-      bg: 'bg-rose-500/10',
+      bg: 'bg-rose-500/100/10',
       text: 'text-rose-400',
       border: 'border-rose-500/20',
-      dot: 'bg-rose-500'
+      dot: 'bg-rose-500/100'
     }
   };
 

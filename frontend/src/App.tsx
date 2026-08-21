@@ -174,10 +174,10 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <div id="climate-resilience-app" className="h-screen flex flex-col bg-surface-950 text-ink-900 font-sans antialiased selection:bg-teal-500/20 selection:text-forest-900 relative overflow-hidden">
+      <div id="climate-resilience-app" className="h-screen flex flex-col bg-surface-950 text-ink-900 font-sans antialiased selection:bg-teal-500/20 selection:text-forest-600 relative overflow-hidden">
         
         {!isLive && (
-          <div className="bg-amber-500/10 border-b border-amber-500/20 text-amber-300 px-4 py-2 text-xs flex items-center justify-center gap-2 font-medium tracking-wide animate-in slide-in-from-top duration-200 z-50">
+          <div className="bg-amber-500/100/10 border-b border-amber-500/20 text-amber-300 px-4 py-2 text-xs flex items-center justify-center gap-2 font-medium tracking-wide animate-in slide-in-from-top duration-200 z-50">
             <WifiOff className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 animate-pulse" />
             <span>Using cached data: Telemetry Link Down.</span>
           </div>
@@ -207,10 +207,10 @@ export default function App() {
               <div className="space-y-6 animate-in fade-in duration-200">
                 
                 {/* Catchment Context Card */}
-                <div className="bg-white/80 border border-sand-200 rounded-3xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="bg-surface-800/80 border border-surface-600 rounded-3xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                      <span className="px-2.5 py-0.5 rounded-full bg-forest-100 text-forest-800 text-[10px] font-mono font-bold tracking-wider border border-forest-200">
+                      <span className="px-2.5 py-0.5 rounded-full bg-forest-100 text-forest-600 text-[10px] font-mono font-bold tracking-wider border border-forest-800/30">
                         {t('overview.liveMonitorBadge', 'LIVE MONITORING')}
                       </span>
                       <span className="text-xs text-ink-500 font-mono">
@@ -232,24 +232,24 @@ export default function App() {
 
                 {/* Location Summary Row */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-sm text-center">
+                  <div className="bg-surface-800/80 border border-surface-600 rounded-2xl p-4 shadow-sm text-center">
                     <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono mb-1">Population</p>
                     <p className="text-xl font-bold font-mono text-ink-900">{currentLocation.population ? (currentLocation.population >= 1000000 ? `${(currentLocation.population / 1000000).toFixed(1)}M` : currentLocation.population >= 1000 ? `${(currentLocation.population / 1000).toFixed(0)}K` : currentLocation.population.toLocaleString()) : '—'}</p>
                     <p className="text-[10px] text-ink-400 mt-0.5">{currentLocation.region}</p>
                   </div>
-                  <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-sm text-center">
+                  <div className="bg-surface-800/80 border border-surface-600 rounded-2xl p-4 shadow-sm text-center">
                     <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono mb-1">Elevation</p>
                     <p className="text-xl font-bold font-mono text-ink-900">{currentLocation.elevationM}m</p>
                     <p className="text-[10px] text-ink-400 mt-0.5">Above Sea Level</p>
                   </div>
-                  <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-sm text-center">
+                  <div className="bg-surface-800/80 border border-surface-600 rounded-2xl p-4 shadow-sm text-center">
                     <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono mb-1">Primary Risk</p>
                     <p className="text-xl font-bold font-mono capitalize text-ink-900">{currentLocation.primaryRisk.replace('_', ' ')}</p>
                     <p className="text-[10px] text-ink-400 mt-0.5">{currentLocation.riverBasin || 'Regional Assessment'}</p>
                   </div>
-                  <div className="bg-white/80 border border-sand-200 rounded-2xl p-4 shadow-sm text-center">
+                  <div className="bg-surface-800/80 border border-surface-600 rounded-2xl p-4 shadow-sm text-center">
                     <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono mb-1">Assets Protected</p>
-                    <p className="text-xl font-bold font-mono text-forest-800">{currentLocation.criticalAssetsCount || assets.length}</p>
+                    <p className="text-xl font-bold font-mono text-forest-600">{currentLocation.criticalAssetsCount || assets.length}</p>
                     <p className="text-[10px] text-ink-400 mt-0.5">Critical Infrastructure</p>
                   </div>
                 </div>
@@ -257,16 +257,16 @@ export default function App() {
                 {/* Bento Grid: Alerts + Map + Resilience */}
                 <div className="grid grid-cols-12 gap-5">
                   {/* Early Warning Feed */}
-                  <div className="col-span-12 lg:col-span-3 bg-white/80 border border-sand-200 rounded-3xl p-5 flex flex-col justify-between shadow-sm">
+                  <div className="col-span-12 lg:col-span-3 bg-surface-800/80 border border-surface-600 rounded-3xl p-5 flex flex-col justify-between shadow-sm">
                     <div>
-                      <div className="flex items-center justify-between mb-4 pb-2 border-b border-sand-200">
+                      <div className="flex items-center justify-between mb-4 pb-2 border-b border-surface-600">
                         <div className="flex items-center gap-2">
                           <Radio className="w-4 h-4 text-rose-600 animate-pulse" />
                           <h2 className="text-xs font-bold text-ink-500 uppercase tracking-wider font-mono">
                             {t('overview.earlyWarningFeed', 'Early Warning Feed')}
                           </h2>
                         </div>
-                        <span className="text-[10px] font-mono font-bold text-forest-800 bg-sand-100 px-2 py-0.5 rounded-md border border-sand-200">
+                        <span className="text-[10px] font-mono font-bold text-forest-600 bg-surface-800 px-2 py-0.5 rounded-md border border-surface-600">
                           {activeAlertsList.length} Active
                         </span>
                       </div>
@@ -276,9 +276,9 @@ export default function App() {
                         <div className="space-y-3">
                           {firstThreeAlerts.map((alert) => (
                             <div key={alert.id} className={`p-3.5 rounded-2xl border transition-all ${
-                              alert.severity === 'Emergency' ? 'bg-rose-50/70 border-rose-200 text-rose-950'
-                              : alert.severity === 'Warning' ? 'bg-amber-50/70 border-amber-200 text-amber-950'
-                              : 'bg-sand-50/90 border-sand-200 text-ink-800'
+                              alert.severity === 'Emergency' ? 'bg-rose-500/10/70 border-rose-500/20 text-rose-400'
+                              : alert.severity === 'Warning' ? 'bg-amber-500/10/70 border-amber-500/20 text-amber-400'
+                              : 'bg-surface-800/80 border-surface-600 text-ink-700'
                             }`}>
                               <div className="flex justify-between items-start mb-1.5">
                                 <RiskBadge level={alert.severity} size="xs" label={`${alert.severity} ${alert.hazard}`} />
@@ -293,8 +293,8 @@ export default function App() {
                         </div>
                       )}
                     </div>
-                    <div className="mt-4 pt-3 border-t border-sand-200">
-                      <button onClick={() => setActiveTab('early_warning')} className="w-full py-2.5 bg-forest-900 hover:bg-forest-800 text-sand-50 transition-colors rounded-xl text-xs font-bold uppercase tracking-wider font-mono flex items-center justify-center gap-1.5 shadow-sm">
+                    <div className="mt-4 pt-3 border-t border-surface-600">
+                      <button onClick={() => setActiveTab('early_warning')} className="w-full py-2.5 bg-forest-900 hover:bg-forest-700 text-ink-900 transition-colors rounded-xl text-xs font-bold uppercase tracking-wider font-mono flex items-center justify-center gap-1.5 shadow-sm">
                         <span>View All Incidents</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
@@ -302,8 +302,8 @@ export default function App() {
                   </div>
 
                   {/* GIS Map */}
-                  <div className="col-span-12 lg:col-span-6 bg-white border border-sand-200 rounded-3xl overflow-hidden flex flex-col shadow-sm">
-                    <div className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-sand-200 bg-sand-50/50">
+                  <div className="col-span-12 lg:col-span-6 bg-surface-700 border border-surface-600 rounded-3xl overflow-hidden flex flex-col shadow-sm">
+                    <div className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-surface-600 bg-surface-800/50">
                       <div>
                         <h2 className="text-base font-bold text-ink-900 font-serif">Area Risk & Water Map</h2>
                         <p className="text-ink-500 text-xs">{currentLocation.name} — {currentLocation.riverBasin || 'Catchment Basin'}</p>
@@ -313,34 +313,34 @@ export default function App() {
                         <RiskBadge level="moderate" size="xs" label="Drought Zones" />
                       </div>
                     </div>
-                    <div className="flex-1 relative min-h-[380px] bg-sand-100">
+                    <div className="flex-1 relative min-h-[380px] bg-surface-800">
                       <RiskMap location={currentLocation} sensors={sensors} assets={assets} incidents={incidents} onSearchLocation={setCurrentLocation} />
                     </div>
                     {/* Weather Bar */}
-                    <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 bg-sand-50/80 border-t border-sand-200">
+                    <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 bg-surface-950/80 border-t border-surface-600">
                       <div className="text-center">
                         <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono">Humidity</p>
                         <p className="text-base sm:text-lg font-bold font-mono text-ink-900">{liveWeather ? `${liveWeather.humidity}%` : weatherLoading ? '...' : '68%'}</p>
                       </div>
-                      <div className="text-center border-l border-sand-200">
+                      <div className="text-center border-l border-surface-600">
                         <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono">Wind Speed</p>
                         <p className="text-base sm:text-lg font-bold font-mono text-ink-900">{liveWeather ? `${liveWeather.windSpeedKmh} km/h` : weatherLoading ? '...' : '14 km/h'}</p>
                       </div>
-                      <div className="text-center border-l border-sand-200">
+                      <div className="text-center border-l border-surface-600">
                         <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono">Rainfall</p>
-                        <p className="text-base sm:text-lg font-bold font-mono text-cyan-700">{liveWeather ? `${liveWeather.precipitationMm} mm` : weatherLoading ? '...' : '0.0 mm'}</p>
+                        <p className="text-base sm:text-lg font-bold font-mono text-cyan-500">{liveWeather ? `${liveWeather.precipitationMm} mm` : weatherLoading ? '...' : '0.0 mm'}</p>
                       </div>
-                      <div className="text-center border-l border-sand-200">
+                      <div className="text-center border-l border-surface-600">
                         <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono">Air Pressure</p>
-                        <p className="text-base sm:text-lg font-bold font-mono text-forest-800">{liveWeather ? `${liveWeather.surfacePressureHpa} hPa` : weatherLoading ? '...' : '1014 hPa'}</p>
+                        <p className="text-base sm:text-lg font-bold font-mono text-forest-600">{liveWeather ? `${liveWeather.surfacePressureHpa} hPa` : weatherLoading ? '...' : '1014 hPa'}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Resilience Score */}
-                  <div className="col-span-12 lg:col-span-3 bg-white/80 border border-sand-200 rounded-3xl p-5 flex flex-col justify-between shadow-sm">
+                  <div className="col-span-12 lg:col-span-3 bg-surface-800/80 border border-surface-600 rounded-3xl p-5 flex flex-col justify-between shadow-sm">
                     <div>
-                      <h2 className="text-xs font-bold text-ink-500 uppercase tracking-wider font-mono mb-4 pb-2 border-b border-sand-200">
+                      <h2 className="text-xs font-bold text-ink-500 uppercase tracking-wider font-mono mb-4 pb-2 border-b border-surface-600">
                         Community Readiness Score
                       </h2>
                       <div className="flex flex-col items-center justify-center my-2">
@@ -349,36 +349,36 @@ export default function App() {
                           <div>
                             <div className="flex justify-between text-[11px] font-bold text-ink-700 mb-1">
                               <span>Building & Drainage Protection</span>
-                              <span className="font-mono text-forest-800 font-bold">{Math.min(98, 100 - Math.floor(currentLocation.vulnerabilityIndex * 0.3))}%</span>
+                              <span className="font-mono text-forest-600 font-bold">{Math.min(98, 100 - Math.floor(currentLocation.vulnerabilityIndex * 0.3))}%</span>
                             </div>
-                            <div className="w-full h-2 bg-sand-200 rounded-full overflow-hidden">
+                            <div className="w-full h-2 bg-surface-600 rounded-full overflow-hidden">
                               <div className="h-full bg-forest-700 rounded-full transition-all duration-500" style={{ width: `${Math.min(98, 100 - currentLocation.vulnerabilityIndex * 0.3)}%` }}></div>
                             </div>
                           </div>
                           <div>
                             <div className="flex justify-between text-[11px] font-bold text-ink-700 mb-1">
                               <span>Community Readiness</span>
-                              <span className="font-mono text-amber-700 font-bold">{Math.max(25, 100 - Math.floor(currentLocation.vulnerabilityIndex * 0.8))}%</span>
+                              <span className="font-mono text-amber-500 font-bold">{Math.max(25, 100 - Math.floor(currentLocation.vulnerabilityIndex * 0.8))}%</span>
                             </div>
-                            <div className="w-full h-2 bg-sand-200 rounded-full overflow-hidden">
-                              <div className="h-full bg-amber-500 rounded-full transition-all duration-500" style={{ width: `${Math.max(25, 100 - currentLocation.vulnerabilityIndex * 0.8)}%` }}></div>
+                            <div className="w-full h-2 bg-surface-600 rounded-full overflow-hidden">
+                              <div className="h-full bg-amber-500/100 rounded-full transition-all duration-500" style={{ width: `${Math.max(25, 100 - currentLocation.vulnerabilityIndex * 0.8)}%` }}></div>
                             </div>
                           </div>
                           <div>
                             <div className="flex justify-between text-[11px] font-bold text-ink-700 mb-1">
                               <span>Sensor Coverage</span>
-                              <span className="font-mono text-cyan-700 font-bold">{Math.min(95, 40 + sensors.filter(s => s.status !== 'offline').length * 12)}%</span>
+                              <span className="font-mono text-cyan-500 font-bold">{Math.min(95, 40 + sensors.filter(s => s.status !== 'offline').length * 12)}%</span>
                             </div>
-                            <div className="w-full h-2 bg-sand-200 rounded-full overflow-hidden">
+                            <div className="w-full h-2 bg-surface-600 rounded-full overflow-hidden">
                               <div className="h-full bg-cyan-600 rounded-full transition-all duration-500" style={{ width: `${Math.min(95, 40 + sensors.filter(s => s.status !== 'offline').length * 12)}%` }}></div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="mt-4 pt-3 border-t border-sand-200 text-[11px] text-ink-500 flex items-center justify-between">
+                    <div className="mt-4 pt-3 border-t border-surface-600 text-[11px] text-ink-500 flex items-center justify-between">
                       <span>Sendai Safety Standard</span>
-                      <span className={`font-semibold font-mono ${resilienceScore >= 60 ? 'text-forest-800' : resilienceScore >= 40 ? 'text-amber-700' : 'text-rose-700'}`}>
+                      <span className={`font-semibold font-mono ${resilienceScore >= 60 ? 'text-forest-600' : resilienceScore >= 40 ? 'text-amber-500' : 'text-rose-400'}`}>
                         {resilienceScore >= 60 ? 'Tier-1 Compliant' : resilienceScore >= 40 ? 'Tier-2 Monitor' : 'Tier-3 Alert'}
                       </span>
                     </div>
@@ -388,15 +388,15 @@ export default function App() {
                 {/* Lower Bento: Forecast + Data Status */}
                 <div className="grid grid-cols-12 gap-5">
                   {/* Weather Forecast Chart */}
-                  <div className="col-span-12 lg:col-span-8 bg-white/80 border border-sand-200 rounded-3xl p-5 flex flex-col justify-between shadow-sm">
+                  <div className="col-span-12 lg:col-span-8 bg-surface-800/80 border border-surface-600 rounded-3xl p-5 flex flex-col justify-between shadow-sm">
                     <div>
-                      <div className="flex items-center justify-between mb-4 pb-2 border-b border-sand-200">
+                      <div className="flex items-center justify-between mb-4 pb-2 border-b border-surface-600">
                         <h2 className="text-xs font-bold text-ink-500 uppercase tracking-wider font-mono">
                           {liveWeather?.daily?.time ? '12-Day Precipitation & Temperature Forecast' : 'Historical Weather Pattern'}
                         </h2>
                         <div className="flex items-center gap-3 text-[10px] font-mono">
-                          <span className="flex items-center gap-1 text-forest-800"><span className="w-2 h-2 rounded-full bg-forest-700"></span> Precip</span>
-                          <span className="flex items-center gap-1 text-rose-700"><span className="w-2 h-2 rounded-full bg-rose-600"></span> Heat Surge</span>
+                          <span className="flex items-center gap-1 text-forest-600"><span className="w-2 h-2 rounded-full bg-forest-700"></span> Precip</span>
+                          <span className="flex items-center gap-1 text-rose-400"><span className="w-2 h-2 rounded-full bg-rose-600"></span> Heat Surge</span>
                         </div>
                       </div>
                       <div className="flex items-end gap-2 sm:gap-3 h-32 px-1 pt-4">
@@ -406,12 +406,12 @@ export default function App() {
                           const isHeatSurge = tMax > 32;
                           const maxPrecip = Math.max(...(liveWeather?.daily?.precipitationSum || [1]));
                           const barH = Math.max(8, (precip / Math.max(maxPrecip, 1)) * 80 + (isHeatSurge ? 15 : 0));
-                          const barColor = isHeatSurge ? 'bg-rose-500' : precip > maxPrecip * 0.6 ? 'bg-forest-600' : 'bg-sand-300';
+                          const barColor = isHeatSurge ? 'bg-rose-500/100' : precip > maxPrecip * 0.6 ? 'bg-forest-600' : 'bg-surface-500';
                           const dateLabel = new Date(day).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                           return (
                             <div key={idx} onMouseEnter={() => setHoveredMonth(`${dateLabel}: ${precip}mm, ${tMax}°C`)} onMouseLeave={() => setHoveredMonth(null)} className="flex-1 flex flex-col items-center h-full justify-end group cursor-pointer">
                               <div style={{ height: `${barH}%` }} className={`w-full ${barColor} group-hover:brightness-95 rounded-t-md transition-all relative`}>
-                                <div className="absolute -top-7 left-1/2 -translate-x-1/2 text-[9px] font-mono bg-ink-900 text-sand-50 px-1.5 py-0.5 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none">
+                                <div className="absolute -top-7 left-1/2 -translate-x-1/2 text-[9px] font-mono bg-ink-900 text-ink-900 px-1.5 py-0.5 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none">
                                   {dateLabel}: {precip}mm{isHeatSurge ? `, ${tMax}°C` : ''}
                                 </div>
                               </div>
@@ -420,7 +420,7 @@ export default function App() {
                         })}
                         {(!liveWeather?.daily?.time || liveWeather.daily.time.length === 0) && Array.from({ length: 12 }, (_, i) => (
                           <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group cursor-pointer">
-                            <div style={{ height: `${20 + Math.sin(i * 0.8) * 30 + Math.random() * 20}%` }} className={`w-full ${i === 4 || i === 7 ? 'bg-rose-400' : 'bg-sand-300'} rounded-t-md transition-all relative`}></div>
+                            <div style={{ height: `${20 + Math.sin(i * 0.8) * 30 + Math.random() * 20}%` }} className={`w-full ${i === 4 || i === 7 ? 'bg-rose-400' : 'bg-surface-500'} rounded-t-md transition-all relative`}></div>
                           </div>
                         ))}
                       </div>
@@ -431,40 +431,40 @@ export default function App() {
                         {(!liveWeather?.daily?.time || liveWeather.daily.time.length === 0) && <><span>JAN</span><span>MAR</span><span>MAY</span><span>JUL</span><span>SEP</span><span>NOV</span></>}
                       </div>
                     </div>
-                    <div className="text-[11px] text-ink-500 font-mono mt-3 pt-2 border-t border-sand-200 flex justify-between">
+                    <div className="text-[11px] text-ink-500 font-mono mt-3 pt-2 border-t border-surface-600 flex justify-between">
                       <span>{liveWeather?.daily?.time ? 'Open-Meteo 12-Day Forecast' : 'Historical Climate Baseline'}</span>
                       <span className="text-ink-900 font-semibold">{hoveredMonth || 'Hover bar for detail'}</span>
                     </div>
                   </div>
 
                   {/* Data Status */}
-                  <div className="col-span-12 lg:col-span-4 bg-white/80 border border-sand-200 rounded-3xl p-5 flex flex-col justify-between shadow-sm">
+                  <div className="col-span-12 lg:col-span-4 bg-surface-800/80 border border-surface-600 rounded-3xl p-5 flex flex-col justify-between shadow-sm">
                     <div>
-                      <div className="flex items-center justify-between mb-4 pb-2 border-b border-sand-200">
+                      <div className="flex items-center justify-between mb-4 pb-2 border-b border-surface-600">
                         <span className="text-xs font-bold text-ink-500 uppercase tracking-wider font-mono">Live Data Feed Status</span>
                         {(!incidentsConnected || weatherError) && !weatherLoading ? (
-                          <span className="px-2 py-0.5 bg-amber-50 text-amber-800 text-[10px] rounded-full border border-amber-200 font-bold font-mono">DEGRADED</span>
+                          <span className="px-2 py-0.5 bg-amber-500/10 text-amber-400 text-[10px] rounded-full border border-amber-500/20 font-bold font-mono">DEGRADED</span>
                         ) : (
-                          <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 text-[10px] rounded-full border border-emerald-200 font-bold font-mono">CONNECTED</span>
+                          <span className="px-2 py-0.5 bg-emerald-50 text-emerald-400 text-[10px] rounded-full border border-emerald-500/20 font-bold font-mono">CONNECTED</span>
                         )}
                       </div>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-ink-700 font-medium">Weather Data Feed</span>
-                          <span className={`font-mono text-[10px] font-bold flex items-center gap-1 ${weatherError && !weatherLoading ? 'text-amber-600' : 'text-emerald-700'}`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${weatherError && !weatherLoading ? 'bg-amber-500' : 'bg-emerald-600 animate-pulse'}`}></span>
+                          <span className={`font-mono text-[10px] font-bold flex items-center gap-1 ${weatherError && !weatherLoading ? 'text-amber-600' : 'text-emerald-500'}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${weatherError && !weatherLoading ? 'bg-amber-500/100' : 'bg-emerald-600 animate-pulse'}`}></span>
                             {weatherLoading ? 'Syncing...' : liveWeather ? 'Live Feed' : 'Unavailable'}
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-ink-700 font-medium">Emergency Dispatch</span>
-                          <span className={`font-mono text-[10px] font-bold ${!incidentsConnected ? 'text-amber-600' : 'text-emerald-700'}`}>
+                          <span className={`font-mono text-[10px] font-bold ${!incidentsConnected ? 'text-amber-600' : 'text-emerald-500'}`}>
                             {incidentsConnected ? `${incidents.length} Synced` : 'Cached Only'}
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-ink-700 font-medium">Local Weather Sensors</span>
-                          <span className="font-mono text-[10px] text-emerald-700 font-bold">{sensors.length} Online</span>
+                          <span className="font-mono text-[10px] text-emerald-500 font-bold">{sensors.length} Online</span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-ink-700 font-medium">Protected Buildings</span>
@@ -472,33 +472,33 @@ export default function App() {
                         </div>
                       </div>
                     </div>
-                    <div className="pt-3 border-t border-sand-200 flex items-center justify-between text-[10px] text-ink-500 font-mono">
+                    <div className="pt-3 border-t border-surface-600 flex items-center justify-between text-[10px] text-ink-500 font-mono">
                       <span>Last sync: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      <span className="text-emerald-700 font-bold">{sensors.filter(s => s.status !== 'offline').length}/{sensors.length} Sensors Online</span>
+                      <span className="text-emerald-500 font-bold">{sensors.filter(s => s.status !== 'offline').length}/{sensors.length} Sensors Online</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Module Navigation Shortcuts */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                  <div onClick={() => setActiveTab('flood_prediction')} className="bg-white/80 hover:bg-white border border-sand-200 hover:border-cyan-400 rounded-3xl p-5 transition-all cursor-pointer shadow-xs hover:shadow-md group">
-                    <div className="flex items-center justify-between text-xs text-cyan-800 mb-1.5 font-bold font-mono">
+                  <div onClick={() => setActiveTab('flood_prediction')} className="bg-surface-800/80 hover:bg-surface-700 border border-surface-600 hover:border-cyan-400 rounded-3xl p-5 transition-all cursor-pointer shadow-xs hover:shadow-md group">
+                    <div className="flex items-center justify-between text-xs text-cyan-400 mb-1.5 font-bold font-mono">
                       <span className="uppercase tracking-wider text-[10px]">LIVE RIVER FLOW</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </div>
                     <div className="font-bold text-ink-900 text-sm font-serif">River Flow & Flood Water Forecast</div>
                     <p className="text-xs text-ink-500 mt-1 leading-relaxed">Live river height, flood overflow limits, and water pump status</p>
                   </div>
-                  <div onClick={() => setActiveTab('drought_assessment')} className="bg-white/80 hover:bg-white border border-sand-200 hover:border-amber-400 rounded-3xl p-5 transition-all cursor-pointer shadow-xs hover:shadow-md group">
-                    <div className="flex items-center justify-between text-xs text-amber-800 mb-1.5 font-bold font-mono">
+                  <div onClick={() => setActiveTab('drought_assessment')} className="bg-surface-800/80 hover:bg-surface-700 border border-surface-600 hover:border-amber-400 rounded-3xl p-5 transition-all cursor-pointer shadow-xs hover:shadow-md group">
+                    <div className="flex items-center justify-between text-xs text-amber-400 mb-1.5 font-bold font-mono">
                       <span className="uppercase tracking-wider text-[10px]">DROUGHT MONITOR</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </div>
                     <div className="font-bold text-ink-900 text-sm font-serif">Drought Tracking & Farm Water Advisory</div>
                     <p className="text-xs text-ink-500 mt-1 leading-relaxed">Soil dryness levels, water reservoir levels, and watering guidelines</p>
                   </div>
-                  <div onClick={() => setActiveTab('sme_preparedness')} className="bg-white/80 hover:bg-white border border-sand-200 hover:border-forest-400 rounded-3xl p-5 transition-all cursor-pointer shadow-xs hover:shadow-md group">
-                    <div className="flex items-center justify-between text-xs text-forest-800 mb-1.5 font-bold font-mono">
+                  <div onClick={() => setActiveTab('sme_preparedness')} className="bg-surface-800/80 hover:bg-surface-700 border border-surface-600 hover:border-forest-400 rounded-3xl p-5 transition-all cursor-pointer shadow-xs hover:shadow-md group">
+                    <div className="flex items-center justify-between text-xs text-forest-600 mb-1.5 font-bold font-mono">
                       <span className="uppercase tracking-wider text-[10px]">BUSINESS SAFETY</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </div>

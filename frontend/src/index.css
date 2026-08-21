@@ -23,11 +23,11 @@
   --color-sand-200: #3a3530;
   --color-sand-300: #4a4440;
 
-  /* Ink Hierarchy (light on dark) */
-  --color-ink-900: #f0ebe4;
-  --color-ink-700: #c8c2b9;
-  --color-ink-500: #9a928a;
-  --color-ink-300: #6a635c;
+  /* Ink Hierarchy (light on dark) — WCAG AA contrast on surface-800 */
+  --color-ink-900: #f5f0e8;
+  --color-ink-700: #d4cec4;
+  --color-ink-500: #a09890;
+  --color-ink-300: #8a837a;
   --color-ink-100: #2d2926;
 
   /* Forest Tones */

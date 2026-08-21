@@ -119,7 +119,7 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
                   }}
                   className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
                     isSelected
-                      ? 'bg-forest-50/80 border-forest-300 shadow-xs'
+                      ? 'bg-forest-50/80 border-forest-700/40 shadow-xs'
                       : 'bg-surface-800/60 border-surface-600 hover:bg-surface-800/70'
                   }`}
                 >
@@ -193,8 +193,8 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
               </div>
 
               {manualErrorWarning && (
-                <div className="p-3 bg-rose-50 border border-rose-500/20 rounded-xl text-xs text-rose-900 flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-rose-700 flex-shrink-0" />
+                <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-400 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0" />
                   <span>{manualErrorWarning}</span>
                 </div>
               )}

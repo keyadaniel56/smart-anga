@@ -145,7 +145,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           className: 'custom-asset-marker',
           html: `<div class="relative flex items-center justify-center w-7 h-7 rounded-full border-2 ${
             isSevere ? 'bg-rose-600 border-white text-white shadow-md shadow-rose-600/40'
-            : isHigh ? 'bg-amber-500 border-white text-white shadow-sm shadow-amber-500/30'
+            : isHigh ? 'bg-amber-500/100 border-white text-white shadow-sm shadow-amber-500/30'
             : 'bg-forest-600 border-white text-white shadow-xs'
           }"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div>`,
           iconSize: [28, 28], iconAnchor: [14, 14]
@@ -155,7 +155,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           <div class="space-y-1.5 font-sans min-w-[200px]">
             <div class="flex items-center justify-between">
               <span class="text-[9px] font-bold uppercase tracking-wider text-ink-500 font-mono">${asset.category.replace('_', ' ')}</span>
-              <span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold ${isSevere ? 'bg-rose-50 text-rose-400 border border-rose-500/20' : 'bg-amber-50 text-amber-400 border border-amber-500/20'}">${asset.riskRating}</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold ${isSevere ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">${asset.riskRating}</span>
             </div>
             <div class="font-bold text-ink-900 text-xs">${asset.name}</div>
             <div class="text-[11px] text-ink-700">Value: <strong class="text-forest-600 font-mono">$${asset.estimatedAssetValueMillionsUSD}M</strong> | Flood Limit: <strong class="font-mono">${asset.floodBreachThresholdM}m</strong></div>
@@ -174,7 +174,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           className: 'custom-sensor-marker',
           html: `<div class="relative flex items-center justify-center w-6 h-6 rounded-full border ${
             isCritical ? 'bg-rose-600 text-white border-white ring-2 ring-rose-400 shadow-sm'
-            : isWarning ? 'bg-amber-500 text-white border-white ring-2 ring-amber-300'
+            : isWarning ? 'bg-amber-500/100 text-white border-white ring-2 ring-amber-300'
             : 'bg-forest-800 text-ink-900 border-white'
           }"><span class="text-[8px] font-extrabold font-mono">${sensor.type === 'river_stage' ? 'H2O' : sensor.type === 'soil_moisture' ? 'SOIL' : sensor.type === 'wet_bulb_temp' ? 'WB' : 'RN'}</span></div>`,
           iconSize: [24, 24], iconAnchor: [12, 12]
@@ -206,7 +206,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
         marker.bindPopup(`
           <div class="space-y-1.5 font-sans min-w-[220px]">
             <div class="flex items-center justify-between">
-              <span class="bg-rose-50 text-rose-400 font-mono text-[9px] px-1.5 py-0.5 rounded font-bold border border-rose-500/20">${inc.id}</span>
+              <span class="bg-rose-500/10 text-rose-400 font-mono text-[9px] px-1.5 py-0.5 rounded font-bold border border-rose-500/20">${inc.id}</span>
               <span class="text-[10px] text-rose-400 font-mono font-bold uppercase">${inc.severity}</span>
             </div>
             <div class="font-bold text-ink-900 text-xs leading-snug">${inc.title}</div>
@@ -385,7 +385,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           {t('map.layersTitle', 'Map Layers')}
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+          <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-500/100/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
             {t('common.live', 'Live')}
           </span>
           <button
@@ -446,7 +446,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           <span className="text-ink-700 text-[11px]">{t('map.floodInundation', 'Flood Danger Zones')}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-500 border border-white"></span>
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-500/100 border border-white"></span>
           <span className="text-ink-700 text-[11px]">{t('map.droughtSoil', 'Dry Soil Areas')}</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -470,7 +470,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
 
       <button
         onClick={toggleExpand}
-        className="absolute top-3 left-3 z-30 bg-surface-700/95 border border-surface-600 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md hover:bg-surface-700 transition-colors"
+        className="absolute top-3 left-3 z-30 bg-surface-700/95 border border-surface-600 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-700 backdrop-blur-md hover:bg-surface-700 transition-colors"
         title="Expand map"
       >
         <Maximize2 className="w-3.5 h-3.5 text-forest-600" />
@@ -479,7 +479,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
 
       <button
         onClick={() => setMobileControlsOpen(!mobileControlsOpen)}
-        className="sm:hidden absolute top-3 right-3 z-30 bg-surface-700/95 border border-surface-600 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md"
+        className="sm:hidden absolute top-3 right-3 z-30 bg-surface-700/95 border border-surface-600 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-700 backdrop-blur-md"
       >
         <SlidersHorizontal className="w-3.5 h-3.5 text-forest-600" />
         <span>{t('map.layersBtn', 'Map Layers')} ({Object.values(layersVisibility).filter(Boolean).length})</span>
@@ -502,7 +502,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
       <div className="absolute top-3 left-3 right-3 z-30 flex items-start gap-2">
         <button
           onClick={toggleExpand}
-          className="flex-shrink-0 bg-surface-700/95 border border-surface-600 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md hover:bg-surface-700 transition-colors"
+          className="flex-shrink-0 bg-surface-700/95 border border-surface-600 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-700 backdrop-blur-md hover:bg-surface-700 transition-colors"
           title="Collapse map"
         >
           <Minimize2 className="w-3.5 h-3.5 text-forest-600" />
@@ -523,7 +523,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
               />
               {geoLoading && <Loader2 className="w-3 h-3 text-ink-300 animate-spin flex-shrink-0" />}
               {searchQuery && (
-                <button onClick={() => { setSearchQuery(''); setGeoResults([]); }} className="text-ink-300 hover:text-ink-600">
+                <button onClick={() => { setSearchQuery(''); setGeoResults([]); }} className="text-ink-500 hover:text-ink-700">
                   <X className="w-3 h-3" />
                 </button>
               )}
@@ -536,7 +536,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
                   <button
                     key={result.place_id}
                     onClick={() => selectGeoResult(result)}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left text-xs hover:bg-forest-50 transition-colors border-b border-sand-100 last:border-b-0"
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left text-xs hover:bg-forest-50 transition-colors border-b border-surface-700 last:border-b-0"
                   >
                     <MapPin className="w-3.5 h-3.5 text-forest-600 flex-shrink-0" />
                     <div className="min-w-0">
@@ -555,7 +555,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
 
       <button
         onClick={() => setMobileControlsOpen(!mobileControlsOpen)}
-        className="sm:hidden absolute top-3 right-3 z-30 bg-surface-700/95 border border-surface-600 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md"
+        className="sm:hidden absolute top-3 right-3 z-30 bg-surface-700/95 border border-surface-600 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-700 backdrop-blur-md"
       >
         <SlidersHorizontal className="w-3.5 h-3.5 text-forest-600" />
         <span>{t('map.layersBtn', 'Map Layers')} ({Object.values(layersVisibility).filter(Boolean).length})</span>

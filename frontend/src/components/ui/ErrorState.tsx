@@ -21,9 +21,9 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
 
   return (
     <div
-      className={`flex flex-col items-center justify-center text-center p-6 rounded-2xl bg-amber-50/60 border border-amber-200/80 shadow-sm ${className}`}
+      className={`flex flex-col items-center justify-center text-center p-6 rounded-2xl bg-amber-500/10 border border-amber-500/20 shadow-sm ${className}`}
     >
-      <div className="w-10 h-10 rounded-xl bg-amber-100/80 border border-amber-200 flex items-center justify-center text-amber-700 mb-2.5">
+      <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/20 flex items-center justify-center text-amber-500 mb-2.5">
         <AlertTriangle className="w-5 h-5" />
       </div>
       <h4 className="text-sm font-bold text-ink-900 font-serif">{displayTitle}</h4>

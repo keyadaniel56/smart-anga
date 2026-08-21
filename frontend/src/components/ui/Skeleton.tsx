@@ -30,7 +30,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   const elements = Array.from({ length: count }).map((_, i) => (
     <div
       key={i}
-      className={`animate-pulse bg-sand-200/80 border border-sand-300/50 ${getVariantStyles()} ${className}`}
+      className={`animate-pulse bg-surface-600/80 border border-surface-500/50 ${getVariantStyles()} ${className}`}
     />
   ));
 
