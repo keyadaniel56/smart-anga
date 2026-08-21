@@ -1,44 +1,28 @@
 import React from 'react';
-import { Inbox } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
-export interface EmptyStateProps {
-  icon?: React.ElementType;
+interface EmptyStateProps {
   title: string;
-  description?: string;
-  actionLabel?: string;
-  onAction?: () => void;
-  className?: string;
+  description: string;
+  icon?: React.ReactNode;
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
-  icon: Icon = Inbox,
   title,
   description,
-  actionLabel,
-  onAction,
-  className = ''
+  icon
 }) => {
   return (
-    <div
-      className={`flex flex-col items-center justify-center text-center p-8 rounded-2xl bg-white/70 border border-sand-200 shadow-sm ${className}`}
-    >
-      <div className="w-12 h-12 rounded-2xl bg-sand-100 border border-sand-200 flex items-center justify-center text-ink-500 mb-3.5 shadow-inner">
-        <Icon className="w-6 h-6 stroke-[1.5]" />
+    <div className="flex flex-col items-center justify-center p-6 text-center bg-sand-50/50 rounded-2xl border border-dashed border-sand-300">
+      <div className="w-10 h-10 rounded-full bg-sand-100 flex items-center justify-center text-ink-500 mb-3">
+        {icon || <AlertCircle className="w-5 h-5" />}
       </div>
-      <h4 className="text-sm font-bold text-ink-900 font-serif">{title}</h4>
-      {description && (
-        <p className="text-xs text-ink-500 max-w-sm mt-1 leading-relaxed">
-          {description}
-        </p>
-      )}
-      {actionLabel && onAction && (
-        <button
-          onClick={onAction}
-          className="mt-4 px-4 py-2 bg-forest-800 hover:bg-forest-900 text-sand-50 text-xs font-semibold rounded-xl transition-all shadow-sm"
-        >
-          {actionLabel}
-        </button>
-      )}
+      <h4 className="text-xs font-bold font-mono text-ink-900 uppercase tracking-wider mb-1">
+        {title}
+      </h4>
+      <p className="text-xs text-ink-500 max-w-xs leading-relaxed">
+        {description}
+      </p>
     </div>
   );
 };

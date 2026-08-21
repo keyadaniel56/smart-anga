@@ -1,20 +1,36 @@
 {
-  "name": "anga",
+  "name": "anga-frontend",
   "private": true,
   "version": "1.0.0",
-  "workspaces": [
-    "frontend",
-    "backend/node"
-  ],
+  "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:frontend": "npm run dev --workspace=frontend",
-    "dev:backend": "npm run dev --workspace=backend/node",
-    "build": "npm run build --workspace=frontend && npm run build --workspace=backend/node",
-    "start": "npm run start --workspace=backend/node",
-    "lint": "npm run lint --workspace=frontend && npm run lint --workspace=backend/node"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "tsc --noEmit",
+    "test": "vitest",
+    "test:ui": "vitest --ui"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.14",
+    "@types/leaflet": "^1.9.22",
+    "@vitejs/plugin-react": "^5.0.4",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.5",
+    "autoprefixer": "^10.4.21",
+    "jsdom": "^30.0.1",
+    "tailwindcss": "^4.1.14",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.3",
+    "vitest": "^4.1.11"
   }
 }
