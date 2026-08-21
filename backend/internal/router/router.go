@@ -17,23 +17,35 @@ func NewRouter(cfg *config.Config, s *store.Store, om *services.OpenMeteoService
 	climateHandler := handlers.NewClimateHandler(om)
 	authHandler := handlers.NewAuthHandler(s)
 
+	// Initialize Alert Engine and Handler
+	alertEngine := services.NewAlertEngine()
+	alertHandler := handlers.NewAlertHandler(alertEngine)
+
 	// Health check
-	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status":"ok"}`))
 	})
 
 	// Auth endpoints
-	mux.HandleFunc("POST /api/register", authHandler.Register)
-	mux.HandleFunc("POST /api/login", authHandler.Login)
+	mux.HandleFunc("/api/register", authHandler.Register)
+	mux.HandleFunc("/api/login", authHandler.Login)
 
 	// Climate endpoints
-	mux.HandleFunc("GET /api/climate/live", climateHandler.GetLiveClimate)
+	mux.HandleFunc("/api/climate/live", climateHandler.GetLiveClimate)
 
-	// Incident endpoints (Public read, Protected write/update)
-	mux.HandleFunc("GET /api/incidents", incidentHandler.GetIncidents)
-	mux.HandleFunc("POST /api/incidents", middleware.AuthMiddleware(incidentHandler.CreateIncident))
-	mux.HandleFunc("PATCH /api/incidents/{id}", middleware.AuthMiddleware(incidentHandler.UpdateIncident))
+	// Incident endpoints
+	mux.HandleFunc("/api/incidents", incidentHandler.GetIncidents)
+
+	// Alert endpoints
+	mux.HandleFunc("/api/alerts", alertHandler.GetAlerts)
+	mux.HandleFunc("/api/alerts/config", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPut {
+			alertHandler.UpdateConfig(w, r)
+			return
+		}
+		alertHandler.GetConfig(w, r)
+	})
 
 	// Apply global middleware stack
 	var handler http.Handler = mux
