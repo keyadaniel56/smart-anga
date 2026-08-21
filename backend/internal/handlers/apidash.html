@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Anga — API Dashboard</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #07090f; --surface: #0d1117; --surface2: #0d1526;
+  --border: #1e293b; --text: #e2e8f0; --muted: #64748b; --subtle: #94a3b8;
+  --blue: #3b82f6; --blue-dim: #1d4ed8;
+  --green: #22c55e; --yellow: #f59e0b; --red: #ef4444; --purple: #8b5cf6;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg); color: var(--text);
+  height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+}
+header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px; background: var(--surface2);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+header h1 { font-size: .95rem; font-weight: 600; }
+.coords { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+.coords label { font-size: .78rem; color: var(--muted); }
+.coords input {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); padding: 5px 9px; border-radius: 6px; width: 108px; font-size: .82rem;
+}
+nav {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 10px 20px; background: var(--surface2);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+nav button {
+  padding: 6px 13px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--subtle);
+  border-radius: 6px; cursor: pointer; font-size: .78rem; font-weight: 500; transition: all .15s;
+}
+nav button:hover    { border-color: var(--blue); color: #60a5fa; }
+nav button.active   { background: #1e3a5f; border-color: var(--blue); color: #60a5fa; }
+nav button.post     { border-color: #92400e; color: var(--yellow); }
+nav button.post:hover, nav button.post.active { background: #1c1300; border-color: var(--yellow); }
+nav button.patch    { border-color: #4c1d95; color: #a78bfa; }
+nav button.patch:hover, nav button.patch.active { background: #1a0a2e; border-color: var(--purple); }
+.main { display: grid; grid-template-columns: 340px 1fr; flex: 1; overflow: hidden; }
+.panel-left {
+  border-right: 1px solid var(--border); background: var(--surface2);
+  overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px;
+}
+.ep-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.ep-row code { font-size: .73rem; color: var(--subtle); font-family: monospace; word-break: break-all; }
+.ep-desc { font-size: .78rem; color: var(--muted); line-height: 1.45; margin-bottom: 10px; }
+.tag {
+  display: inline-block; padding: 2px 7px; border-radius: 4px;
+  font-size: .65rem; font-weight: 700; text-transform: uppercase; flex-shrink: 0;
+}
+.tag-get   { background: #0c2a4a; color: #38bdf8; }
+.tag-post  { background: #2a1500; color: #fbbf24; }
+.tag-patch { background: #1a0a2e; color: #c4b5fd; }
+.field-group { display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; }
+.field-group label { font-size: .75rem; color: var(--subtle); }
+.field-group input, .field-group textarea {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); padding: 7px 10px; border-radius: 6px; font-size: .82rem; width: 100%;
+}
+.field-group textarea { resize: vertical; font-family: monospace; min-height: 80px; }
+.params-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.btn {
+  width: 100%; padding: 9px; border: none; border-radius: 6px;
+  cursor: pointer; font-size: .85rem; font-weight: 600; transition: background .15s;
+}
+.btn-primary { background: var(--blue-dim); color: #fff; }
+.btn-primary:hover { background: var(--blue); }
+.btn-primary:disabled { background: var(--surface); color: var(--muted); cursor: not-allowed; }
+.status { display: flex; align-items: center; gap: 6px; font-size: .75rem; color: var(--subtle); min-height: 22px; margin-top: 8px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-idle    { background: var(--muted); }
+.dot-loading { background: var(--yellow); animation: pulse 1s infinite; }
+.dot-ok      { background: var(--green); }
+.dot-err     { background: var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+.hint { font-size: .7rem; color: var(--muted); margin-top: 4px; }
+.hint code { color: #60a5fa; background: #0d1e30; padding: 1px 4px; border-radius: 3px; }
+.panel-right { background: var(--bg); overflow-y: auto; }
+.output-wrap { padding: 16px; }
+.empty-state {
+  display: flex; align-items: center; justify-content: center;
+  height: 100%; color: var(--muted); font-size: .85rem; font-style: italic; text-align: center; padding: 60px;
+}
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 8px; margin-bottom: 12px; }
+.card { background: #0d1e30; border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+.card .val { font-size: 1.5rem; font-weight: 700; color: #60a5fa; }
+.card .lbl { font-size: .7rem; color: var(--muted); margin-top: 2px; }
+.score-bar  { height: 7px; border-radius: 4px; background: #1e293b; }
+.score-fill { height: 100%; border-radius: 4px; transition: width .4s; }
+.section-lbl { font-size: .7rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 12px 0 8px; }
+.raw-block {
+  background: #0a0f1e; border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px; font-family: monospace; font-size: .76rem; line-height: 1.6;
+  white-space: pre-wrap; word-break: break-word; color: #a5f3fc; overflow-x: auto; margin-top: 12px;
+}
+.item-card { background: #0d1e30; border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; margin-bottom: 6px; }
+.item-title { font-size: .82rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.item-sub   { font-size: .72rem; color: var(--muted); }
+.badge { display: inline-block; font-size: .63rem; font-weight: 700; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; }
+.row-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
+.bar-row   { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.bar-label { width: 130px; font-size: .73rem; color: var(--subtle); flex-shrink: 0; }
+.bar-wrap  { flex: 1; }
+.bar-value { width: 36px; text-align: right; font-size: .73rem; }
+.chart-bars { display: flex; align-items: flex-end; gap: 3px; height: 80px; }
+.chart-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.chart-bar { width: 100%; border-radius: 2px 2px 0 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
+    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+  </svg>
+  <h1>Smart Anga &mdash; API Dashboard</h1>
+  <div class="coords">
+    <label>Lat</label>
+    <input type="number" id="g-lat" value="-1.2864" step="0.0001">
+    <label>Lon</label>
+    <input type="number" id="g-lon" value="36.8172" step="0.0001">
+  </div>
+</header>
+
+<nav id="nav"></nav>
+
+<div class="main">
+  <div class="panel-left" id="panel-left">
+    <p class="empty-state" style="height:auto;padding:20px 0;font-size:.82rem">&#8592; Select an endpoint</p>
+  </div>
+  <div class="panel-right" id="panel-right">
+    <div class="empty-state">Response will appear here</div>
+  </div>
+</div>
+
+<script>
+const BASE = '';  // same origin
+
+const ENDPOINTS = [
+  { id:'health',           method:'GET',   label:'Health Check',        path:'/api/health',
+    desc:'Verify the server is running.', params:[] },
+  { id:'climate',          method:'GET',   label:'Climate Live',         path:'/api/climate/live',
+    desc:'Live weather and flood data from Open-Meteo.', params:['lat','lon'] },
+  { id:'overview',         method:'GET',   label:'Dashboard Overview',   path:'/api/dashboard/overview',
+    desc:'Composite risk score, active incidents and hazard summary.', params:['lat','lon'] },
+  { id:'trends',           method:'GET',   label:'Dashboard Trends',     path:'/api/dashboard/trends',
+    desc:'Historical daily trends — temperature, precipitation, composite risk.',
+    params:['lat','lon',{id:'days',label:'Days',default:'30'}] },
+  { id:'assets',           method:'GET',   label:'Vulnerable Assets',    path:'/api/dashboard/vulnerable-assets',
+    desc:'Infrastructure assets within radius scored by hazard type.',
+    params:['lat','lon',{id:'radius',label:'Radius km',default:'10'}] },
+  { id:'drought',          method:'GET',   label:'Drought Prediction',   path:'/api/predictions/drought',
+    desc:'Drought risk score, SPI, soil moisture layers, precipitation deficit.', params:['lat','lon'] },
+  { id:'flood',            method:'GET',   label:'Flood Prediction',     path:'/api/predictions/flood',
+    desc:'Flood risk score, river discharge ratio, 24/48/72h precip forecast.', params:['lat','lon'] },
+  { id:'sme-register',     method:'POST',  label:'Register SME',         path:'/api/sme',
+    desc:'Register a business for climate preparedness assessment.', params:[],
+    body: JSON.stringify({businessName:"Nairobi Grain Traders Ltd",industry:"agriculture",employeeCount:18,location:"Kikuyu, Nairobi",coordinates:[-1.25,36.78],hasInsurance:true,insuranceCovers:["flood","drought"],emergencyMeasures:["evacuation_plan","early_warning_system","water_storage"],criticalAssets:[{name:"Grain Silo A",type:"equipment",estimatedValue:12000,isInsured:true},{name:"Irrigation Pump",type:"equipment",estimatedValue:4500,isInsured:false}]},null,2) },
+  { id:'sme-profile',      method:'GET',   label:'SME Profile',          path:'/api/sme/{sme-id}',
+    desc:'Retrieve a registered SME profile by ID.',
+    params:[{id:'sme-id',label:'SME ID',default:'SME-1234',path:true}] },
+  { id:'sme-assessment',   method:'GET',   label:'SME Assessment',       path:'/api/sme/{sme-id}/assessment',
+    desc:'Vulnerability score, preparedness grade, industry benchmark comparison.',
+    params:[{id:'sme-id',label:'SME ID',default:'SME-1234',path:true}] },
+  { id:'sme-plan',         method:'GET',   label:'SME Action Plan',      path:'/api/sme/{sme-id}/action-plan',
+    desc:'Prioritised preparedness tasks: immediate to long term.',
+    params:[{id:'sme-id',label:'SME ID',default:'SME-1234',path:true}] },
+  { id:'incidents-list',   method:'GET',   label:'List Incidents',       path:'/api/incidents',
+    desc:'All active and historical climate incidents.', params:[] },
+  { id:'incidents-create', method:'POST',  label:'Create Incident',      path:'/api/incidents',
+    desc:'Log a new climate incident.', params:[],
+    body: JSON.stringify({title:"Flash flood — Nairobi River",hazardType:"flood",severity:"high",location:"Nairobi CBD",coordinates:[-1.2864,36.8172],department:"Emergency Management",assignedTo:"Response Team B",actionsTaken:["Issued public alert via SMS broadcast"]},null,2) },
+  { id:'incidents-patch',  method:'PATCH', label:'Update Incident',      path:'/api/incidents/{inc-id}',
+    desc:'Update incident status, assigned officer, or actions taken.',
+    params:[{id:'inc-id',label:'Incident ID',default:'INC-0001',path:true}],
+    body: JSON.stringify({status:"mitigated",assignedTo:"Commander Vance",actionsTaken:["Flood barriers deployed","All residents evacuated"]},null,2) },
+];
+
+let active = null;
+let lastSmeId = null;
+
+// ── Utils ──────────────────────────────────────────────────────────────────
+function riskColor(s) {
+  if(s>=70) return '#8b5cf6'; if(s>=45) return '#ef4444';
+  if(s>=20) return '#f59e0b'; return '#22c55e';
+}
+function bar(score,max=100) {
+  const pct=Math.min(100,(score/max)*100).toFixed(1);
+  return `<div class="score-bar"><div class="score-fill" style="width:${pct}%;background:${riskColor(score)}"></div></div>`;
+}
+function badge(text,color) {
+  return `<span class="badge" style="background:${color}22;color:${color}">${text}</span>`;
+}
+function syntaxHL(json) {
+  return json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,m=>{
+      let cls='color:#a5f3fc';
+      if(/^"/.test(m)) cls=/:$/.test(m)?'color:#93c5fd':'color:#86efac';
+      else if(/true|false/.test(m)) cls='color:#fbbf24';
+      else if(/null/.test(m)) cls='color:#94a3b8';
+      return `<span style="${cls}">${m}</span>`;
+    });
+}
+function norm(params) {
+  return (params||[]).map(p=>typeof p==='string'
+    ?{id:p,label:p==='lat'?'Latitude':p==='lon'?'Longitude':p,default:p==='lat'?'-1.2864':p==='lon'?'36.8172':''}
+    :p);
+}
+function getParam(id) { const el=document.getElementById(`param-${id}`); return el?el.value.trim():''; }
+function setStatus(state,text) {
+  const dot=document.querySelector('#status .dot'),txt=document.getElementById('status-text');
+  if(!dot||!txt) return;
+  dot.className='dot dot-'+state; txt.textContent=text;
+}
+
+// ── Visuals ────────────────────────────────────────────────────────────────
+function visOverview(d) {
+  if(!d) return '';
+  const lc={LOW:'#22c55e',MODERATE:'#f59e0b',HIGH:'#ef4444','VERY HIGH':'#dc2626',EXTREME:'#8b5cf6'}[d.riskLevel]||'#94a3b8';
+  return `<div class="section-lbl">Overview</div>
+  <div class="cards">
+    <div class="card"><div class="val" style="color:${lc}">${d.compositeRiskScore}</div><div class="lbl">Composite Risk</div><div style="font-size:.72rem;font-weight:700;color:${lc};margin-top:4px">${d.riskLevel}</div></div>
+    <div class="card"><div class="val" style="color:#f87171">${d.activeIncidents}</div><div class="lbl">Active Incidents</div></div>
+    <div class="card"><div class="val" style="color:#38bdf8">${d.temperatureCelsius}°C</div><div class="lbl">Temperature</div></div>
+    <div class="card"><div class="val" style="color:#a78bfa">${d.soilMoisturePercent}%</div><div class="lbl">Soil Moisture</div></div>
+  </div>
+  <div class="section-lbl">Hazard Summary</div>
+  ${['flood','drought','heatwave','storm'].map(h=>`
+    <div class="bar-row">
+      <span class="bar-label" style="text-transform:capitalize">${h}</span>
+      <div class="bar-wrap">${bar(d.hazardSummary?.[h]??0)}</div>
+      <span class="bar-value" style="color:${riskColor(d.hazardSummary?.[h]??0)}">${d.hazardSummary?.[h]??'—'}</span>
+    </div>`).join('')}`;
+}
+function visDrought(d) {
+  if(!d) return '';
+  const sc={none:'#22c55e',watch:'#f59e0b',warning:'#ef4444',emergency:'#8b5cf6'}[d.severity]||'#94a3b8';
+  return `<div class="section-lbl">Drought Assessment</div>
+  <div class="cards">
+    <div class="card"><div class="val" style="color:${sc}">${d.droughtRiskScore}</div><div class="lbl">Risk Score</div><div style="font-size:.72rem;font-weight:700;color:${sc};margin-top:4px;text-transform:uppercase">${d.severity}</div></div>
+    <div class="card"><div class="val" style="color:#fbbf24">${d.soilMoisturePercent}%</div><div class="lbl">Soil Moisture</div></div>
+    <div class="card"><div class="val" style="color:#f87171">${d.precipitationDeficitMm}mm</div><div class="lbl">30-day Deficit</div></div>
+    <div class="card"><div class="val" style="color:#a78bfa">${d.spi}</div><div class="lbl">SPI · ${d.spiClass}</div></div>
+  </div>
+  <div class="section-lbl">Soil Layers</div>
+  ${[['0–1cm',d.soilLayers?.depth0to1cm],['1–3cm',d.soilLayers?.depth1to3cm],['3–9cm',d.soilLayers?.depth3to9cm],['9–27cm',d.soilLayers?.depth9to27cm]].map(([l,v])=>`
+    <div class="bar-row"><span class="bar-label">${l}</span><div class="bar-wrap">${bar(v??0,50)}</div><span class="bar-value" style="color:#60a5fa">${v??'—'}%</span></div>`).join('')}`;
+}
+function visFlood(d) {
+  if(!d) return '';
+  const pc={low:'#22c55e',moderate:'#f59e0b',high:'#ef4444',very_high:'#8b5cf6'}[d.probability]||'#94a3b8';
+  return `<div class="section-lbl">Flood Prediction</div>
+  <div class="cards">
+    <div class="card"><div class="val" style="color:${pc}">${d.riskScore}</div><div class="lbl">Risk Score</div><div style="font-size:.72rem;font-weight:700;color:${pc};margin-top:4px;text-transform:uppercase">${d.probability}</div></div>
+    <div class="card"><div class="val" style="color:#38bdf8">${d.confidence}%</div><div class="lbl">Confidence</div></div>
+    <div class="card"><div class="val" style="color:#fbbf24">${d.riverDischarge?.ratioToMedian}×</div><div class="lbl">Discharge/Median</div></div>
+    <div class="card"><div class="val" style="color:#a78bfa;font-size:1rem">${d.timeWindow}</div><div class="lbl">Peak Window</div></div>
+  </div>
+  ${d.factors?`<div class="section-lbl">Factor Scores</div>${Object.entries(d.factors).map(([k,v])=>`
+    <div class="bar-row"><span class="bar-label" style="text-transform:capitalize">${k} <span style="color:#475569">(${(v.weight*100).toFixed(0)}%)</span></span><div class="bar-wrap">${bar(v.score)}</div><span class="bar-value" style="color:${riskColor(v.score)}">${v.score}</span></div>`).join('')}`:''}
+  <div class="section-lbl" style="margin-top:12px">Precip Forecast</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+    ${[['24h',d.precipForecast?.next24hMm],['48h',d.precipForecast?.next48hMm],['72h',d.precipForecast?.next72hMm]].map(([t,v])=>`
+    <div class="card" style="text-align:center"><div class="val" style="font-size:1.1rem;color:#60a5fa">${v}mm</div><div class="lbl">${t}</div></div>`).join('')}
+  </div>`;
+}
+function visTrends(d) {
+  if(!d||!d.trends) return '';
+  const pts=d.trends.slice(-14), maxC=Math.max(...pts.map(p=>p.compositeRisk),1);
+  return `<div class="section-lbl">Composite Risk — last ${pts.length} days</div>
+  <div class="chart-bars" style="margin-bottom:4px">
+    ${pts.map(p=>{const h=Math.max(4,(p.compositeRisk/maxC)*76);return `<div class="chart-bar-col" title="${p.date}: ${p.compositeRisk}"><div class="chart-bar" style="height:${h}px;background:${riskColor(p.compositeRisk)}"></div></div>`;}).join('')}
+  </div>
+  <div style="display:flex;justify-content:space-between;font-size:.65rem;color:#475569;margin-bottom:12px"><span>${pts[0]?.date||''}</span><span>${pts[pts.length-1]?.date||''}</span></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+    ${pts.slice(-4).map(p=>`<div class="card"><div style="font-size:.7rem;color:#475569;margin-bottom:4px">${p.date}</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        ${[['T',p.temperature+'°C','#38bdf8'],['P',p.precipitation+'mm','#818cf8'],['💧',p.soilMoisture+'%','#a78bfa'],['R',p.compositeRisk,riskColor(p.compositeRisk)]].map(([l,v,c])=>`<span style="font-size:.67rem;background:#0a0f1e;border-radius:3px;padding:1px 5px;color:${c}">${l} ${v}</span>`).join('')}
+      </div></div>`).join('')}
+  </div>`;
+}
+function visAssets(d) {
+  if(!d||!d.assets) return '';
+  return `<div class="section-lbl"><b style="color:#60a5fa">${d.total}</b> assets found</div>
+  ${d.assets.slice(0,8).map(a=>{const c=riskColor(a.overallRisk);return `<div class="item-card" style="display:flex;align-items:center;gap:10px">
+    <div style="flex:1"><div class="item-title">${a.name}</div><div class="item-sub">${a.type} · ${a.distanceKm}km · ${a.primaryHazard}</div></div>
+    <div style="text-align:right"><div style="font-size:1.1rem;font-weight:700;color:${c}">${a.overallRisk}</div><div style="font-size:.67rem;color:${c};text-transform:uppercase">${a.riskLevel}</div></div>
+  </div>`;}).join('')}
+  ${d.assets.length>8?`<div style="font-size:.75rem;color:#475569;text-align:center;padding:4px">+${d.assets.length-8} more in JSON below</div>`:''}`;
+}
+function visAssessment(d) {
+  if(!d) return '';
+  const gc={A:'#22c55e',B:'#4ade80',C:'#facc15',D:'#f59e0b',E:'#ef4444',F:'#8b5cf6'}[d.preparednessGrade]||'#94a3b8';
+  return `<div class="section-lbl">SME Assessment</div>
+  <div class="cards">
+    <div class="card"><div class="val" style="color:${gc};font-size:2.2rem">${d.preparednessGrade}</div><div class="lbl">Grade · ${d.preparednessScore}/100</div></div>
+    <div class="card"><div class="val" style="color:#f87171">${d.vulnerabilityScore}</div><div class="lbl">Vulnerability Score</div></div>
+    <div class="card"><div class="val" style="color:#94a3b8">${d.industryBenchmark}</div><div class="lbl">Industry Benchmark</div></div>
+    <div class="card"><div class="val" style="color:${d.benchmarkDelta>=0?'#22c55e':'#ef4444'}">${d.benchmarkDelta>=0?'+':''}${d.benchmarkDelta}</div><div class="lbl">vs Benchmark</div></div>
+  </div>
+  ${d.factors?.length?`<div class="section-lbl">Vulnerability Factors</div>${d.factors.map(f=>`
+    <div class="bar-row"><span class="bar-label">${f.name}</span><div class="bar-wrap">${bar(f.score)}</div><span class="bar-value" style="color:${riskColor(f.score)}">${f.score}</span></div>`).join('')}`:''}`;
+}
+function visPlan(d) {
+  if(!d) return '';
+  const pc={immediate:'#ef4444',short_term:'#f59e0b',medium_term:'#3b82f6',long_term:'#22c55e'};
+  return `<div class="section-lbl">Action Plan</div>
+  <div class="cards">
+    <div class="card"><div class="val">${d.totalTasks}</div><div class="lbl">Total Tasks</div></div>
+    <div class="card"><div class="val" style="color:#ef4444">${d.immediateCount}</div><div class="lbl">Immediate</div></div>
+  </div>
+  ${(d.tasks||[]).map(t=>{const c=pc[t.priority]||'#94a3b8';return `<div class="item-card" style="border-left:3px solid ${c};border-radius:0 6px 6px 0">
+    <div class="row-meta">${badge(t.priority.replace('_',' '),c)}<span style="font-size:.7rem;color:#64748b">${t.hazard}</span><span style="font-size:.7rem;color:#64748b;margin-left:auto">${t.estimatedCost}</span></div>
+    <div class="item-title">${t.title}</div><div class="item-sub">${t.description}</div>
+  </div>`;}).join('')}`;
+}
+function visIncidents(incidents) {
+  if(!incidents) return '';
+  const sc={low:'#22c55e',moderate:'#f59e0b',high:'#ef4444',critical:'#8b5cf6'};
+  return `<div class="section-lbl"><b style="color:#60a5fa">${incidents.length}</b> incidents</div>
+  ${incidents.map(i=>{const c=sc[i.severity]||'#94a3b8';return `<div class="item-card" style="border-left:3px solid ${c}">
+    <div class="row-meta">${badge(i.severity,c)}<span style="font-size:.68rem;color:#64748b;text-transform:uppercase">${i.hazardType}</span><span style="font-size:.68rem;color:#64748b;margin-left:auto">${i.status?.replace('_',' ')}</span></div>
+    <div class="item-title">${i.title}</div><div class="item-sub">${i.location} · ${i.assignedTo}</div>
+  </div>`;}).join('')}`;
+}
+function buildVisual(id,data) {
+  try {
+    switch(id) {
+      case 'overview':       return visOverview(data.data);
+      case 'drought':        return visDrought(data.data);
+      case 'flood':          return visFlood(data.data);
+      case 'assets':         return visAssets(data.data);
+      case 'trends':         return visTrends(data.data);
+      case 'sme-assessment': return visAssessment(data.assessment);
+      case 'sme-plan':       return visPlan(data.actionPlan);
+      case 'incidents-list': return visIncidents(data.incidents);
+      default: return '';
+    }
+  } catch(e) { return ''; }
+}
+
+// ── Nav ────────────────────────────────────────────────────────────────────
+const nav = document.getElementById('nav');
+ENDPOINTS.forEach(ep => {
+  const btn = document.createElement('button');
+  btn.textContent = ep.label;
+  btn.dataset.id = ep.id;
+  if(ep.method==='POST')  btn.classList.add('post');
+  if(ep.method==='PATCH') btn.classList.add('patch');
+  btn.addEventListener('click', () => selectEndpoint(ep));
+  nav.appendChild(btn);
+});
+
+function selectEndpoint(ep) {
+  active = ep;
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.id===ep.id));
+  renderLeft(ep);
+  document.getElementById('panel-right').innerHTML = '<div class="empty-state">Press "Send Request" to call the endpoint</div>';
+}
+
+function renderLeft(ep) {
+  const tag = `<span class="tag tag-${ep.method.toLowerCase()}">${ep.method}</span>`;
+  const pd = norm(ep.params);
+  let html = `<div class="ep-row">${tag}<code>${ep.path}</code></div><p class="ep-desc">${ep.desc}</p>`;
+  if(pd.length) {
+    html += '<div class="params-grid">';
+    pd.forEach(p => {
+      const val = p.id==='lat' ? document.getElementById('g-lat').value
+                : p.id==='lon' ? document.getElementById('g-lon').value : p.default;
+      html += `<div class="field-group"><label>${p.label}</label><input type="text" id="param-${p.id}" value="${val}"></div>`;
+    });
+    html += '</div>';
+  }
+  if(ep.body) html += `<div class="field-group"><label>Request Body (JSON)</label><textarea id="req-body" rows="12">${ep.body}</textarea></div>`;
+  html += `<div id="status" class="status"><div class="dot dot-idle"></div><span id="status-text">Ready</span></div>`;
+  html += `<button class="btn btn-primary" id="run-btn" onclick="runEndpoint()">&#9654; Send Request</button>`;
+  if(ep.id.startsWith('sme-') && ep.id!=='sme-register' && lastSmeId)
+    html += `<p class="hint">Last registered: <code>${lastSmeId}</code> &mdash; auto-filled above</p>`;
+  document.getElementById('panel-left').innerHTML = html;
+  if(lastSmeId && ['sme-profile','sme-assessment','sme-plan'].includes(ep.id)) {
+    const el = document.getElementById('param-sme-id');
+    if(el) el.value = lastSmeId;
+  }
+  ['lat','lon'].forEach(k => {
+    const el = document.getElementById(`param-${k}`);
+    if(el) el.addEventListener('input', e => { document.getElementById(`g-${k}`).value = e.target.value; });
+  });
+}
+
+async function runEndpoint() {
+  if(!active) return;
+  setStatus('loading','Fetching…');
+  document.getElementById('run-btn').disabled = true;
+  try {
+    const pd = norm(active.params);
+    let url = BASE + active.path;
+    pd.forEach(p => { if(url.includes(`{${p.id}}`)) url = url.replace(`{${p.id}}`, encodeURIComponent(getParam(p.id))); });
+    const qp = new URLSearchParams();
+    pd.forEach(p => { if(!p.path){ const v=getParam(p.id); if(v) qp.set(p.id,v); } });
+    const qs = qp.toString(); if(qs) url += '?'+qs;
+    const opts = { method: active.method, headers:{} };
+    if(active.body) {
+      const bodyEl = document.getElementById('req-body');
+      opts.body = bodyEl ? bodyEl.value : active.body;
+      opts.headers['Content-Type'] = 'application/json';
+    }
+    const res = await fetch(url, opts);
+    const data = await res.json();
+    if(active.id==='sme-register' && data.sme?.id) lastSmeId = data.sme.id;
+    setStatus('ok', `${res.status} ${res.statusText}`);
+    const visual = buildVisual(active.id, data);
+    const raw = `<div class="raw-block">${syntaxHL(JSON.stringify(data,null,2))}</div>`;
+    document.getElementById('panel-right').innerHTML = `<div class="output-wrap">${visual}${raw}</div>`;
+  } catch(e) {
+    setStatus('err', e.message);
+    document.getElementById('panel-right').innerHTML =
+      `<div class="output-wrap"><div class="raw-block" style="color:#fca5a5">Error: ${e.message}\n\nMake sure the server is running.</div></div>`;
+  } finally {
+    const btn = document.getElementById('run-btn');
+    if(btn) btn.disabled = false;
+  }
+}
+
+document.addEventListener('keydown', e => { if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)) runEndpoint(); });
+</script>
+</body>
+</html>

@@ -22,6 +22,12 @@ func NewRouter(cfg *config.Config, s *store.Store, om *services.OpenMeteoService
 		services.NewFloodPredictor(cfg),
 	)
 
+	// Static dashboard
+	mux.Handle("GET /", http.FileServer(http.Dir("static")))
+
+	// API dashboard UI
+	mux.HandleFunc("GET /dashboard/apis", handlers.ServeDashboard)
+
 	// Health check
 	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

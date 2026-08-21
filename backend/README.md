@@ -589,6 +589,27 @@ Status values: `active` · `in_progress` · `mitigated` · `resolved`
 
 ---
 
+## API Dashboard UI
+
+A built-in interactive dashboard is available at:
+
+```
+http://localhost:3001/dashboard/apis
+```
+
+Start the server first (`make dev` or `go run ./cmd/server`), then open the URL in your browser. No extra setup required.
+
+Features:
+- All 14 endpoints listed in the nav bar
+- Click any endpoint to see its description and input fields
+- Set `lat`/`lon` globally in the header — all coordinate endpoints sync automatically
+- Press **Send Request** (or `Ctrl+Enter`) to call the endpoint
+- Response panel shows a visual summary card + raw syntax-highlighted JSON
+- POST/PATCH endpoints include an editable request body
+- Registering an SME auto-fills its ID into the profile/assessment/plan endpoints
+
+---
+
 ## Running All Tests
 
 ```bash
