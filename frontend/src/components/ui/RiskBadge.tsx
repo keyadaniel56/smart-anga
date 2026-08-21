@@ -3,7 +3,7 @@ import React from 'react';
 export type RiskLevel = 'low' | 'moderate' | 'high' | 'critical';
 
 export interface RiskBadgeProps {
-  level: RiskLevel | 'Low' | 'Moderate' | 'High' | 'Severe' | 'Emergency' | 'Warning' | 'Watch' | 'Advisory' | 'optimal' | 'warning';
+  level: RiskLevel | string;
   label?: string;
   size?: 'xs' | 'sm' | 'md';
   dot?: boolean;
@@ -17,7 +17,7 @@ export function normalizeRiskLevel(level: string): RiskLevel {
   if (l === 'critical' || l === 'severe' || l === 'emergency') return 'critical';
   if (l === 'high' || l === 'warning') return 'high';
   if (l === 'moderate' || l === 'watch' || l === 'elevated') return 'moderate';
-  return 'moderate';
+  return 'low';
 }
 
 export const RiskBadge: React.FC<RiskBadgeProps> = ({
@@ -33,28 +33,28 @@ export const RiskBadge: React.FC<RiskBadgeProps> = ({
 
   const styles: Record<RiskLevel, { bg: string; text: string; border: string; dot: string }> = {
     low: {
-      bg: 'bg-emerald-50/80',
-      text: 'text-emerald-800',
-      border: 'border-emerald-200/80',
-      dot: 'bg-emerald-600'
+      bg: 'bg-emerald-500/10',
+      text: 'text-emerald-400',
+      border: 'border-emerald-500/20',
+      dot: 'bg-emerald-500'
     },
     moderate: {
-      bg: 'bg-amber-50/80',
-      text: 'text-amber-800',
-      border: 'border-amber-200/80',
-      dot: 'bg-amber-600'
+      bg: 'bg-amber-500/10',
+      text: 'text-amber-400',
+      border: 'border-amber-500/20',
+      dot: 'bg-amber-500'
     },
     high: {
-      bg: 'bg-orange-50/80',
-      text: 'text-orange-900',
-      border: 'border-orange-200/80',
-      dot: 'bg-orange-600'
+      bg: 'bg-orange-500/10',
+      text: 'text-orange-400',
+      border: 'border-orange-500/20',
+      dot: 'bg-orange-500'
     },
     critical: {
-      bg: 'bg-rose-50/80',
-      text: 'text-rose-900',
-      border: 'border-rose-200/80',
-      dot: 'bg-rose-600'
+      bg: 'bg-rose-500/10',
+      text: 'text-rose-400',
+      border: 'border-rose-500/20',
+      dot: 'bg-rose-500'
     }
   };
 

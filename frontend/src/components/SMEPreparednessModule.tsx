@@ -59,9 +59,9 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
   return (
     <div id="sme-preparedness-container" className="space-y-6">
       {/* Top Banner */}
-      <div className="bg-white/80 border border-sand-200 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-surface-800/80 border border-surface-600 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-forest-50 border border-forest-200 text-forest-800 flex items-center justify-center shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-forest-50 border border-forest-800/30 text-forest-600 flex items-center justify-center shadow-xs">
             <Building2 className="w-6 h-6" />
           </div>
           <div>
@@ -69,7 +69,7 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
               <h2 className="text-lg font-bold text-ink-900 font-serif">
                 {t('sme.heading', 'Local Business Disaster Readiness')}
               </h2>
-              <span className="px-2 py-0.5 rounded-full bg-forest-100 text-forest-800 text-[10px] font-mono font-bold tracking-wide border border-forest-200">
+              <span className="px-2 py-0.5 rounded-full bg-forest-50 text-forest-600 text-[10px] font-mono font-bold tracking-wide border border-forest-800/30">
                 {t('sme.badge', 'BUSINESS RESILIENCE')}
               </span>
             </div>
@@ -80,8 +80,8 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
         </div>
 
         {/* Clear Unobtrusive Session Indicator */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-900 text-xs self-start md:self-auto shadow-2xs">
-          <Info className="w-4 h-4 text-amber-700 flex-shrink-0" />
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50/80 border border-amber-500/20 text-amber-900 text-xs self-start md:self-auto shadow-2xs">
+          <Info className="w-4 h-4 text-amber-500 flex-shrink-0" />
           <span className="text-[11px] font-medium">
             <strong className="font-semibold">{t('sme.sessionNoticeTitle', 'Live Checklist Test')}:</strong> {t('sme.sessionNoticeDesc', 'Checking items updates the readiness score in memory for testing.')}
           </span>
@@ -91,12 +91,12 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
       {/* Main Grid: Profile Archetypes & Selected Business Diagnostic */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* SME Profiles Selector */}
-        <div className="bg-white/80 border border-sand-200 rounded-3xl p-5 shadow-sm space-y-3">
-          <div className="flex items-center justify-between pb-3 border-b border-sand-200">
+        <div className="bg-surface-800/80 border border-surface-600 rounded-3xl p-5 shadow-sm space-y-3">
+          <div className="flex items-center justify-between pb-3 border-b border-surface-600">
             <h3 className="text-xs font-bold uppercase tracking-wider text-ink-500 font-mono">
               {t('sme.profilesHeading', 'Example Local Businesses')}
             </h3>
-            <span className="text-[10px] font-mono text-ink-400">{smeProfiles.length} {t('sme.businessesCount', 'Businesses')}</span>
+            <span className="text-[10px] font-mono text-ink-300">{smeProfiles.length} {t('sme.businessesCount', 'Businesses')}</span>
           </div>
 
           <div className="space-y-2.5">
@@ -108,8 +108,8 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
                   onClick={() => setSelectedProfileId(p.id)}
                   className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
                     isSelected
-                      ? 'bg-forest-50/70 border-forest-300 shadow-xs'
-                      : 'bg-sand-50/60 border-sand-200 hover:bg-sand-100/70'
+                      ? 'bg-forest-500/10 border-forest-300 shadow-xs'
+                      : 'bg-surface-800/60 border-surface-600 hover:bg-surface-800/70'
                   }`}
                 >
                   <div className="flex items-center justify-between text-xs font-bold text-ink-900">
@@ -124,12 +124,12 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
                     <span>{p.industry}</span>
                     <span>•</span>
                     <span className="flex items-center gap-1 font-mono">
-                      <Users className="w-3 h-3 text-ink-400" /> {p.headcount} {t('sme.staff', 'Staff')}
+                      <Users className="w-3 h-3 text-ink-300" /> {p.headcount} {t('sme.staff', 'Staff')}
                     </span>
                   </div>
                   <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
                     {p.primaryHazards.map((h, i) => (
-                      <span key={i} className="text-[10px] bg-white text-ink-700 px-2 py-0.5 rounded-md border border-sand-200 font-medium">
+                      <span key={i} className="text-[10px] bg-surface-700 text-ink-700 px-2 py-0.5 rounded-md border border-surface-600 font-medium">
                         {h}
                       </span>
                     ))}
@@ -141,11 +141,11 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
         </div>
 
         {/* Selected SME Diagnostic Details & Interactive Controls */}
-        <div className="lg:col-span-2 bg-white/90 border border-sand-200 rounded-3xl p-6 shadow-sm space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-sand-200">
+        <div className="lg:col-span-2 bg-surface-700/90 border border-surface-600 rounded-3xl p-6 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-surface-600">
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-mono text-xs font-bold text-forest-800 bg-forest-50 px-2 py-0.5 rounded-md border border-forest-200">
+                <span className="font-mono text-xs font-bold text-forest-600 bg-forest-50 px-2 py-0.5 rounded-md border border-forest-800/30">
                   {selectedProfile.id}
                 </span>
                 <span className="text-xs text-ink-500">{selectedProfile.location}</span>
@@ -159,7 +159,7 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
             </div>
 
             {/* RiskDial for SME Readiness Score */}
-            <div className="flex items-center gap-3 bg-sand-50 p-2.5 rounded-2xl border border-sand-200 self-start sm:self-auto">
+            <div className="flex items-center gap-3 bg-surface-950 p-2.5 rounded-2xl border border-surface-600 self-start sm:self-auto">
               <RiskDial
                 score={selectedProfile.readinessScore}
                 size={90}
@@ -179,7 +179,7 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
               <h4 className="text-xs font-bold uppercase tracking-wider text-ink-500 font-mono">
                 {t('sme.checklistHeading', 'Emergency Protection Checklist (Click to Toggle)')}
               </h4>
-              <span className="text-[11px] text-ink-400 font-mono">{t('sme.clickToToggle', 'Click to update score')}</span>
+              <span className="text-[11px] text-ink-300 font-mono">{t('sme.clickToToggle', 'Click to update score')}</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -188,8 +188,8 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
                 onClick={() => toggleMeasure('hasFloodBarriers')}
                 className={`p-4 rounded-2xl border cursor-pointer flex items-center justify-between transition-all select-none ${
                   selectedProfile.hasFloodBarriers 
-                    ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950 shadow-2xs' 
-                    : 'bg-sand-50/80 border-sand-200 text-ink-600 hover:bg-sand-100'
+                    ? 'bg-emerald-500/10/80 border-emerald-300 text-emerald-950 shadow-2xs' 
+                    : 'bg-surface-950/80 border-surface-600 text-ink-600 hover:bg-surface-800'
                 }`}
               >
                 <div>
@@ -200,7 +200,7 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
                   type="checkbox"
                   checked={selectedProfile.hasFloodBarriers}
                   readOnly
-                  className="w-4 h-4 rounded text-forest-800 accent-forest-700 pointer-events-none"
+                  className="w-4 h-4 rounded text-forest-600 accent-forest-700 pointer-events-none"
                 />
               </div>
 
@@ -209,8 +209,8 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
                 onClick={() => toggleMeasure('hasBackupGenerator')}
                 className={`p-4 rounded-2xl border cursor-pointer flex items-center justify-between transition-all select-none ${
                   selectedProfile.hasBackupGenerator 
-                    ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950 shadow-2xs' 
-                    : 'bg-sand-50/80 border-sand-200 text-ink-600 hover:bg-sand-100'
+                    ? 'bg-emerald-500/10/80 border-emerald-300 text-emerald-950 shadow-2xs' 
+                    : 'bg-surface-950/80 border-surface-600 text-ink-600 hover:bg-surface-800'
                 }`}
               >
                 <div>
@@ -221,7 +221,7 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
                   type="checkbox"
                   checked={selectedProfile.hasBackupGenerator}
                   readOnly
-                  className="w-4 h-4 rounded text-forest-800 accent-forest-700 pointer-events-none"
+                  className="w-4 h-4 rounded text-forest-600 accent-forest-700 pointer-events-none"
                 />
               </div>
 
@@ -230,8 +230,8 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
                 onClick={() => toggleMeasure('hasSupplyChainRedundancy')}
                 className={`p-4 rounded-2xl border cursor-pointer flex items-center justify-between transition-all select-none ${
                   selectedProfile.hasSupplyChainRedundancy 
-                    ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950 shadow-2xs' 
-                    : 'bg-sand-50/80 border-sand-200 text-ink-600 hover:bg-sand-100'
+                    ? 'bg-emerald-500/10/80 border-emerald-300 text-emerald-950 shadow-2xs' 
+                    : 'bg-surface-950/80 border-surface-600 text-ink-600 hover:bg-surface-800'
                 }`}
               >
                 <div>
@@ -242,7 +242,7 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
                   type="checkbox"
                   checked={selectedProfile.hasSupplyChainRedundancy}
                   readOnly
-                  className="w-4 h-4 rounded text-forest-800 accent-forest-700 pointer-events-none"
+                  className="w-4 h-4 rounded text-forest-600 accent-forest-700 pointer-events-none"
                 />
               </div>
 
@@ -251,8 +251,8 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
                 onClick={() => toggleMeasure('hasClimateInsurance')}
                 className={`p-4 rounded-2xl border cursor-pointer flex items-center justify-between transition-all select-none ${
                   selectedProfile.hasClimateInsurance 
-                    ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950 shadow-2xs' 
-                    : 'bg-sand-50/80 border-sand-200 text-ink-600 hover:bg-sand-100'
+                    ? 'bg-emerald-500/10/80 border-emerald-300 text-emerald-950 shadow-2xs' 
+                    : 'bg-surface-950/80 border-surface-600 text-ink-600 hover:bg-surface-800'
                 }`}
               >
                 <div>
@@ -263,16 +263,16 @@ export const SMEPreparednessModule: React.FC<SMEPreparednessModuleProps> = ({
                   type="checkbox"
                   checked={selectedProfile.hasClimateInsurance}
                   readOnly
-                  className="w-4 h-4 rounded text-forest-800 accent-forest-700 pointer-events-none"
+                  className="w-4 h-4 rounded text-forest-600 accent-forest-700 pointer-events-none"
                 />
               </div>
             </div>
           </div>
 
           {/* Continuity Recommendations */}
-          <div className="bg-sand-50/80 border border-sand-200 rounded-2xl p-4 space-y-2">
-            <div className="flex items-center gap-2 text-xs font-bold text-forest-900 uppercase tracking-wider font-mono">
-              <Sparkles className="w-4 h-4 text-teal-600" />
+          <div className="bg-surface-950/80 border border-surface-600 rounded-2xl p-4 space-y-2">
+            <div className="flex items-center gap-2 text-xs font-bold text-forest-600 uppercase tracking-wider font-mono">
+              <Sparkles className="w-4 h-4 text-teal-500" />
               {t('sme.recommendationHeading', 'Recommended Next Steps for Business Safety')}
             </div>
             <p className="text-xs text-ink-700 leading-relaxed">

@@ -58,7 +58,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
     activeIncidents: true
   });
 
-  const [mapStyle, setMapStyle] = useState<'light' | 'satellite' | 'terrain'>('light');
+  const [mapStyle, setMapStyle] = useState<'dark' | 'light' | 'satellite' | 'terrain'>('dark');
   const [mobileControlsOpen, setMobileControlsOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -96,10 +96,10 @@ export const RiskMap: React.FC<RiskMapProps> = ({
       })
       .bindPopup(`
         <div class="space-y-1 font-sans">
-          <div class="text-[10px] font-bold text-cyan-800 uppercase tracking-wider font-mono">High Risk Inundation Zone</div>
+          <div class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider font-mono">High Risk Inundation Zone</div>
           <div class="text-xs font-bold text-ink-900">${location.riverBasin || 'Catchment Basin'} Flood Plain</div>
           <div class="text-xs text-ink-700">Projected 50-Year Stage: <strong class="font-mono">5.40m</strong></div>
-          <div class="text-[11px] text-cyan-800 font-mono font-semibold">Catchment Saturation: 87.4%</div>
+          <div class="text-[11px] text-cyan-400 font-mono font-semibold">Catchment Saturation: 87.4%</div>
         </div>
       `)
       .addTo(groups.floodPlumes);
@@ -115,9 +115,9 @@ export const RiskMap: React.FC<RiskMapProps> = ({
       })
       .bindPopup(`
         <div class="space-y-1 font-sans">
-          <div class="text-[10px] font-bold text-amber-800 uppercase font-mono">Agricultural Soil Deficit</div>
+          <div class="text-[10px] font-bold text-amber-400 uppercase font-mono">Agricultural Soil Deficit</div>
           <div class="text-xs text-ink-700">Root-zone (0-28cm) moisture: <strong class="font-mono">14.2%</strong></div>
-          <div class="text-[11px] text-amber-800 font-mono font-semibold">SPEI Index: -1.82 (Severe Drought)</div>
+          <div class="text-[11px] text-amber-400 font-mono font-semibold">SPEI Index: -1.82 (Severe Drought)</div>
         </div>
       `)
       .addTo(groups.droughtZones);
@@ -129,9 +129,9 @@ export const RiskMap: React.FC<RiskMapProps> = ({
       })
       .bindPopup(`
         <div class="space-y-1 font-sans">
-          <div class="text-[10px] font-bold text-rose-800 uppercase font-mono">Urban Heat Island (UHI) Core</div>
+          <div class="text-[10px] font-bold text-rose-400 uppercase font-mono">Urban Heat Island (UHI) Core</div>
           <div class="text-xs text-ink-700">Wet-Bulb Temp (WBGT): <strong class="font-mono">31.8°C</strong></div>
-          <div class="text-[11px] text-rose-800 font-mono font-semibold">Thermal Anomaly: +4.2°C</div>
+          <div class="text-[11px] text-rose-400 font-mono font-semibold">Thermal Anomaly: +4.2°C</div>
         </div>
       `)
       .addTo(groups.heatIslands);
@@ -146,7 +146,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           html: `<div class="relative flex items-center justify-center w-7 h-7 rounded-full border-2 ${
             isSevere ? 'bg-rose-600 border-white text-white shadow-md shadow-rose-600/40'
             : isHigh ? 'bg-amber-500 border-white text-white shadow-sm shadow-amber-500/30'
-            : 'bg-forest-700 border-white text-white shadow-xs'
+            : 'bg-forest-600 border-white text-white shadow-xs'
           }"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div>`,
           iconSize: [28, 28], iconAnchor: [14, 14]
         });
@@ -155,11 +155,11 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           <div class="space-y-1.5 font-sans min-w-[200px]">
             <div class="flex items-center justify-between">
               <span class="text-[9px] font-bold uppercase tracking-wider text-ink-500 font-mono">${asset.category.replace('_', ' ')}</span>
-              <span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold ${isSevere ? 'bg-rose-50 text-rose-800 border border-rose-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}">${asset.riskRating}</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold ${isSevere ? 'bg-rose-50 text-rose-400 border border-rose-500/20' : 'bg-amber-50 text-amber-400 border border-amber-500/20'}">${asset.riskRating}</span>
             </div>
             <div class="font-bold text-ink-900 text-xs">${asset.name}</div>
-            <div class="text-[11px] text-ink-700">Value: <strong class="text-forest-800 font-mono">$${asset.estimatedAssetValueMillionsUSD}M</strong> | Flood Limit: <strong class="font-mono">${asset.floodBreachThresholdM}m</strong></div>
-            <div class="pt-1 border-t border-sand-200 text-[10px] text-ink-500">Mitigation: ${asset.protectiveMeasures.join(', ')}</div>
+            <div class="text-[11px] text-ink-700">Value: <strong class="text-forest-600 font-mono">$${asset.estimatedAssetValueMillionsUSD}M</strong> | Flood Limit: <strong class="font-mono">${asset.floodBreachThresholdM}m</strong></div>
+            <div class="pt-1 border-t border-surface-600 text-[10px] text-ink-500">Mitigation: ${asset.protectiveMeasures.join(', ')}</div>
           </div>
         `);
         marker.addTo(groups.criticalAssets);
@@ -175,7 +175,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           html: `<div class="relative flex items-center justify-center w-6 h-6 rounded-full border ${
             isCritical ? 'bg-rose-600 text-white border-white ring-2 ring-rose-400 shadow-sm'
             : isWarning ? 'bg-amber-500 text-white border-white ring-2 ring-amber-300'
-            : 'bg-forest-800 text-sand-50 border-white'
+            : 'bg-forest-800 text-ink-900 border-white'
           }"><span class="text-[8px] font-extrabold font-mono">${sensor.type === 'river_stage' ? 'H2O' : sensor.type === 'soil_moisture' ? 'SOIL' : sensor.type === 'wet_bulb_temp' ? 'WB' : 'RN'}</span></div>`,
           iconSize: [24, 24], iconAnchor: [12, 12]
         });
@@ -183,12 +183,12 @@ export const RiskMap: React.FC<RiskMapProps> = ({
         marker.bindPopup(`
           <div class="space-y-1 font-sans min-w-[190px]">
             <div class="flex items-center justify-between text-[10px]">
-              <span class="font-mono font-bold text-forest-800">${sensor.id}</span>
+              <span class="font-mono font-bold text-forest-600">${sensor.id}</span>
               <span class="text-ink-500 font-mono">Batt: ${sensor.batteryPct}%</span>
             </div>
             <div class="font-bold text-ink-900 text-xs">${sensor.name}</div>
-            <div class="text-[11px] text-ink-700">Live Value: <span class="font-mono font-bold ${isWarning ? 'text-amber-800' : 'text-forest-900'}">${sensor.currentValue} ${sensor.unit}</span></div>
-            <div class="text-[10px] text-ink-400 font-mono">Normal: ${sensor.normalRange[0]} - ${sensor.normalRange[1]} ${sensor.unit}</div>
+            <div class="text-[11px] text-ink-700">Live Value: <span class="font-mono font-bold ${isWarning ? 'text-amber-400' : 'text-forest-600'}">${sensor.currentValue} ${sensor.unit}</span></div>
+            <div class="text-[10px] text-ink-300 font-mono">Normal: ${sensor.normalRange[0]} - ${sensor.normalRange[1]} ${sensor.unit}</div>
           </div>
         `);
         marker.addTo(groups.sensorNodes);
@@ -206,11 +206,11 @@ export const RiskMap: React.FC<RiskMapProps> = ({
         marker.bindPopup(`
           <div class="space-y-1.5 font-sans min-w-[220px]">
             <div class="flex items-center justify-between">
-              <span class="bg-rose-50 text-rose-800 font-mono text-[9px] px-1.5 py-0.5 rounded font-bold border border-rose-200">${inc.id}</span>
-              <span class="text-[10px] text-rose-800 font-mono font-bold uppercase">${inc.severity}</span>
+              <span class="bg-rose-50 text-rose-400 font-mono text-[9px] px-1.5 py-0.5 rounded font-bold border border-rose-500/20">${inc.id}</span>
+              <span class="text-[10px] text-rose-400 font-mono font-bold uppercase">${inc.severity}</span>
             </div>
             <div class="font-bold text-ink-900 text-xs leading-snug">${inc.title}</div>
-            <div class="text-[11px] text-ink-700">${inc.department} • <span class="font-medium text-amber-800 capitalize">${inc.status.replace('_', ' ')}</span></div>
+            <div class="text-[11px] text-ink-700">${inc.department} • <span class="font-medium text-amber-400 capitalize">${inc.status.replace('_', ' ')}</span></div>
           </div>
         `);
         marker.addTo(groups.activeIncidents);
@@ -239,7 +239,9 @@ export const RiskMap: React.FC<RiskMapProps> = ({
 
       L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-      const tileUrl = mapStyle === 'light'
+      const tileUrl = mapStyle === 'dark'
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : mapStyle === 'light'
         ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
         : mapStyle === 'satellite'
         ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
@@ -373,22 +375,22 @@ export const RiskMap: React.FC<RiskMapProps> = ({
 
   const layerControls = (
     <div
-      className={`absolute top-3 right-3 z-30 bg-white/95 border border-sand-200 rounded-2xl p-3.5 shadow-lg backdrop-blur-md max-w-xs space-y-3 transition-all ${
+      className={`absolute top-3 right-3 z-30 bg-surface-700/95 border border-surface-600 rounded-2xl p-3.5 shadow-lg backdrop-blur-md max-w-xs space-y-3 transition-all ${
         mobileControlsOpen ? 'block' : 'hidden sm:block'
       }`}
     >
-      <div className="flex items-center justify-between border-b border-sand-200 pb-2">
+      <div className="flex items-center justify-between border-b border-surface-600 pb-2">
         <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ink-900 font-mono">
-          <Layers className="w-3.5 h-3.5 text-forest-700" />
+          <Layers className="w-3.5 h-3.5 text-forest-600" />
           {t('map.layersTitle', 'Map Layers')}
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-[10px] text-emerald-800 font-mono font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+          <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
             {t('common.live', 'Live')}
           </span>
           <button
             onClick={() => setMobileControlsOpen(false)}
-            className="sm:hidden w-6 h-6 rounded-full bg-sand-100 flex items-center justify-center text-ink-500"
+            className="sm:hidden w-6 h-6 rounded-full bg-surface-800 flex items-center justify-center text-ink-500"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -400,8 +402,8 @@ export const RiskMap: React.FC<RiskMapProps> = ({
           { key: 'floodPlumes', icon: Waves, iconClass: 'text-cyan-600', label: t('map.floodInundation', 'Flood Danger Zones') },
           { key: 'droughtZones', icon: Sun, iconClass: 'text-amber-600', label: t('map.droughtSoil', 'Dry Soil Areas') },
           { key: 'heatIslands', icon: Flame, iconClass: 'text-rose-600', label: t('map.heatIslands', 'Extreme Heat Areas') },
-          { key: 'criticalAssets', icon: Building, iconClass: 'text-forest-700', label: `${t('map.criticalAssets', 'Protected Buildings')} (${assets.length})` },
-          { key: 'sensorNodes', icon: Radio, iconClass: 'text-teal-600', label: `${t('map.sensors', 'Water & Weather Sensors')} (${sensors.length})` },
+          { key: 'criticalAssets', icon: Building, iconClass: 'text-forest-600', label: `${t('map.criticalAssets', 'Protected Buildings')} (${assets.length})` },
+          { key: 'sensorNodes', icon: Radio, iconClass: 'text-teal-500', label: `${t('map.sensors', 'Water & Weather Sensors')} (${sensors.length})` },
           { key: 'activeIncidents', icon: AlertCircle, iconClass: 'text-rose-600', label: `${t('map.incidents', 'Active Warnings')} (${incidents.length})` },
         ] as const).map(({ key, icon: Icon, iconClass, label }) => (
           <label key={key} className="flex items-center justify-between text-ink-700 hover:text-ink-900 cursor-pointer select-none">
@@ -413,19 +415,19 @@ export const RiskMap: React.FC<RiskMapProps> = ({
               type="checkbox"
               checked={layersVisibility[key]}
               onChange={(e) => setLayersVisibility({ ...layersVisibility, [key]: e.target.checked })}
-              className="rounded text-forest-800 accent-forest-700"
+              className="rounded text-forest-600 accent-forest-700"
             />
           </label>
         ))}
       </div>
 
-      <div className="pt-2 border-t border-sand-200 flex items-center justify-between gap-1">
-        {(['light', 'satellite', 'terrain'] as const).map((style) => (
+      <div className="pt-2 border-t border-surface-600 flex items-center justify-between gap-1">
+        {(['dark', 'light', 'satellite', 'terrain'] as const).map((style) => (
           <button
             key={style}
             onClick={() => setMapStyle(style)}
             className={`flex-1 py-1 text-[10px] font-semibold rounded-lg transition-all ${
-              mapStyle === style ? 'bg-forest-900 text-sand-50 font-bold' : 'bg-sand-100 text-ink-600 hover:bg-sand-200'
+              mapStyle === style ? 'bg-forest-800 text-ink-900 font-bold' : 'bg-surface-800 text-ink-600 hover:bg-surface-600'
             }`}
           >
             {t(`map.style${style.charAt(0).toUpperCase() + style.slice(1)}`, style.charAt(0).toUpperCase() + style.slice(1))}
@@ -436,7 +438,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
   );
 
   const legendBar = (
-    <div className={`absolute bottom-3 left-3 right-16 z-20 bg-white/90 border border-sand-200 rounded-2xl p-2.5 sm:p-3 shadow-md backdrop-blur-md flex flex-wrap items-center justify-between gap-2 text-xs ${expanded ? 'max-w-3xl' : ''}`}>
+    <div className={`absolute bottom-3 left-3 right-16 z-20 bg-surface-700/90 border border-surface-600 rounded-2xl p-2.5 sm:p-3 shadow-md backdrop-blur-md flex flex-wrap items-center justify-between gap-2 text-xs ${expanded ? 'max-w-3xl' : ''}`}>
       <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
         <span className="font-semibold text-ink-500 text-[10px] uppercase tracking-wider font-mono">{t('map.keyLabel', 'Key')}:</span>
         <div className="flex items-center gap-1.5">
@@ -453,7 +455,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
         </div>
       </div>
       <div className="hidden md:block text-[11px] font-mono text-ink-500">
-        Area: <span className="text-forest-900 font-bold">{location.name}</span> ({location.elevationM}m ASL)
+        Area: <span className="text-forest-600 font-bold">{location.name}</span> ({location.elevationM}m ASL)
       </div>
     </div>
   );
@@ -462,24 +464,24 @@ export const RiskMap: React.FC<RiskMapProps> = ({
   const collapsedView = (
     <div
       id="gis-risk-map-panel"
-      className="relative w-full h-[460px] sm:h-[520px] lg:h-[580px] bg-sand-100 rounded-3xl overflow-hidden select-none"
+      className="relative w-full h-[460px] sm:h-[520px] lg:h-[580px] bg-surface-800 rounded-3xl overflow-hidden select-none"
     >
       <div ref={mapContainerRef} className="w-full h-full z-0" />
 
       <button
         onClick={toggleExpand}
-        className="absolute top-3 left-3 z-30 bg-white/95 border border-sand-200 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md hover:bg-white transition-colors"
+        className="absolute top-3 left-3 z-30 bg-surface-700/95 border border-surface-600 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md hover:bg-surface-700 transition-colors"
         title="Expand map"
       >
-        <Maximize2 className="w-3.5 h-3.5 text-forest-700" />
+        <Maximize2 className="w-3.5 h-3.5 text-forest-600" />
         <span className="hidden sm:inline">{t('map.expand', 'Expand')}</span>
       </button>
 
       <button
         onClick={() => setMobileControlsOpen(!mobileControlsOpen)}
-        className="sm:hidden absolute top-3 right-3 z-30 bg-white/95 border border-sand-200 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md"
+        className="sm:hidden absolute top-3 right-3 z-30 bg-surface-700/95 border border-surface-600 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md"
       >
-        <SlidersHorizontal className="w-3.5 h-3.5 text-forest-700" />
+        <SlidersHorizontal className="w-3.5 h-3.5 text-forest-600" />
         <span>{t('map.layersBtn', 'Map Layers')} ({Object.values(layersVisibility).filter(Boolean).length})</span>
       </button>
 
@@ -492,7 +494,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
   const expandedView = (
     <div
       id="gis-risk-map-panel"
-      className="fixed inset-0 z-[9999] bg-sand-100"
+      className="fixed inset-0 z-[9999] bg-surface-800"
     >
       <div ref={mapContainerRef} className="absolute inset-0 z-0" />
 
@@ -500,18 +502,18 @@ export const RiskMap: React.FC<RiskMapProps> = ({
       <div className="absolute top-3 left-3 right-3 z-30 flex items-start gap-2">
         <button
           onClick={toggleExpand}
-          className="flex-shrink-0 bg-white/95 border border-sand-200 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md hover:bg-white transition-colors"
+          className="flex-shrink-0 bg-surface-700/95 border border-surface-600 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md hover:bg-surface-700 transition-colors"
           title="Collapse map"
         >
-          <Minimize2 className="w-3.5 h-3.5 text-forest-700" />
+          <Minimize2 className="w-3.5 h-3.5 text-forest-600" />
           <span>{t('map.collapse', 'Collapse')}</span>
         </button>
 
         {/* Fullscreen search bar */}
         {onSearchLocation && (
           <div className="relative flex-1 max-w-md">
-            <div className="flex items-center gap-2 bg-white/95 border border-sand-200 rounded-xl px-3 py-1.5 shadow-md backdrop-blur-md">
-              <Search className="w-3.5 h-3.5 text-ink-400 flex-shrink-0" />
+            <div className="flex items-center gap-2 bg-surface-700/95 border border-surface-600 rounded-xl px-3 py-1.5 shadow-md backdrop-blur-md">
+              <Search className="w-3.5 h-3.5 text-ink-300 flex-shrink-0" />
               <input
                 type="text"
                 placeholder={t('map.searchPlaceholder', 'Search any place...')}
@@ -519,9 +521,9 @@ export const RiskMap: React.FC<RiskMapProps> = ({
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-transparent text-xs text-ink-900 placeholder-ink-400 focus:outline-none"
               />
-              {geoLoading && <Loader2 className="w-3 h-3 text-ink-400 animate-spin flex-shrink-0" />}
+              {geoLoading && <Loader2 className="w-3 h-3 text-ink-300 animate-spin flex-shrink-0" />}
               {searchQuery && (
-                <button onClick={() => { setSearchQuery(''); setGeoResults([]); }} className="text-ink-400 hover:text-ink-600">
+                <button onClick={() => { setSearchQuery(''); setGeoResults([]); }} className="text-ink-300 hover:text-ink-600">
                   <X className="w-3 h-3" />
                 </button>
               )}
@@ -529,7 +531,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
 
             {/* Search results dropdown */}
             {geoResults.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-sand-200 rounded-xl shadow-xl overflow-hidden max-h-60 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-surface-700 border border-surface-600 rounded-xl shadow-xl overflow-hidden max-h-60 overflow-y-auto">
                 {geoResults.map((result) => (
                   <button
                     key={result.place_id}
@@ -553,9 +555,9 @@ export const RiskMap: React.FC<RiskMapProps> = ({
 
       <button
         onClick={() => setMobileControlsOpen(!mobileControlsOpen)}
-        className="sm:hidden absolute top-3 right-3 z-30 bg-white/95 border border-sand-200 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md"
+        className="sm:hidden absolute top-3 right-3 z-30 bg-surface-700/95 border border-surface-600 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md"
       >
-        <SlidersHorizontal className="w-3.5 h-3.5 text-forest-700" />
+        <SlidersHorizontal className="w-3.5 h-3.5 text-forest-600" />
         <span>{t('map.layersBtn', 'Map Layers')} ({Object.values(layersVisibility).filter(Boolean).length})</span>
       </button>
 

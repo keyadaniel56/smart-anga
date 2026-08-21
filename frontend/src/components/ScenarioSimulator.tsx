@@ -342,7 +342,7 @@ export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({
             <RiskDial
               score={results.stressScore}
               size={120}
-              riskLevel={results.cascadeRiskLevel}
+              invertColor={true}
             />
             <span className="text-[11px] text-ink-500 mt-2">
               {t('simulator.stressExplainer', 'Combined risk across flood, heat, and drought')}

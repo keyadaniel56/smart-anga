@@ -67,9 +67,9 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
   return (
     <div id="sensor-telemetry-container" className="space-y-6">
       {/* Top Banner */}
-      <div className="bg-white/80 border border-sand-200 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-surface-800/80 border border-surface-600 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-200 text-teal-800 flex items-center justify-center shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-teal-100 border border-teal-800/30 text-teal-800 flex items-center justify-center shadow-xs">
             <Cpu className="w-6 h-6" />
           </div>
           <div>
@@ -77,7 +77,7 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
               <h2 className="text-lg font-bold text-ink-900 font-serif">
                 {t('sensors.heading', 'Live Weather & River Sensors')}
               </h2>
-              <span className="px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-mono font-bold tracking-wide border border-teal-200">
+              <span className="px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-mono font-bold tracking-wide border border-teal-800/30">
                 {t('sensors.badge', 'LIVE SENSORS')}
               </span>
             </div>
@@ -88,7 +88,7 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs bg-sand-100 text-ink-700 px-3 py-1.5 rounded-xl border border-sand-200 font-mono">
+          <span className="text-xs bg-surface-800 text-ink-700 px-3 py-1.5 rounded-xl border border-surface-600 font-mono">
             {sensors.length} {t('sensors.activeNodes', 'Sensors Online')}
           </span>
           {anomaliesCount > 0 && (
@@ -100,10 +100,10 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
       {/* Sensor Grid & Detail View */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Sensor List */}
-        <div className="bg-white/90 border border-sand-200 rounded-3xl p-5 shadow-sm space-y-3">
-          <div className="flex items-center justify-between pb-3 border-b border-sand-200 text-xs font-bold text-ink-500 font-mono">
+        <div className="bg-surface-700/90 border border-surface-600 rounded-3xl p-5 shadow-sm space-y-3">
+          <div className="flex items-center justify-between pb-3 border-b border-surface-600 text-xs font-bold text-ink-500 font-mono">
             <span>{t('sensors.listHeading', 'Weather & Water Gauges')}</span>
-            <span className="text-[10px] text-forest-800">{t('sensors.pollingInterval', 'Updates every 10s')}</span>
+            <span className="text-[10px] text-forest-600">{t('sensors.pollingInterval', 'Updates every 10s')}</span>
           </div>
 
           <div className="space-y-2.5 max-h-[520px] overflow-y-auto pr-1">
@@ -120,11 +120,11 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
                   className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
                     isSelected
                       ? 'bg-forest-50/80 border-forest-300 shadow-xs'
-                      : 'bg-sand-50/60 border-sand-200 hover:bg-sand-100/70'
+                      : 'bg-surface-800/60 border-surface-600 hover:bg-surface-800/70'
                   }`}
                 >
                   <div className="flex items-center justify-between text-[10px] mb-1.5">
-                    <span className="font-mono text-forest-800 font-bold">{sensor.id}</span>
+                    <span className="font-mono text-forest-600 font-bold">{sensor.id}</span>
                     <RiskBadge level={sensor.status} size="xs" label={sensor.status} />
                   </div>
                   <div className="font-bold text-ink-900 text-xs truncate font-serif">{sensor.name}</div>
@@ -132,8 +132,8 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
                     <span className="font-bold text-ink-900">
                       {sensor.currentValue} {sensor.unit}
                     </span>
-                    <span className="flex items-center gap-1 text-[10px] text-ink-400">
-                      <Battery className="w-3 h-3 text-forest-700" /> {sensor.batteryPct}%
+                    <span className="flex items-center gap-1 text-[10px] text-ink-300">
+                      <Battery className="w-3 h-3 text-forest-600" /> {sensor.batteryPct}%
                     </span>
                   </div>
                 </div>
@@ -144,11 +144,11 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
 
         {/* Selected Sensor Detail */}
         {selectedSensor && (
-          <div className="lg:col-span-2 bg-white/90 border border-sand-200 rounded-3xl p-6 shadow-sm space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-sand-200">
+          <div className="lg:col-span-2 bg-surface-700/90 border border-surface-600 rounded-3xl p-6 shadow-sm space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-surface-600">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs text-forest-800 font-bold bg-forest-50 px-2 py-0.5 rounded-md border border-forest-200">
+                  <span className="font-mono text-xs text-forest-600 font-bold bg-forest-50 px-2 py-0.5 rounded-md border border-forest-800/30">
                     {selectedSensor.id}
                   </span>
                   <span className="text-xs text-ink-500">({selectedSensor.locationName})</span>
@@ -157,7 +157,7 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
               </div>
               <div className="text-right">
                 <span className="text-xs text-ink-500 block font-mono">{t('sensors.currentReading', 'Latest Reading')}</span>
-                <span className="text-2xl font-extrabold font-mono text-forest-900">
+                <span className="text-2xl font-extrabold font-mono text-forest-600">
                   {selectedSensor.currentValue} <span className="text-xs text-ink-500 font-sans">{selectedSensor.unit}</span>
                 </span>
               </div>
@@ -169,7 +169,7 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
                 <span className="font-semibold">{t('sensors.historyHeading', '24-Hour Reading History')}</span>
                 <span>{t('sensors.normalRange', 'Normal')}: {selectedSensor.normalRange[0]} - {selectedSensor.normalRange[1]} {selectedSensor.unit}</span>
               </div>
-              <div className="h-60 w-full bg-sand-50/80 p-3 rounded-2xl border border-sand-200">
+              <div className="h-60 w-full bg-surface-950/80 p-3 rounded-2xl border border-surface-600">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={selectedSensor.history} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e7e2d6" />
@@ -183,17 +183,17 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
             </div>
 
             {/* Manual Calibration Form */}
-            <div className="bg-sand-50/90 p-4 sm:p-5 rounded-2xl border border-sand-200 space-y-3">
+            <div className="bg-surface-800/80 p-4 sm:p-5 rounded-2xl border border-surface-600 space-y-3">
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-ink-900 font-mono flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-forest-700" />
+                  <ShieldCheck className="w-4 h-4 text-forest-600" />
                   {t('sensors.manualFormHeading', 'Manual Gauge Reading with Typo Check')}
                 </h4>
-                <span className="text-[10px] text-ink-400 font-mono">{t('sensors.validationDesc', 'Checks for reasonable numbers')}</span>
+                <span className="text-[10px] text-ink-300 font-mono">{t('sensors.validationDesc', 'Checks for reasonable numbers')}</span>
               </div>
 
               {manualErrorWarning && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-900 flex items-center gap-2">
+                <div className="p-3 bg-rose-50 border border-rose-500/20 rounded-xl text-xs text-rose-900 flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-rose-700 flex-shrink-0" />
                   <span>{manualErrorWarning}</span>
                 </div>
@@ -206,11 +206,11 @@ export const LiveSensorFeed: React.FC<LiveSensorFeedProps> = ({
                   placeholder={`${t('sensors.manualPlaceholder', 'Enter reading in')} ${selectedSensor.unit}...`}
                   value={manualInputVal}
                   onChange={(e) => setManualInputVal(e.target.value)}
-                  className="w-full sm:flex-1 bg-white border border-sand-300 rounded-xl px-3.5 py-2.5 text-xs text-ink-900 placeholder-ink-400 focus:outline-none focus:border-forest-700 font-mono"
+                  className="w-full sm:flex-1 bg-surface-700 border border-surface-500 rounded-xl px-3.5 py-2.5 text-xs text-ink-900 placeholder-ink-400 focus:outline-none focus:border-forest-700 font-mono"
                 />
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-4 py-2.5 bg-forest-900 hover:bg-forest-800 text-sand-50 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-forest-900 hover:bg-forest-800 text-ink-900 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   {t('sensors.saveReadingBtn', 'Check and Save Reading')}

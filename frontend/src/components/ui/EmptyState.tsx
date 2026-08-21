@@ -13,8 +13,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   icon
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center p-6 text-center bg-sand-50/50 rounded-2xl border border-dashed border-sand-300">
-      <div className="w-10 h-10 rounded-full bg-sand-100 flex items-center justify-center text-ink-500 mb-3">
+    <div className="flex flex-col items-center justify-center p-6 text-center bg-surface-800/50 rounded-2xl border border-dashed border-surface-500">
+      <div className="w-10 h-10 rounded-full bg-surface-700 flex items-center justify-center text-ink-500 mb-3">
         {icon || <AlertCircle className="w-5 h-5" />}
       </div>
       <h4 className="text-xs font-bold font-mono text-ink-900 uppercase tracking-wider mb-1">

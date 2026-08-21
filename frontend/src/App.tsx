@@ -74,7 +74,7 @@ export default function App() {
       setIsLive(status.live);
       if (!status.live && status.msg) setToastMessage(status.msg);
     });
-    return () => unsubscribe();
+    return () => { unsubscribe(); };
   }, []);
 
   useEffect(() => {
@@ -174,7 +174,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <div id="climate-resilience-app" className="min-h-screen bg-sand-50 text-ink-900 flex flex-col font-sans antialiased selection:bg-teal-500/20 selection:text-forest-900 relative">
+      <div id="climate-resilience-app" className="h-screen flex flex-col bg-surface-950 text-ink-900 font-sans antialiased selection:bg-teal-500/20 selection:text-forest-900 relative overflow-hidden">
         
         {!isLive && (
           <div className="bg-amber-500/10 border-b border-amber-500/20 text-amber-300 px-4 py-2 text-xs flex items-center justify-center gap-2 font-medium tracking-wide animate-in slide-in-from-top duration-200 z-50">
@@ -193,7 +193,7 @@ export default function App() {
           activeIncidentCount={activeIncidentsList.length}
         />
 
-        <div className="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto pb-20 lg:pb-8">
+        <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
           <NavigationTabs
             activeTab={activeTab}
             onSelectTab={setActiveTab}
@@ -202,7 +202,7 @@ export default function App() {
             anomaliesDetectedCount={sensors.filter(s => s.isAnomalyDetected).length}
           />
 
-          <main className="flex-1 p-4 sm:p-6 lg:p-7 min-w-0 overflow-x-hidden">
+          <main className="flex-1 p-4 sm:p-6 lg:p-7 min-w-0 overflow-y-auto pb-20 lg:pb-6">
             {activeTab === 'overview_gis' && (
               <div className="space-y-6 animate-in fade-in duration-200">
                 
@@ -517,7 +517,7 @@ export default function App() {
             )}
             {activeTab === 'sme_preparedness' && <SMEPreparednessModule location={currentLocation} />}
             {activeTab === 'scenario_simulator' && <ScenarioSimulator location={currentLocation} />}
-            {activeTab === 'sensor_telemetry' && <LiveSensorFeed sensors={sensors} onAddReading={handleAddSensorReading} onResolveAnomaly={handleResolveAnomaly} />}
+            {activeTab === 'sensor_telemetry' && <LiveSensorFeed sensors={sensors} onAddSensorReading={handleAddSensorReading} onResolveAnomaly={handleResolveAnomaly} />}
           </main>
         </div>
 

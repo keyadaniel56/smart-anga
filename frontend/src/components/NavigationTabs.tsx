@@ -135,7 +135,7 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
       {/* Desktop Sidebar (~256px fixed/sticky) */}
       <aside
         id="desktop-sidebar-navigation"
-        className="hidden lg:flex flex-col w-64 flex-shrink-0 bg-sand-100/80 border-r border-sand-200 p-4 space-y-6 select-none"
+        className="hidden lg:flex flex-col w-64 flex-shrink-0 bg-surface-800/80 border-r border-surface-600 p-4 space-y-6 select-none overflow-y-auto min-h-0"
       >
         <div className="space-y-1">
           <div className="px-3 py-1 text-[10px] font-mono font-bold tracking-wider text-ink-500 uppercase">
@@ -155,14 +155,14 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
                   onClick={() => onSelectTab(item.id)}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-left group ${
                     isActive
-                      ? 'bg-forest-900 text-sand-50 shadow-md shadow-forest-900/20 font-bold'
-                      : 'text-ink-700 hover:text-ink-900 hover:bg-sand-200/60'
+                      ? 'bg-forest-800 text-ink-900 shadow-md shadow-forest-900/20 font-bold'
+                      : 'text-ink-700 hover:text-ink-900 hover:bg-surface-600/60'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Icon
                       className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110 ${
-                        isActive ? 'text-teal-400' : 'text-ink-500'
+                        isActive ? 'text-teal-500' : 'text-ink-500'
                       }`}
                     />
                     <span className="truncate">{item.label}</span>
@@ -176,13 +176,13 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
         </div>
 
         {/* Environmental System Integrity Info Card */}
-        <div className="mt-auto p-3.5 rounded-2xl bg-white/80 border border-sand-200 shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-[11px] font-bold text-forest-900 font-serif">
+        <div className="mt-auto p-3.5 rounded-2xl bg-surface-700/80 border border-surface-600 shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-[11px] font-bold text-forest-500 font-serif">
             <span className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-teal-600" />
+              <Sparkles className="w-3.5 h-3.5 text-teal-500" />
               SmartAnga
             </span>
-            <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200">
+            <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-500 border border-teal-800/30">
               v2.4
             </span>
           </div>
@@ -195,7 +195,7 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
       {/* Mobile Fixed Bottom Navigation Bar */}
       <nav
         id="mobile-bottom-navigation"
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-sand-50/95 border-t border-sand-200 backdrop-blur-md px-2 py-1.5 shadow-lg select-none"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface-900/95 border-t border-surface-600 backdrop-blur-md px-2 py-1.5 shadow-lg select-none"
       >
         <div className="flex items-center justify-around">
           {primaryMobileTabs.map((tabId) => {
@@ -216,16 +216,16 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
                 }}
                 className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all relative ${
                   isActive
-                    ? 'text-forest-900 font-bold'
+                    ? 'text-forest-500 font-bold'
                     : 'text-ink-500 hover:text-ink-900'
                 }`}
               >
-                <div className={`p-1 rounded-lg ${isActive ? 'bg-forest-900 text-sand-50' : ''}`}>
+                <div className={`p-1 rounded-lg ${isActive ? 'bg-forest-800 text-ink-900' : ''}`}>
                   <Icon className="w-4 h-4" />
                 </div>
                 <span className="text-[10px] mt-0.5 font-medium">{item.shortLabel}</span>
                 {hasAlert && (
-                  <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-rose-600 ring-2 ring-sand-50" />
+                  <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-rose-600 ring-2 ring-surface-900" />
                 )}
               </button>
             );
@@ -237,14 +237,14 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all relative ${
               mobileMenuOpen || !primaryMobileTabs.includes(activeTab)
-                ? 'text-forest-900 font-bold'
+                ? 'text-forest-500 font-bold'
                 : 'text-ink-500 hover:text-ink-900'
             }`}
           >
             <div
               className={`p-1 rounded-lg ${
                 mobileMenuOpen || !primaryMobileTabs.includes(activeTab)
-                  ? 'bg-forest-900 text-sand-50'
+                  ? 'bg-forest-800 text-ink-900'
                   : ''
               }`}
             >
@@ -263,17 +263,17 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
           onClick={() => setMobileMenuOpen(false)}
         >
           <div
-            className="bg-sand-50 rounded-t-3xl border-t border-sand-200 p-5 shadow-2xl space-y-4 max-h-[80vh] overflow-y-auto"
+            className="bg-surface-900 rounded-t-3xl border-t border-surface-600 p-5 shadow-2xl space-y-4 max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-3 border-b border-sand-200">
+            <div className="flex items-center justify-between pb-3 border-b border-surface-600">
               <div>
                 <h3 className="text-base font-bold text-ink-900 font-serif">{t('nav.allModules', 'All System Modules')}</h3>
                 <p className="text-xs text-ink-500">{t('nav.selectDomain', 'Select a weather risk & safety area')}</p>
               </div>
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-8 h-8 rounded-full bg-sand-200/80 flex items-center justify-center text-ink-700 hover:bg-sand-300"
+                className="w-8 h-8 rounded-full bg-surface-600/80 flex items-center justify-center text-ink-700 hover:bg-surface-500"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -294,21 +294,21 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
                     }}
                     className={`flex items-center justify-between p-3 rounded-2xl border text-left transition-all ${
                       isActive
-                        ? 'bg-forest-900 text-sand-50 border-forest-900 shadow-md'
-                        : 'bg-white/80 border-sand-200 text-ink-900 hover:bg-sand-100'
+                        ? 'bg-forest-800 text-ink-900 border-forest-800 shadow-md'
+                        : 'bg-surface-700/80 border-surface-600 text-ink-900 hover:bg-surface-600'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div
                         className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                          isActive ? 'bg-forest-800 text-teal-300' : 'bg-sand-100 text-forest-800 border border-sand-200'
+                          isActive ? 'bg-forest-800 text-teal-300' : 'bg-surface-800 text-forest-500 border border-surface-600'
                         }`}
                       >
                         <Icon className="w-4 h-4" />
                       </div>
                       <div>
                         <div className="font-bold text-xs">{item.label}</div>
-                        <div className={`text-[10px] ${isActive ? 'text-sand-200' : 'text-ink-500'}`}>
+                        <div className={`text-[10px] ${isActive ? 'text-ink-300' : 'text-ink-500'}`}>
                           {item.description}
                         </div>
                       </div>
@@ -316,7 +316,7 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
 
                     <div className="flex items-center gap-2">
                       {badge}
-                      <ChevronRight className={`w-4 h-4 ${isActive ? 'text-sand-200' : 'text-ink-400'}`} />
+                      <ChevronRight className="w-4 h-4 text-ink-300" />
                     </div>
                   </button>
                 );

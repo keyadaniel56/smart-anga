@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "react-grid-layout/css/styles.css";
+@import "react-resizable/css/styles.css";
 
 @theme {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -6,74 +8,84 @@
   --font-display: 'Fraunces', Georgia, serif;
   --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
 
+  /* Earth Dark Surface */
+  --color-surface-950: #0c0a09;
+  --color-surface-900: #141210;
+  --color-surface-800: #1c1917;
+  --color-surface-700: #252220;
+  --color-surface-600: #2d2926;
+  --color-surface-500: #3a3530;
+  --color-surface-400: #4a4440;
+
+  /* Warm Sand */
+  --color-sand-50: #1e1b18;
+  --color-sand-100: #252220;
+  --color-sand-200: #3a3530;
+  --color-sand-300: #4a4440;
+
+  /* Ink Hierarchy (light on dark) */
+  --color-ink-900: #f0ebe4;
+  --color-ink-700: #c8c2b9;
+  --color-ink-500: #9a928a;
+  --color-ink-300: #6a635c;
+  --color-ink-100: #2d2926;
+
   /* Forest Tones */
-  --color-forest-900: #14281d;
-  --color-forest-800: #1f3d24;
-  --color-forest-700: #2d5a37;
-  --color-forest-600: #3f7d4e;
-  --color-forest-50: #f4f8f5;
+  --color-forest-900: #14532d;
+  --color-forest-800: #166534;
+  --color-forest-700: #15803d;
+  --color-forest-600: #22c55e;
+  --color-forest-500: #4ade80;
+  --color-forest-50: #0a2e18;
 
   /* Teal Accents */
-  --color-teal-900: #0a3d3d;
-  --color-teal-800: #0d4f4f;
-  --color-teal-700: #0f5b5b;
-  --color-teal-600: #147d7d;
-  --color-teal-500: #1a9e9e;
+  --color-teal-900: #042f2e;
+  --color-teal-800: #0d5e59;
+  --color-teal-700: #0f766e;
+  --color-teal-600: #14b8a6;
+  --color-teal-500: #2dd4bf;
   --color-teal-300: #5eead4;
   --color-teal-200: #99f6e4;
-  --color-teal-100: #e0f2f1;
-  --color-teal-50: #f0fdfa;
+  --color-teal-100: #113a36;
+  --color-teal-50: #042f2e;
 
   /* Lake Blues */
   --color-lake-800: #1e3a5f;
   --color-lake-700: #2b5387;
   --color-lake-600: #3b6ea8;
-  --color-lake-100: #e3edf7;
-  --color-lake-50: #f0f7ff;
+  --color-lake-100: #0f2942;
+  --color-lake-50: #0a1e33;
 
   /* Ochre Warmth */
-  --color-ochre-600: #b45309;
-  --color-ochre-500: #d97706;
-  --color-ochre-300: #fcd34d;
-  --color-ochre-100: #fef3c7;
-  --color-ochre-50: #fffbeb;
+  --color-ochre-600: #d97706;
+  --color-ochre-500: #f59e0b;
+  --color-ochre-300: #fbbf24;
+  --color-ochre-100: #2e2510;
+  --color-ochre-50: #1f1a0a;
 
-  /* Sand Neutrals */
-  --color-sand-50: #fcfbf8;
-  --color-sand-100: #f5f2eb;
-  --color-sand-200: #e7e2d6;
-  --color-sand-300: #d5cebf;
+  /* Semantic Risk Tokens (dark-optimized) */
+  --color-risk-low: #22c55e;
+  --color-risk-low-bg: #0a2e18;
+  --color-risk-low-border: #166534;
 
-  /* Ink Hierarchy */
-  --color-ink-900: #191c1a;
-  --color-ink-700: #3d453f;
-  --color-ink-500: #6f7a72;
-  --color-ink-300: #a8b3ab;
-  --color-ink-100: #e2e7e3;
+  --color-risk-moderate: #f59e0b;
+  --color-risk-moderate-bg: #2e2510;
+  --color-risk-moderate-border: #92400e;
 
-  /* Semantic Risk Tokens */
-  --color-risk-low: #15803d;
-  --color-risk-low-bg: #f0fdf4;
-  --color-risk-low-border: #bbf7d0;
+  --color-risk-high: #f97316;
+  --color-risk-high-bg: #2a1a08;
+  --color-risk-high-border: #9a3412;
 
-  --color-risk-moderate: #b45309;
-  --color-risk-moderate-bg: #fffbeb;
-  --color-risk-moderate-border: #fde68a;
-
-  --color-risk-high: #c2410c;
-  --color-risk-high-bg: #fff7ed;
-  --color-risk-high-border: #fed7aa;
-
-  --color-risk-critical: #b91c1c;
-  --color-risk-critical-bg: #fef2f2;
-  --color-risk-critical-border: #fecaca;
+  --color-risk-critical: #ef4444;
+  --color-risk-critical-bg: #2a0a0a;
+  --color-risk-critical-border: #991b1b;
 }
 
 @layer base {
   body {
     font-family: var(--font-sans);
-    background-color: var(--color-sand-50);
-    color: var(--color-ink-900);
+    background-color: #0c0a09;
+    color: #f0ebe4;
   }
   h1, h2, h3, .font-serif {
     font-family: var(--font-serif);
@@ -83,23 +95,23 @@
   }
 }
 
-/* Light mode Leaflet tile overlay adjustments */
+/* Dark Leaflet overrides */
 .leaflet-container {
-  background-color: #f5f2eb !important;
+  background-color: #141210 !important;
   font-family: inherit !important;
 }
 
 .leaflet-popup-content-wrapper {
-  background: #ffffff !important;
-  color: #191c1a !important;
+  background: #1e1b18 !important;
+  color: #f0ebe4 !important;
   border-radius: 0.875rem !important;
-  border: 1px solid #e7e2d6 !important;
-  box-shadow: 0 10px 25px -5px rgba(25, 28, 26, 0.1), 0 8px 10px -6px rgba(25, 28, 26, 0.05) !important;
+  border: 1px solid #3a3530 !important;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.3) !important;
 }
 
 .leaflet-popup-tip {
-  background: #ffffff !important;
-  border: 1px solid #e7e2d6 !important;
+  background: #1e1b18 !important;
+  border: 1px solid #3a3530 !important;
 }
 
 .leaflet-popup-content {
@@ -107,18 +119,88 @@
   line-height: 1.4 !important;
 }
 
-/* Custom warm scrollbar */
+/* Dark scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f5f2eb;
+  background: #141210;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d5cebf;
+  background: #3a3530;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8b3ab;
+  background: #4a4440;
+}
+
+/* React Grid Layout */
+.react-grid-layout {
+  position: relative;
+  transition: height 200ms ease;
+}
+.react-grid-item {
+  transition: all 200ms ease;
+  transition-property: left, top, width, height;
+}
+.react-grid-item.cssTransforms {
+  transition-property: transform, width, height;
+}
+.react-grid-item.resizing {
+  z-index: 1;
+  will-change: width, height;
+}
+.react-grid-item.react-draggable-dragging {
+  transition: none;
+  z-index: 3;
+  will-change: transform;
+}
+.react-grid-item > .react-resizable-handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  bottom: 0;
+  right: 0;
+  cursor: se-resize;
+}
+.react-grid-item > .react-resizable-handle::after {
+  content: "";
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(255,255,255,0.2);
+  border-bottom: 2px solid rgba(255,255,255,0.2);
+}
+.react-grid-placeholder {
+  background: rgba(20,184,166,0.15) !important;
+  border: 2px dashed rgba(20,184,166,0.4) !important;
+  border-radius: 1rem;
+  opacity: 1 !important;
+}
+
+/* Animated gauge fill */
+@keyframes gauge-fill {
+  from { stroke-dashoffset: 283; }
+}
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-gauge-fill {
+  animation: gauge-fill 1.2s ease-out forwards;
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
 }
