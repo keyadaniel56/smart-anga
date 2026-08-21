@@ -64,6 +64,29 @@ export const RiskMap: React.FC<RiskMapProps> = ({
   useEffect(() => {
     if (expanded) {
       document.body.style.overflow = 'hidden';
+
+      // Walk up ancestors and remove overflow-hidden so fixed positioning escapes
+      const el = mapContainerRef.current?.parentElement;
+      const originals: { el: HTMLElement; overflow: string; borderRadius: string; position: string; zIndex: string }[] = [];
+      let current: HTMLElement | null = el;
+      while (current && current !== document.body) {
+        const cs = window.getComputedStyle(current);
+        if (cs.overflow === 'hidden' || cs.overflowX === 'hidden' || cs.overflowY === 'hidden') {
+          originals.push({
+            el: current,
+            overflow: current.style.overflow,
+            borderRadius: current.style.borderRadius,
+            position: current.style.position,
+            zIndex: current.style.zIndex
+          });
+          current.style.overflow = 'visible';
+          current.style.borderRadius = '0';
+          current.style.position = 'relative';
+          current.style.zIndex = '40';
+        }
+        current = current.parentElement;
+      }
+
       const handleEsc = (e: KeyboardEvent) => {
         if (e.key === 'Escape') setExpanded(false);
       };
@@ -71,6 +94,12 @@ export const RiskMap: React.FC<RiskMapProps> = ({
       return () => {
         window.removeEventListener('keydown', handleEsc);
         document.body.style.overflow = '';
+        originals.forEach(({ el, overflow, borderRadius, position, zIndex }) => {
+          el.style.overflow = overflow;
+          el.style.borderRadius = borderRadius;
+          el.style.position = position;
+          el.style.zIndex = zIndex;
+        });
       };
     } else {
       document.body.style.overflow = '';
@@ -363,10 +392,10 @@ export const RiskMap: React.FC<RiskMapProps> = ({
   return (
     <div 
       id="gis-risk-map-panel" 
-      className={`relative w-full bg-sand-100 rounded-3xl overflow-hidden select-none transition-all duration-300 ${
+      className={`relative w-full bg-sand-100 select-none transition-all duration-300 ${
         expanded 
-          ? 'fixed inset-0 z-50 rounded-none' 
-          : 'h-[460px] sm:h-[520px] lg:h-[580px]'
+          ? 'fixed inset-0 z-[9999] rounded-none' 
+          : 'h-[460px] sm:h-[520px] lg:h-[580px] rounded-3xl overflow-hidden'
       }`}
     >
       {/* Map Canvas Container */}
@@ -381,7 +410,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
         {expanded ? (
           <>
             <Minimize2 className="w-3.5 h-3.5 text-forest-700" />
-            <span className="hidden sm:inline">{t('map.collapse', 'Collapse')}</span>
+            <span>{t('map.collapse', 'Collapse')}</span>
           </>
         ) : (
           <>
