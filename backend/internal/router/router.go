@@ -20,10 +20,6 @@ func NewRouter(cfg *config.Config, s *store.Store, om *services.OpenMeteoService
 	exportHandler := handlers.NewExportHandler(s, om)
 	docsHandler := handlers.NewDocsHandler()
 
-	// Initialize Alert Engine and Handler
-	alertEngine := services.NewAlertEngine()
-	alertHandler := handlers.NewAlertHandler(alertEngine)
-
 	// Initialize WebSocket Hub
 	wsHub := websocket.NewHub()
 	go wsHub.Run()
@@ -44,16 +40,6 @@ func NewRouter(cfg *config.Config, s *store.Store, om *services.OpenMeteoService
 	// Incident endpoints
 	mux.HandleFunc("/api/incidents", incidentHandler.GetIncidents)
 
-	// Alert endpoints
-	mux.HandleFunc("/api/alerts", alertHandler.GetAlerts)
-	mux.HandleFunc("/api/alerts/config", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPut {
-			alertHandler.UpdateConfig(w, r)
-			return
-		}
-		alertHandler.GetConfig(w, r)
-	})
-
 	// Export endpoints
 	mux.HandleFunc("/api/export/incidents", exportHandler.ExportIncidents)
 	mux.HandleFunc("/api/export/climate", exportHandler.ExportClimate)
@@ -66,13 +52,12 @@ func NewRouter(cfg *config.Config, s *store.Store, om *services.OpenMeteoService
 		websocket.ServeWs(wsHub, w, r)
 	})
 
-	// Apply global middleware stack (Rate Limiter, Logger, CORS)
+	// Apply global middleware stack (Rate Limiter, Logger)
 	limiter := middleware.NewRateLimiter(60.0) // 60 requests/minute default
 
 	var handler http.Handler = mux
 	handler = limiter.Middleware(handler)
 	handler = middleware.Logger(handler)
-	handler = middleware.CORS(cfg.CORSOrigin)(handler)
 
 	return handler
 }
