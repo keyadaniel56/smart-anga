@@ -32,6 +32,9 @@ import { LiveSensorFeed } from './components/LiveSensorFeed';
 import { RiskBadge } from './components/ui/RiskBadge';
 import { RiskDial } from './components/ui/RiskDial';
 import { EmptyState } from './components/ui/EmptyState';
+import { ErrorState } from './components/ui/ErrorState';
+import { Skeleton } from './components/ui/Skeleton';
+import { useToast } from './components/ui/Toast';
 import { useTranslation } from './context/LanguageContext';
 import { 
   ArrowRight,
@@ -44,6 +47,7 @@ import {
 
 export default function App() {
   const { t, language } = useTranslation();
+  const { addToast } = useToast();
   const [currentLocation, setCurrentLocation] = useState<LocationProfile>(DEFAULT_LOCATIONS[0]);
   const [activeTab, setActiveTab] = useState<NavigationTabType>('overview_gis');
   
@@ -73,6 +77,7 @@ export default function App() {
         setLiveWeather(data);
       } else {
         setWeatherError(true);
+        addToast('error', t('common.weatherFeedError', 'Unable to connect to live weather feed. Showing cached safety data.'));
       }
       setWeatherLoading(false);
     };
@@ -87,10 +92,14 @@ export default function App() {
         if (serverIncidents && serverIncidents.length > 0) {
           setIncidents(serverIncidents);
           setIncidentsConnected(true);
+        } else {
+          setIncidentsConnected(false);
+          addToast('info', t('common.usingCachedData', 'Incident server unavailable. Using locally cached emergency data.'));
         }
       } catch (err) {
         console.warn('Incident server sync notice:', err);
         setIncidentsConnected(false);
+        addToast('info', t('common.usingCachedData', 'Incident server unavailable. Using locally cached emergency data.'));
       }
     };
     loadIncidents();
@@ -185,6 +194,15 @@ export default function App() {
         weatherLoading={weatherLoading}
         activeIncidentCount={activeIncidentsList.length}
       />
+
+      {(!incidentsConnected || weatherError) && !weatherLoading && (
+        <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-7 pt-2">
+          <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-50/80 border border-amber-200/80 rounded-xl text-xs text-amber-800 font-medium">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+            {t('common.cachedDataBanner', 'Some data feeds are unavailable. Displaying locally cached data for safety reference.')}
+          </div>
+        </div>
+      )}
 
       {/* Main Responsive Body with Fixed Sidebar on Desktop */}
       <div className="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto pb-20 lg:pb-8">
@@ -315,40 +333,76 @@ export default function App() {
                   </div>
 
                   {/* Real live weather parameters bar */}
-                  <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 bg-sand-50/80 border-t border-sand-200">
-                    <div className="text-center">
-                      <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono">
-                        {t('overview.humidity', 'Humidity')}
-                      </p>
-                      <p className="text-base sm:text-lg font-bold font-mono text-ink-900">
-                        {liveWeather ? `${liveWeather.humidity}%` : '68%'}
-                      </p>
+                  {weatherError && !liveWeather ? (
+                    <div className="p-4 border-t border-sand-200">
+                      <ErrorState
+                        onRetry={() => {
+                          setWeatherError(false);
+                          setWeatherLoading(true);
+                          fetchLiveWeather(
+                            currentLocation.coordinates[0],
+                            currentLocation.coordinates[1],
+                            currentLocation.name
+                          ).then(data => {
+                            if (data) setLiveWeather(data);
+                            else setWeatherError(true);
+                            setWeatherLoading(false);
+                          });
+                        }}
+                      />
                     </div>
-                    <div className="text-center border-l border-sand-200">
-                      <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono">
-                        {t('overview.windSpeed', 'Wind Speed')}
-                      </p>
-                      <p className="text-base sm:text-lg font-bold font-mono text-ink-900">
-                        {liveWeather ? `${liveWeather.windSpeedKmh} km/h` : '14 km/h'}
-                      </p>
+                  ) : (
+                    <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 bg-sand-50/80 border-t border-sand-200">
+                      <div className="text-center">
+                        <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono">
+                          {t('overview.humidity', 'Humidity')}
+                        </p>
+                        {weatherLoading ? (
+                          <Skeleton variant="text" className="w-16 mx-auto mt-1" />
+                        ) : (
+                          <p className="text-base sm:text-lg font-bold font-mono text-ink-900">
+                            {liveWeather ? `${liveWeather.humidity}%` : '68%'}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-center border-l border-sand-200">
+                        <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono">
+                          {t('overview.windSpeed', 'Wind Speed')}
+                        </p>
+                        {weatherLoading ? (
+                          <Skeleton variant="text" className="w-20 mx-auto mt-1" />
+                        ) : (
+                          <p className="text-base sm:text-lg font-bold font-mono text-ink-900">
+                            {liveWeather ? `${liveWeather.windSpeedKmh} km/h` : '14 km/h'}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-center border-l border-sand-200">
+                        <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono">
+                          {t('overview.precipitation', 'Rainfall')}
+                        </p>
+                        {weatherLoading ? (
+                          <Skeleton variant="text" className="w-16 mx-auto mt-1" />
+                        ) : (
+                          <p className="text-base sm:text-lg font-bold font-mono text-cyan-700">
+                            {liveWeather ? `${liveWeather.precipitationMm} mm` : '0.0 mm'}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-center border-l border-sand-200">
+                        <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono">
+                          {t('overview.airPressure', 'Air Pressure')}
+                        </p>
+                        {weatherLoading ? (
+                          <Skeleton variant="text" className="w-20 mx-auto mt-1" />
+                        ) : (
+                          <p className="text-base sm:text-lg font-bold font-mono text-forest-800">
+                            {liveWeather ? `${liveWeather.surfacePressureHpa} hPa` : '1014 hPa'}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-center border-l border-sand-200">
-                      <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono">
-                        {t('overview.precipitation', 'Rainfall')}
-                      </p>
-                      <p className="text-base sm:text-lg font-bold font-mono text-cyan-700">
-                        {liveWeather ? `${liveWeather.precipitationMm} mm` : '0.0 mm'}
-                      </p>
-                    </div>
-                    <div className="text-center border-l border-sand-200">
-                      <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider font-mono">
-                        {t('overview.airPressure', 'Air Pressure')}
-                      </p>
-                      <p className="text-base sm:text-lg font-bold font-mono text-forest-800">
-                        {liveWeather ? `${liveWeather.surfacePressureHpa} hPa` : '1014 hPa'}
-                      </p>
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* 3. Resilience Score Gauge Card */}
@@ -497,26 +551,32 @@ export default function App() {
                       <span className="text-xs font-bold text-ink-500 uppercase tracking-wider font-mono">
                         {t('overview.dataIntegration', 'Live Data Feed Status')}
                       </span>
-                      <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 text-[10px] rounded-full border border-emerald-200 font-bold font-mono">
-                        {t('common.connected', 'CONNECTED')}
-                      </span>
+                      {(!incidentsConnected || weatherError) && !weatherLoading ? (
+                        <span className="px-2 py-0.5 bg-amber-50 text-amber-800 text-[10px] rounded-full border border-amber-200 font-bold font-mono">
+                          DEGRADED
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 text-[10px] rounded-full border border-emerald-200 font-bold font-mono">
+                          {t('common.connected', 'CONNECTED')}
+                        </span>
+                      )}
                     </div>
 
                     <div className="space-y-3">
                       {/* Open-Meteo Weather API */}
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-ink-700 font-medium">{t('overview.weatherFeed', 'Weather Data Feed')}</span>
-                        <span className="font-mono text-[10px] text-emerald-700 font-bold flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-                          {weatherLoading ? 'Syncing...' : liveWeather ? t('common.live', 'Live Feed') : 'Local Fallback'}
+                        <span className={`font-mono text-[10px] font-bold flex items-center gap-1 ${weatherError && !weatherLoading ? 'text-amber-600' : 'text-emerald-700'}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${weatherError && !weatherLoading ? 'bg-amber-500' : 'bg-emerald-600 animate-pulse'}`}></span>
+                          {weatherLoading ? 'Syncing...' : liveWeather ? t('common.live', 'Live Feed') : 'Unavailable'}
                         </span>
                       </div>
 
                       {/* Incident Command Store */}
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-ink-700 font-medium">{t('overview.incidentApi', 'Emergency Dispatch System')}</span>
-                        <span className="font-mono text-[10px] text-emerald-700 font-bold">
-                          {incidentsConnected ? `${incidents.length} ${t('common.synced', 'Synced')}` : 'Local Buffer'}
+                        <span className={`font-mono text-[10px] font-bold ${!incidentsConnected ? 'text-amber-600' : 'text-emerald-700'}`}>
+                          {incidentsConnected ? `${incidents.length} ${t('common.synced', 'Synced')}` : 'Cached Only'}
                         </span>
                       </div>
 
