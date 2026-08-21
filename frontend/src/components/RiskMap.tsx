@@ -11,23 +11,38 @@ import {
   Maximize2, 
   Minimize2,
   X,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Search,
+  MapPin,
+  Loader2
 } from 'lucide-react';
 import { LocationProfile, SensorNode, CriticalAsset, DepartmentIncident } from '../types/climate';
 import { useTranslation } from '../context/LanguageContext';
+
+interface NominatimResult {
+  place_id: number;
+  lat: string;
+  lon: string;
+  display_name: string;
+  type: string;
+  category: string;
+  address?: Record<string, string>;
+}
 
 interface RiskMapProps {
   location: LocationProfile;
   sensors: SensorNode[];
   assets: CriticalAsset[];
   incidents: DepartmentIncident[];
+  onSearchLocation?: (loc: LocationProfile) => void;
 }
 
 export const RiskMap: React.FC<RiskMapProps> = ({
   location,
   sensors,
   assets,
-  incidents
+  incidents,
+  onSearchLocation
 }) => {
   const { t } = useTranslation();
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -46,6 +61,10 @@ export const RiskMap: React.FC<RiskMapProps> = ({
   const [mapStyle, setMapStyle] = useState<'light' | 'satellite' | 'terrain'>('light');
   const [mobileControlsOpen, setMobileControlsOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [geoResults, setGeoResults] = useState<NominatimResult[]>([]);
+  const [geoLoading, setGeoLoading] = useState(false);
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const destroyMap = useCallback(() => {
     if (leafletMapRef.current) {
@@ -288,6 +307,57 @@ export const RiskMap: React.FC<RiskMapProps> = ({
     }
   }, [expanded]);
 
+  // Nominatim geocoding for fullscreen search
+  useEffect(() => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    if (searchQuery.trim().length < 3) {
+      setGeoResults([]);
+      setGeoLoading(false);
+      return;
+    }
+    setGeoLoading(true);
+    searchDebounceRef.current = setTimeout(async () => {
+      try {
+        const params = new URLSearchParams({
+          q: searchQuery, format: 'json', limit: '6', addressdetails: '1', 'accept-language': 'en'
+        });
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) { setGeoResults([]); return; }
+        setGeoResults(await res.json());
+      } catch {
+        setGeoResults([]);
+      } finally {
+        setGeoLoading(false);
+      }
+    }, 500);
+    return () => { if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current); };
+  }, [searchQuery]);
+
+  const selectGeoResult = useCallback((result: NominatimResult) => {
+    if (!onSearchLocation) return;
+    const addr = result.address || {};
+    const city = addr.city || addr.town || addr.village || addr.county || addr.state || '';
+    const country = addr.country || '';
+    const displayName = city ? `${city}, ${country}` : result.display_name.split(',').slice(0, 2).join(',').trim();
+
+    onSearchLocation({
+      id: `geocoded-${result.place_id}`,
+      name: displayName,
+      region: addr.state || addr.region || city || 'Searched Area',
+      country: country || 'Unknown',
+      coordinates: [parseFloat(result.lat), parseFloat(result.lon)],
+      elevationM: 25,
+      population: 100000,
+      primaryRisk: 'flood',
+      vulnerabilityIndex: 55,
+      criticalAssetsCount: 10
+    });
+    setSearchQuery('');
+    setGeoResults([]);
+  }, [onSearchLocation]);
+
   const toggleExpand = useCallback(() => setExpanded((prev) => !prev), []);
 
   const layerControls = (
@@ -415,14 +485,60 @@ export const RiskMap: React.FC<RiskMapProps> = ({
     >
       <div ref={mapContainerRef} className="absolute inset-0 z-0" />
 
-      <button
-        onClick={toggleExpand}
-        className="absolute top-3 left-3 z-30 bg-white/95 border border-sand-200 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md hover:bg-white transition-colors"
-        title="Collapse map"
-      >
-        <Minimize2 className="w-3.5 h-3.5 text-forest-700" />
-        <span>{t('map.collapse', 'Collapse')}</span>
-      </button>
+      {/* Top bar: collapse button + search */}
+      <div className="absolute top-3 left-3 right-3 z-30 flex items-start gap-2">
+        <button
+          onClick={toggleExpand}
+          className="flex-shrink-0 bg-white/95 border border-sand-200 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md hover:bg-white transition-colors"
+          title="Collapse map"
+        >
+          <Minimize2 className="w-3.5 h-3.5 text-forest-700" />
+          <span>{t('map.collapse', 'Collapse')}</span>
+        </button>
+
+        {/* Fullscreen search bar */}
+        {onSearchLocation && (
+          <div className="relative flex-1 max-w-md">
+            <div className="flex items-center gap-2 bg-white/95 border border-sand-200 rounded-xl px-3 py-1.5 shadow-md backdrop-blur-md">
+              <Search className="w-3.5 h-3.5 text-ink-400 flex-shrink-0" />
+              <input
+                type="text"
+                placeholder={t('map.searchPlaceholder', 'Search any place...')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-transparent text-xs text-ink-900 placeholder-ink-400 focus:outline-none"
+              />
+              {geoLoading && <Loader2 className="w-3 h-3 text-ink-400 animate-spin flex-shrink-0" />}
+              {searchQuery && (
+                <button onClick={() => { setSearchQuery(''); setGeoResults([]); }} className="text-ink-400 hover:text-ink-600">
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+
+            {/* Search results dropdown */}
+            {geoResults.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-sand-200 rounded-xl shadow-xl overflow-hidden max-h-60 overflow-y-auto">
+                {geoResults.map((result) => (
+                  <button
+                    key={result.place_id}
+                    onClick={() => selectGeoResult(result)}
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left text-xs hover:bg-forest-50 transition-colors border-b border-sand-100 last:border-b-0"
+                  >
+                    <MapPin className="w-3.5 h-3.5 text-forest-600 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <div className="font-bold text-ink-900 truncate">{result.display_name.split(',')[0]}</div>
+                      <div className="text-[10px] text-ink-500 truncate">
+                        {[result.address?.state, result.address?.country].filter(Boolean).join(', ') || result.type}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       <button
         onClick={() => setMobileControlsOpen(!mobileControlsOpen)}

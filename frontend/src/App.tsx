@@ -329,6 +329,7 @@ export default function App() {
                       sensors={sensors}
                       assets={assets}
                       incidents={incidents}
+                      onSearchLocation={setCurrentLocation}
                     />
                   </div>
 
