@@ -29,11 +29,7 @@ func (h *ExportHandler) ExportIncidents(w http.ResponseWriter, r *http.Request) 
 		format = "json"
 	}
 
-	incidents, err := h.store.GetIncidents()
-	if err != nil {
-		http.Error(w, "Failed to fetch incidents", http.StatusInternalServerError)
-		return
-	}
+	incidents := h.store.GetIncidents()
 
 	if format == "csv" {
 		w.Header().Set("Content-Type", "text/csv")
@@ -68,7 +64,7 @@ func (h *ExportHandler) ExportClimate(w http.ResponseWriter, r *http.Request) {
 
 	// Default coordinates if not provided
 	lat, lon := -0.1022, 34.7617
-	climateData, err := h.climateSvc.GetLiveClimate(lat, lon)
+	climateData, err := h.climateSvc.FetchClimate(lat, lon)
 	if err != nil {
 		http.Error(w, "Failed to fetch climate data", http.StatusInternalServerError)
 		return
