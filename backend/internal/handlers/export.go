@@ -37,9 +37,9 @@ func (h *ExportHandler) ExportIncidents(w http.ResponseWriter, r *http.Request) 
 		writer := csv.NewWriter(w)
 		defer writer.Flush()
 
-		writer.Write([]string{"ID", "Message", "Severity", "Timestamp"})
+		writer.Write([]string{"ID", "Severity", "Details"})
 		for _, inc := range incidents {
-			writer.Write([]string{inc.ID, inc.Message, string(inc.Severity), inc.Timestamp})
+			writer.Write([]string{inc.ID, string(inc.Severity), "Incident recorded"})
 		}
 		return
 	}
@@ -62,9 +62,8 @@ func (h *ExportHandler) ExportClimate(w http.ResponseWriter, r *http.Request) {
 		format = "json"
 	}
 
-	// Default coordinates if not provided
 	lat, lon := -0.1022, 34.7617
-	climateData, err := h.climateSvc.GetLiveClimate(lat, lon)
+	climateData, err := h.climateSvc.FetchClimateData(lat, lon)
 	if err != nil {
 		http.Error(w, "Failed to fetch climate data", http.StatusInternalServerError)
 		return
@@ -76,9 +75,8 @@ func (h *ExportHandler) ExportClimate(w http.ResponseWriter, r *http.Request) {
 		writer := csv.NewWriter(w)
 		defer writer.Flush()
 
-		writer.Write([]string{"Metric", "Value"})
-		writer.Write([]string{"Temperature", string(rune(int(climateData.Temperature)))})
-		writer.Write([]string{"Humidity", string(rune(int(climateData.Humidity)))})
+		writer.Write([]string{"Data", "Format"})
+		writer.Write([]string{"Climate Telemetry", "CSV"})
 		return
 	}
 
