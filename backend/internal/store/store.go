@@ -12,6 +12,7 @@ import (
 type Store struct {
 	mu        sync.RWMutex
 	incidents []models.Incident
+	smes      []models.SMEProfile
 }
 
 func New() *Store {
@@ -211,4 +212,66 @@ var seededAssets = []AssetRecord{
 // GetAssets returns all asset records from the internal database.
 func (s *Store) GetAssets() []AssetRecord {
 	return seededAssets
+}
+
+// ──────────────────────────────── SME store ──────────────────────────────────
+
+func (s *Store) initSMEs() {
+	if s.smes == nil {
+		s.smes = []models.SMEProfile{}
+	}
+}
+
+// GetSME returns the SME with the given ID, or nil if not found.
+func (s *Store) GetSME(id string) *models.SMEProfile {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	for i := range s.smes {
+		if s.smes[i].ID == id {
+			cp := s.smes[i]
+			return &cp
+		}
+	}
+	return nil
+}
+
+// CreateSME persists a new SME profile and returns it.
+func (s *Store) CreateSME(req models.RegisterSMERequest) models.SMEProfile {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.initSMEs()
+
+	now := time.Now().UTC()
+	sme := models.SMEProfile{
+		ID:                fmt.Sprintf("SME-%04d", 1000+rand.Intn(9000)),
+		BusinessName:      req.BusinessName,
+		Industry:          req.Industry,
+		EmployeeCount:     req.EmployeeCount,
+		Location:          req.Location,
+		Coordinates:       req.Coordinates,
+		HasInsurance:      req.HasInsurance,
+		InsuranceCovers:   req.InsuranceCovers,
+		EmergencyMeasures: req.EmergencyMeasures,
+		CriticalAssets:    req.CriticalAssets,
+		RegisteredAt:      now,
+		UpdatedAt:         now,
+	}
+	if sme.BusinessName == "" {
+		sme.BusinessName = "Unnamed Business"
+	}
+	if sme.Industry == "" {
+		sme.Industry = models.IndustryOther
+	}
+	if sme.InsuranceCovers == nil {
+		sme.InsuranceCovers = []string{}
+	}
+	if sme.EmergencyMeasures == nil {
+		sme.EmergencyMeasures = []models.EmergencyMeasure{}
+	}
+	if sme.CriticalAssets == nil {
+		sme.CriticalAssets = []models.CriticalAsset{}
+	}
+
+	s.smes = append(s.smes, sme)
+	return sme
 }
