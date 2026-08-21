@@ -2,6 +2,9 @@ package router
 
 import (
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/anga/backend/internal/config"
 	"github.com/anga/backend/internal/handlers"
@@ -66,10 +69,46 @@ func NewRouter(cfg *config.Config, s *store.Store, om *services.OpenMeteoService
 		websocket.ServeWs(wsHub, w, r)
 	})
 
+	// Serve frontend static files in production
+	frontendDir := getEnv("FRONTEND_DIR", "frontend/dist")
+	if _, err := os.Stat(frontendDir); err == nil {
+		fs := http.Dir(frontendDir)
+		fileServer := http.FileServer(fs)
+
+		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			// If the path matches an API or WebSocket route, skip
+			if strings.HasPrefix(r.URL.Path, "/api/") || strings.HasPrefix(r.URL.Path, "/ws/") {
+				http.NotFound(w, r)
+				return
+			}
+
+			// Try to serve the file directly
+			path := filepath.Clean(r.URL.Path)
+			if path == "/" {
+				path = "/index.html"
+			}
+
+			// Check if file exists, if not serve index.html (SPA fallback)
+			fullPath := filepath.Join(frontendDir, path)
+			if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+				r.URL.Path = "/"
+			}
+
+			fileServer.ServeHTTP(w, r)
+		})
+	}
+
 	// Apply global middleware stack
 	var handler http.Handler = mux
 	handler = middleware.Logger(handler)
 	handler = middleware.CORS(cfg.CORSOrigin)(handler)
 
 	return handler
+}
+
+func getEnv(key, fallback string) string {
+	if val := os.Getenv(key); val != "" {
+		return val
+	}
+	return fallback
 }

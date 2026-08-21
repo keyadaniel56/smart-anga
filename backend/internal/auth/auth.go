@@ -2,13 +2,22 @@ package auth
 
 import (
     "errors"
+    "os"
     "time"
 
     "github.com/golang-jwt/jwt/v5"
     "golang.org/x/crypto/bcrypt"
 )
 
-var jwtSecret = []byte("super-secret-climate-key-change-in-production")
+var jwtSecret []byte
+
+func init() {
+	if secret := os.Getenv("JWT_SECRET"); secret != "" {
+		jwtSecret = []byte(secret)
+	} else {
+		jwtSecret = []byte("super-secret-climate-key-change-in-production")
+	}
+}
 
 type Claims struct {
     Username string `json:"username"`

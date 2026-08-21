@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: smart-anga
+    runtime: docker
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: smart-anga-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        sync: false
+    healthCheckPath: /api/health
+
+  - type: postgres
+    name: smart-anga-db
+    plan: free
+    databaseName: smart_anga
+    ipAllowList: []
