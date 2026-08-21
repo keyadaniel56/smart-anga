@@ -17,6 +17,7 @@ func NewRouter(cfg *config.Config, s *store.Store, om *services.OpenMeteoService
 	climateHandler := handlers.NewClimateHandler(om)
 	dashboardHandler := handlers.NewDashboardHandler(services.NewDashboardAggregator(cfg, s))
 	smeHandler := handlers.NewSMEHandler(s, services.NewSMEAssessor())
+	predictionsHandler := handlers.NewPredictionsHandler(services.NewDroughtAssessor(cfg))
 
 	// Health check
 	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, r *http.Request) {
@@ -31,6 +32,9 @@ func NewRouter(cfg *config.Config, s *store.Store, om *services.OpenMeteoService
 	mux.HandleFunc("GET /api/dashboard/overview", dashboardHandler.GetOverview)
 	mux.HandleFunc("GET /api/dashboard/trends", dashboardHandler.GetTrends)
 	mux.HandleFunc("GET /api/dashboard/vulnerable-assets", dashboardHandler.GetVulnerableAssets)
+
+	// Predictions endpoints
+	mux.HandleFunc("GET /api/predictions/drought", predictionsHandler.GetDrought)
 
 	// SME endpoints
 	mux.HandleFunc("POST /api/sme", smeHandler.Register)
