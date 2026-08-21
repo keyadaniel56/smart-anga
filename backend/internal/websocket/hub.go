@@ -6,19 +6,13 @@ import (
 	"sync"
 )
 
-type ClientSubscription struct {
-	Lat      float64
-	Lon      float64
-	RadiusKm float64
-}
-
 type Hub struct {
 	clients    map[*Client]bool
 	register   chan *Client
 	unregister chan *Client
 	broadcast  chan []byte
+	subs       map[string]map[*Client]bool
 	mu         sync.Mutex
-	subs       map[*Client]ClientSubscription
 }
 
 func NewHub() *Hub {
@@ -27,7 +21,7 @@ func NewHub() *Hub {
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		broadcast:  make(chan []byte),
-		subs:       make(map[*Client]ClientSubscription),
+		subs:       make(map[string]map[*Client]bool),
 	}
 }
 
@@ -35,52 +29,63 @@ func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.register:
-			h.mu.Lock()
 			h.clients[client] = true
-			h.mu.Unlock()
-			log.Println("WebSocket client connected")
-
+			log.Printf("WebSocket client connected: %p", client)
 		case client := <-h.unregister:
-			h.mu.Lock()
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
-				delete(h.subs, client)
-				close(client.Send)
+				h.removeSubscriptions(client)
+				close(client.send)
+				log.Printf("WebSocket client disconnected: %p", client)
 			}
-			h.mu.Unlock()
-			log.Println("WebSocket client disconnected")
-
 		case message := <-h.broadcast:
-			h.mu.Lock()
 			for client := range h.clients {
 				select {
-				case client.Send <- message:
+				case client.send <- message:
 				default:
-					close(client.Send)
+					close(client.send)
 					delete(h.clients, client)
-					delete(h.subs, client)
+					h.removeSubscriptions(client)
 				}
 			}
-			h.mu.Unlock()
 		}
 	}
 }
 
-func (h *Hub) BroadcastMessage(msgType string, data interface{}) {
-	payload := map[string]interface{}{
-		"type": msgType,
-		"data": data,
-	}
-	bytes, err := json.Marshal(payload)
-	if err != nil {
-		log.Printf("Failed to marshal broadcast message: %v", err)
-		return
-	}
-	h.broadcast <- bytes
-}
-
-func (h *Hub) UpdateSubscription(client *Client, sub ClientSubscription) {
+func (h *Hub) removeSubscriptions(client *Client) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	h.subs[client] = sub
+	for region, clients := range h.subs {
+		if _, ok := clients[client]; ok {
+			delete(clients, client)
+			if len(clients) == 0 {
+				delete(h.subs, region)
+			}
+		}
+	}
+}
+
+func (h *Hub) HandleSubscription(client *Client, msg []byte) {
+	var payload struct {
+		Action   string  `json:"action"`
+		Lat      float64 `json:"lat"`
+		Lon      float64 `json:"lon"`
+		RadiusKm float64 `json:"radiusKm"`
+	}
+
+	if err := json.Unmarshal(msg, &payload); err != nil {
+		log.Printf("Invalid WS subscription payload: %v", err)
+		return
+	}
+
+	if payload.Action == "subscribe" {
+		h.mu.Lock()
+		defer h.mu.Unlock()
+		regionKey := "default_region"
+		if h.subs[regionKey] == nil {
+			h.subs[regionKey] = make(map[*Client]bool)
+		}
+		h.subs[regionKey][client] = true
+		log.Printf("Client %p subscribed to region updates", client)
+	}
 }
