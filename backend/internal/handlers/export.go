@@ -37,9 +37,9 @@ func (h *ExportHandler) ExportIncidents(w http.ResponseWriter, r *http.Request) 
 		writer := csv.NewWriter(w)
 		defer writer.Flush()
 
-		writer.Write([]string{"ID", "Type", "Severity", "Description", "Timestamp"})
+		writer.Write([]string{"ID", "Message", "Severity", "Timestamp"})
 		for _, inc := range incidents {
-			writer.Write([]string{inc.ID, inc.Type, inc.Severity, inc.Description, inc.Timestamp})
+			writer.Write([]string{inc.ID, inc.Message, string(inc.Severity), inc.Timestamp})
 		}
 		return
 	}
@@ -64,7 +64,7 @@ func (h *ExportHandler) ExportClimate(w http.ResponseWriter, r *http.Request) {
 
 	// Default coordinates if not provided
 	lat, lon := -0.1022, 34.7617
-	climateData, err := h.climateSvc.FetchClimate(lat, lon)
+	climateData, err := h.climateSvc.GetLiveClimate(lat, lon)
 	if err != nil {
 		http.Error(w, "Failed to fetch climate data", http.StatusInternalServerError)
 		return
