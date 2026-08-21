@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   MapPin, 
   Search, 
@@ -7,7 +7,9 @@ import {
   ChevronDown, 
   Sparkles, 
   Thermometer,
-  Languages
+  Languages,
+  Globe,
+  Loader2
 } from 'lucide-react';
 import { LocationProfile, EarlyWarningAlert, LiveWeatherData } from '../types/climate';
 import { GLOBAL_HOTSPOTS } from '../data/mockClimateData';
@@ -24,6 +26,17 @@ interface HeaderProps {
   activeIncidentCount?: number;
 }
 
+interface NominatimResult {
+  place_id: number;
+  lat: string;
+  lon: string;
+  display_name: string;
+  type: string;
+  category: string;
+  importance: number;
+  address?: Record<string, string>;
+}
+
 export const Header: React.FC<HeaderProps> = ({
   locations = GLOBAL_HOTSPOTS,
   currentLocation,
@@ -37,6 +50,9 @@ export const Header: React.FC<HeaderProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTime, setCurrentTime] = useState('');
   const [currentDate, setCurrentDate] = useState('');
+  const [geoResults, setGeoResults] = useState<NominatimResult[]>([]);
+  const [geoLoading, setGeoLoading] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const updateClock = () => {
@@ -61,6 +77,53 @@ export const Header: React.FC<HeaderProps> = ({
     return () => clearInterval(timer);
   }, []);
 
+  const fetchGeocodeResults = useCallback(async (query: string) => {
+    if (query.trim().length < 3) {
+      setGeoResults([]);
+      setGeoLoading(false);
+      return;
+    }
+    try {
+      setGeoLoading(true);
+      const params = new URLSearchParams({
+        q: query,
+        format: 'json',
+        limit: '8',
+        addressdetails: '1',
+        'accept-language': 'en'
+      });
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!res.ok) {
+        setGeoResults([]);
+        return;
+      }
+      const data: NominatimResult[] = await res.json();
+      setGeoResults(data);
+    } catch {
+      setGeoResults([]);
+    } finally {
+      setGeoLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (searchQuery.trim().length >= 3) {
+      setGeoLoading(true);
+      debounceRef.current = setTimeout(() => {
+        fetchGeocodeResults(searchQuery);
+      }, 500);
+    } else {
+      setGeoResults([]);
+      setGeoLoading(false);
+    }
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [searchQuery, fetchGeocodeResults]);
+
   const criticalAlerts = activeAlerts.filter(a => a.severity === 'Emergency' || a.severity === 'Warning' || a.active);
 
   const filteredHotspots = locations.filter(h => 
@@ -68,6 +131,30 @@ export const Header: React.FC<HeaderProps> = ({
     h.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
     h.region.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const selectGeoResult = (result: NominatimResult) => {
+    const addr = result.address || {};
+    const city = addr.city || addr.town || addr.village || addr.county || addr.state || '';
+    const country = addr.country || '';
+    const displayName = city ? `${city}, ${country}` : result.display_name.split(',').slice(0, 2).join(',').trim();
+
+    const loc: LocationProfile = {
+      id: `geocoded-${result.place_id}`,
+      name: displayName,
+      region: addr.state || addr.region || city || 'Searched Area',
+      country: country || 'Unknown',
+      coordinates: [parseFloat(result.lat), parseFloat(result.lon)],
+      elevationM: 25,
+      population: 100000,
+      primaryRisk: 'flood',
+      vulnerabilityIndex: 55,
+      criticalAssetsCount: 10
+    };
+    onSelectLocation(loc);
+    setDropdownOpen(false);
+    setSearchQuery('');
+    setGeoResults([]);
+  };
 
   const handleUseCurrentLocation = () => {
     if (navigator.geolocation) {
@@ -94,6 +181,18 @@ export const Header: React.FC<HeaderProps> = ({
       );
     }
   };
+
+  const formatGeoType = (result: NominatimResult) => {
+    const addr = result.address || {};
+    const parts: string[] = [];
+    if (addr.state) parts.push(addr.state);
+    if (addr.country) parts.push(addr.country);
+    return parts.length > 0 ? parts.join(', ') : result.type;
+  };
+
+  const showGeoSection = geoResults.length > 0 || geoLoading;
+  const showHotspotsSection = filteredHotspots.length > 0;
+  const showEmptyState = !showGeoSection && !showHotspotsSection && searchQuery.trim().length >= 3;
 
   return (
     <header id="platform-header" className="bg-sand-50/95 border-b border-sand-200 sticky top-0 z-40 backdrop-blur-md">
@@ -214,15 +313,18 @@ export const Header: React.FC<HeaderProps> = ({
               className="absolute left-0 right-0 mt-2 bg-white border border-sand-200 rounded-2xl shadow-xl z-50 p-2 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             >
               <div className="p-2 border-b border-sand-200 flex items-center gap-2 bg-sand-50/50 rounded-t-xl">
-                <Search className="w-4 h-4 text-ink-400" />
+                <Search className="w-4 h-4 text-ink-400 flex-shrink-0" />
                 <input
                   type="text"
-                  placeholder={t('header.searchPlaceholder', 'Search town, neighborhood, or river area...')}
+                  placeholder={t('header.searchPlaceholder', 'Search any town, city, or country...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-transparent text-xs text-ink-900 placeholder-ink-400 focus:outline-none"
                   autoFocus
                 />
+                {geoLoading && (
+                  <Loader2 className="w-3.5 h-3.5 text-ink-400 animate-spin flex-shrink-0" />
+                )}
               </div>
 
               <div className="py-1">
@@ -236,38 +338,86 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
               </div>
 
-              <div className="max-h-60 overflow-y-auto space-y-1 py-1">
-                <div className="px-2 py-1 text-[10px] font-bold text-ink-400 uppercase tracking-wider font-mono">
-                  {t('header.selectHotspot', 'Select Monitored Town or Catchment Area')}
-                </div>
-                {filteredHotspots.map((spot) => (
-                  <button
-                    key={spot.id}
-                    id={`select-loc-${spot.id}`}
-                    onClick={() => {
-                      onSelectLocation(spot);
-                      setDropdownOpen(false);
-                      setSearchQuery('');
-                    }}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs transition-colors ${
-                      currentLocation.id === spot.id 
-                        ? 'bg-forest-50 border border-forest-200 text-forest-900 font-bold' 
-                        : 'hover:bg-sand-100 text-ink-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold text-ink-900">{spot.name}</div>
-                      <div className="text-[11px] text-ink-500 font-sans">
-                        {spot.region}, {spot.country} • Basin: {spot.riverBasin || 'Regional Catchment'}
-                      </div>
+              <div className="max-h-72 overflow-y-auto space-y-1 py-1">
+                {/* Geocoding results */}
+                {showGeoSection && (
+                  <>
+                    <div className="px-2 py-1 text-[10px] font-bold text-forest-700 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                      <Globe className="w-3 h-3" />
+                      {searchQuery.trim().length >= 3 && !geoLoading && geoResults.length > 0
+                        ? `Search Results for "${searchQuery}"`
+                        : geoLoading ? 'Searching worldwide...' : ''}
                     </div>
-                    <div className="text-right">
-                      <span className="capitalize text-[10px] px-2 py-0.5 rounded-md bg-sand-100 text-ink-700 border border-sand-200 font-medium">
-                        {spot.primaryRisk.replace('_', ' ')}
-                      </span>
+                    {geoResults.map((result) => (
+                      <button
+                        key={result.place_id}
+                        id={`geo-loc-${result.place_id}`}
+                        onClick={() => selectGeoResult(result)}
+                        className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs transition-colors hover:bg-forest-50 text-ink-700 border border-transparent hover:border-forest-200"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <Globe className="w-3.5 h-3.5 text-forest-600 flex-shrink-0" />
+                          <div className="min-w-0">
+                            <div className="font-bold text-ink-900 truncate">{result.display_name.split(',')[0]}</div>
+                            <div className="text-[11px] text-ink-500 truncate">
+                              {formatGeoType(result)}
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-forest-50 text-forest-700 border border-forest-200 font-medium flex-shrink-0 ml-2">
+                          Add
+                        </span>
+                      </button>
+                    ))}
+                  </>
+                )}
+
+                {/* Monitored hotspots */}
+                {showHotspotsSection && (
+                  <>
+                    <div className="px-2 py-1 text-[10px] font-bold text-ink-400 uppercase tracking-wider font-mono">
+                      {searchQuery.trim().length > 0
+                        ? 'Monitored Locations'
+                        : t('header.selectHotspot', 'Select Monitored Town or Catchment Area')}
                     </div>
-                  </button>
-                ))}
+                    {filteredHotspots.map((spot) => (
+                      <button
+                        key={spot.id}
+                        id={`select-loc-${spot.id}`}
+                        onClick={() => {
+                          onSelectLocation(spot);
+                          setDropdownOpen(false);
+                          setSearchQuery('');
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs transition-colors ${
+                          currentLocation.id === spot.id 
+                            ? 'bg-forest-50 border border-forest-200 text-forest-900 font-bold' 
+                            : 'hover:bg-sand-100 text-ink-700'
+                        }`}
+                      >
+                        <div>
+                          <div className="font-bold text-ink-900">{spot.name}</div>
+                          <div className="text-[11px] text-ink-500 font-sans">
+                            {spot.region}, {spot.country} • Basin: {spot.riverBasin || 'Regional Catchment'}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="capitalize text-[10px] px-2 py-0.5 rounded-md bg-sand-100 text-ink-700 border border-sand-200 font-medium">
+                            {spot.primaryRisk.replace('_', ' ')}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </>
+                )}
+
+                {/* Empty state */}
+                {showEmptyState && (
+                  <div className="px-3 py-4 text-center text-ink-400 text-xs">
+                    <MapPin className="w-5 h-5 mx-auto mb-1.5 text-ink-300" />
+                    No matches found. Try a different search or use GPS.
+                  </div>
+                )}
               </div>
             </div>
           )}

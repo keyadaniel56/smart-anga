@@ -251,10 +251,57 @@ export default function App() {
                   </div>
                 </div>
 
+<<<<<<< HEAD
                 {/* Weather Metrics Card Column with integrated Skeletons */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {weatherLoading ? (
                     <WeatherSkeleton />
+=======
+                {/* 2. Interactive GIS Map Centerpiece */}
+                <div className="col-span-12 lg:col-span-6 bg-white border border-sand-200 rounded-3xl overflow-hidden flex flex-col shadow-sm">
+                  <div className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-sand-200 bg-sand-50/50">
+                    <div>
+                      <h2 className="text-base font-bold text-ink-900 font-serif">
+                        {t('overview.mapHeading', 'Area Risk & Water Map')}
+                      </h2>
+                      <p className="text-ink-500 text-xs">{currentLocation.name} • {currentLocation.riverBasin || 'Catchment Basin'}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <RiskBadge level="critical" size="xs" label={t('flood.heading', 'Flood Zones')} />
+                      <RiskBadge level="moderate" size="xs" label={t('drought.heading', 'Drought Zones')} />
+                    </div>
+                  </div>
+
+                  <div className="flex-1 relative min-h-[380px] bg-sand-100">
+                    <RiskMap
+                      location={currentLocation}
+                      sensors={sensors}
+                      assets={assets}
+                      incidents={incidents}
+                      onSearchLocation={setCurrentLocation}
+                    />
+                  </div>
+
+                  {/* Real live weather parameters bar */}
+                  {weatherError && !liveWeather ? (
+                    <div className="p-4 border-t border-sand-200">
+                      <ErrorState
+                        onRetry={() => {
+                          setWeatherError(false);
+                          setWeatherLoading(true);
+                          fetchLiveWeather(
+                            currentLocation.coordinates[0],
+                            currentLocation.coordinates[1],
+                            currentLocation.name
+                          ).then(data => {
+                            if (data) setLiveWeather(data);
+                            else setWeatherError(true);
+                            setWeatherLoading(false);
+                          });
+                        }}
+                      />
+                    </div>
+>>>>>>> 80014e6e339e8980f3eaef1b218d892ab0eb8a09
                   ) : (
                     <div className="bg-white border border-sand-200 rounded-2xl p-4 shadow-sm">
                       <h3 className="text-xs font-mono uppercase text-ink-500">Live Conditions</h3>
