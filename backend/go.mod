@@ -11,6 +11,8 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
 	golang.org/x/crypto v0.55.0
-	golang.org/x/sync v0.17.0
-	golang.org/x/text v0.29.0
+	golang.org/x/sync v0.22.0
+	golang.org/x/text v0.41.0
 )
+
+require github.com/gorilla/websocket v1.5.3 // indirect
