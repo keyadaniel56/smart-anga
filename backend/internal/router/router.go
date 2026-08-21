@@ -8,6 +8,7 @@ import (
 	"github.com/anga/backend/internal/middleware"
 	"github.com/anga/backend/internal/services"
 	"github.com/anga/backend/internal/store"
+	"github.com/anga/backend/internal/websocket"
 )
 
 func NewRouter(cfg *config.Config, s *store.Store, om *services.OpenMeteoService) http.Handler {
@@ -20,6 +21,10 @@ func NewRouter(cfg *config.Config, s *store.Store, om *services.OpenMeteoService
 	// Initialize Alert Engine and Handler
 	alertEngine := services.NewAlertEngine()
 	alertHandler := handlers.NewAlertHandler(alertEngine)
+
+	// Initialize WebSocket Hub
+	wsHub := websocket.NewHub()
+	go wsHub.Run()
 
 	// Health check
 	mux.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
@@ -45,6 +50,11 @@ func NewRouter(cfg *config.Config, s *store.Store, om *services.OpenMeteoService
 			return
 		}
 		alertHandler.GetConfig(w, r)
+	})
+
+	// WebSocket endpoint
+	mux.HandleFunc("/ws/climate", func(w http.ResponseWriter, r *http.Request) {
+		websocket.ServeWs(wsHub, w, r)
 	})
 
 	// Apply global middleware stack
