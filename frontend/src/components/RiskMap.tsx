@@ -8,6 +8,7 @@ import {
   Radio, 
   AlertCircle, 
   Maximize2, 
+  Minimize2,
   Compass,
   X,
   SlidersHorizontal,
@@ -48,6 +49,33 @@ export const RiskMap: React.FC<RiskMapProps> = ({
 
   const [mapStyle, setMapStyle] = useState<'light' | 'satellite' | 'terrain'>('light');
   const [mobileControlsOpen, setMobileControlsOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  const invalidateMapSize = () => {
+    if (leafletMapRef.current) {
+      setTimeout(() => leafletMapRef.current.invalidateSize(), 100);
+    }
+  };
+
+  useEffect(() => {
+    invalidateMapSize();
+  }, [expanded]);
+
+  useEffect(() => {
+    if (expanded) {
+      document.body.style.overflow = 'hidden';
+      const handleEsc = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') setExpanded(false);
+      };
+      window.addEventListener('keydown', handleEsc);
+      return () => {
+        window.removeEventListener('keydown', handleEsc);
+        document.body.style.overflow = '';
+      };
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [expanded]);
 
   // Initialize Leaflet map
   useEffect(() => {
@@ -333,9 +361,35 @@ export const RiskMap: React.FC<RiskMapProps> = ({
   };
 
   return (
-    <div id="gis-risk-map-panel" className="relative w-full h-[460px] sm:h-[520px] lg:h-[580px] bg-sand-100 rounded-3xl overflow-hidden select-none">
+    <div 
+      id="gis-risk-map-panel" 
+      className={`relative w-full bg-sand-100 rounded-3xl overflow-hidden select-none transition-all duration-300 ${
+        expanded 
+          ? 'fixed inset-0 z-50 rounded-none' 
+          : 'h-[460px] sm:h-[520px] lg:h-[580px]'
+      }`}
+    >
       {/* Map Canvas Container */}
       <div ref={mapContainerRef} className="w-full h-full z-0" />
+
+      {/* Expand/Collapse Button */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="absolute top-3 left-3 z-30 bg-white/95 border border-sand-200 px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5 text-xs font-semibold text-ink-800 backdrop-blur-md hover:bg-white transition-colors"
+        title={expanded ? 'Exit fullscreen' : 'Expand map'}
+      >
+        {expanded ? (
+          <>
+            <Minimize2 className="w-3.5 h-3.5 text-forest-700" />
+            <span className="hidden sm:inline">{t('map.collapse', 'Collapse')}</span>
+          </>
+        ) : (
+          <>
+            <Maximize2 className="w-3.5 h-3.5 text-forest-700" />
+            <span className="hidden sm:inline">{t('map.expand', 'Expand')}</span>
+          </>
+        )}
+      </button>
 
       {/* Mobile Toggle Button for Layer Controls */}
       <button
@@ -480,7 +534,7 @@ export const RiskMap: React.FC<RiskMapProps> = ({
       </div>
 
       {/* Bottom Map Legend Bar */}
-      <div className="absolute bottom-3 left-3 right-16 z-20 bg-white/90 border border-sand-200 rounded-2xl p-2.5 sm:p-3 shadow-md backdrop-blur-md flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div className={`absolute bottom-3 left-3 right-16 z-20 bg-white/90 border border-sand-200 rounded-2xl p-2.5 sm:p-3 shadow-md backdrop-blur-md flex flex-wrap items-center justify-between gap-2 text-xs ${expanded ? 'max-w-3xl' : ''}`}>
         <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
           <span className="font-semibold text-ink-500 text-[10px] uppercase tracking-wider font-mono">{t('map.keyLabel', 'Key')}:</span>
           <div className="flex items-center gap-1.5">
