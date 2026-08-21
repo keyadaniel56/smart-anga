@@ -20,13 +20,20 @@ type Store struct {
 
 func New(db *sqlx.DB) *Store {
 	s := &Store{db: db}
-	s.runMigrations()
-	s.seedDefaultIncidents()
+	if db != nil {
+		s.runMigrations()
+		s.seedDefaultIncidents()
+	} else {
+		log.Println("WARNING: No database connection. Running with in-memory store only.")
+	}
 	return s
 }
 
 // runMigrations automatically runs our schema file on startup
 func (s *Store) runMigrations() {
+	if s.db == nil {
+		return
+	}
 	schema := `
 	CREATE TABLE IF NOT EXISTS incidents (
 		id VARCHAR(10) PRIMARY KEY,
@@ -52,13 +59,17 @@ func (s *Store) runMigrations() {
 	`
 	_, err := s.db.Exec(schema)
 	if err != nil {
-		log.Fatalf("Failed to run database migrations: %v", err)
+		log.Printf("WARNING: Database migration failed: %v", err)
+		return
 	}
 	log.Println("Database migrations checked/applied successfully.")
 }
 
 // seedDefaultIncidents populates initial sample data if table is empty
 func (s *Store) seedDefaultIncidents() {
+	if s.db == nil {
+		return
+	}
 	var count int
 	err := s.db.Get(&count, "SELECT COUNT(*) FROM incidents")
 	if err != nil || count > 0 {
@@ -166,6 +177,9 @@ func toModelIncident(d dbIncident) models.Incident {
 }
 
 func (s *Store) GetIncidents() []models.Incident {
+	if s.db == nil {
+		return []models.Incident{}
+	}
 	var dbIncidents []dbIncident
 	err := s.db.Select(&dbIncidents, "SELECT * FROM incidents ORDER BY reported_at DESC")
 	if err != nil {
@@ -181,6 +195,9 @@ func (s *Store) GetIncidents() []models.Incident {
 }
 
 func (s *Store) GetIncidentByID(id string) *models.Incident {
+	if s.db == nil {
+		return nil
+	}
 	var di dbIncident
 	err := s.db.Get(&di, "SELECT * FROM incidents WHERE id = $1", id)
 	if err != nil {
@@ -195,6 +212,9 @@ func (s *Store) GetIncidentByID(id string) *models.Incident {
 }
 
 func (s *Store) CreateIncident(req models.CreateIncidentRequest) models.Incident {
+	if s.db == nil {
+		return models.Incident{}
+	}
 	id := fmt.Sprintf("INC-%d", 1000+rand.Intn(9000))
 
 	title := req.Title
@@ -261,6 +281,9 @@ func (s *Store) CreateIncident(req models.CreateIncidentRequest) models.Incident
 }
 
 func (s *Store) UpdateIncident(id string, req models.UpdateIncidentRequest) *models.Incident {
+	if s.db == nil {
+		return nil
+	}
 	existing := s.GetIncidentByID(id)
 	if existing == nil {
 		return nil
@@ -303,6 +326,9 @@ func (s *Store) UpdateIncident(id string, req models.UpdateIncidentRequest) *mod
 
 // In-memory user store for JWT auth (will be migrated to DB later)
 func (s *Store) CreateUser(user models.User) error {
+	if s.db == nil {
+		return fmt.Errorf("database not available")
+	}
 	for _, u := range s.users {
 		if u.Username == user.Username {
 			return fmt.Errorf("username already exists")
@@ -315,6 +341,9 @@ func (s *Store) CreateUser(user models.User) error {
 }
 
 func (s *Store) GetUserByUsername(username string) (*models.User, error) {
+	if s.db == nil {
+		return nil, fmt.Errorf("database not available")
+	}
 	for i := range s.users {
 		if s.users[i].Username == username {
 			return &s.users[i], nil

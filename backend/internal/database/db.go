@@ -5,38 +5,62 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 )
 
-// ConnectDB initializes the PostgreSQL connection pool using environment variables
+// ConnectDB initializes the PostgreSQL connection pool with retry logic for cloud deployments
 func ConnectDB() (*sqlx.DB, error) {
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		// Fallback default connection string for local development
 		dbURL = "postgres://postgres:postgres@localhost:5432/smart_anga?sslmode=disable"
 	}
 
-	db, err := sqlx.Connect("pgx", dbURL)
-	if err != nil {
-		return nil, fmt.Errorf("error connecting to database: %w", err)
+	// Render and other cloud providers use postgres:// scheme; pgx expects postgresql://
+	dbURL = strings.Replace(dbURL, "postgres://", "postgresql://", 1)
+
+	// Ensure sslmode is set for cloud databases
+	if !strings.Contains(dbURL, "sslmode=") {
+		if strings.Contains(dbURL, "localhost") || strings.Contains(dbURL, "127.0.0.1") {
+			dbURL += "&sslmode=disable"
+		} else {
+			dbURL += "&sslmode=require"
+		}
 	}
 
-	// Configure connection pooling for performance and stability
-	db.SetMaxOpenConns(25)                 // Maximum number of open connections
-	db.SetMaxIdleConns(10)                 // Maximum number of idle connections in the pool
-	db.SetConnMaxLifetime(5 * time.Minute) // Maximum amount of time a connection may be reused
+	var db *sqlx.DB
+	var err error
 
-	// Verify connection is alive
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	maxRetries := 5
+	for attempt := 1; attempt <= maxRetries; attempt++ {
+		db, err = sqlx.Connect("pgx", dbURL)
+		if err == nil {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			err = db.PingContext(ctx)
+			cancel()
+			if err == nil {
+				break
+			}
+			db.Close()
+		}
 
-	if err := db.PingContext(ctx); err != nil {
-		return nil, fmt.Errorf("database ping failed: %w", err)
+		if attempt == maxRetries {
+			return nil, fmt.Errorf("database connection failed after %d attempts: %w", maxRetries, err)
+		}
+
+		wait := time.Duration(attempt) * 3 * time.Second
+		log.Printf("Database connection attempt %d/%d failed: %v. Retrying in %v...", attempt, maxRetries, err, wait)
+		time.Sleep(wait)
 	}
 
-	log.Println("Successfully connected to PostgreSQL database and configured pooling.")
+	// Configure connection pooling
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(10)
+	db.SetConnMaxLifetime(5 * time.Minute)
+
+	log.Println("Successfully connected to PostgreSQL database.")
 	return db, nil
 }

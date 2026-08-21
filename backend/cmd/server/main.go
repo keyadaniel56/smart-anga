@@ -20,16 +20,21 @@ import (
 func main() {
 	cfg := config.Load()
 
-	// Initialize PostgreSQL database connection pool
+	// Connect to PostgreSQL with retries; start server even if DB is down
 	db, err := database.ConnectDB()
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		log.Printf("WARNING: Database unavailable (%v). Running in degraded mode.", err)
 	}
-	defer db.Close()
 
-	s := store.New(db)
+	var s *store.Store
+	if db != nil {
+		defer db.Close()
+		s = store.New(db)
+	} else {
+		s = store.New(nil)
+	}
+
 	om := services.NewOpenMeteoService(cfg)
-
 	handler := router.NewRouter(cfg, s, om)
 
 	srv := &http.Server{
